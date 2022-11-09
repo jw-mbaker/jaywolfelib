@@ -39,10 +39,6 @@ class Hooks
 
 	public static function get_hook_manager(): EventEmitterInterface
 	{
-		if (!isset(container()['hooks'])) {
-			container()->set('hooks', new EventEmitter());
-		}
-
 		return container()->get('hooks');
 	}
 }

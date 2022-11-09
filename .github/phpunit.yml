@@ -1,0 +1,31 @@
+name: Unit Test
+
+on:
+  push:
+    branches:
+      - '*'
+
+jobs:
+  phpunit:
+    name: PHPUnit on PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php: ['7.4', '8.0', '8.1', '8.2']
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup PHP ${{ matrix.php }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: zlib, mbstring
+          tools: phpunit
+      
+      - name: Install dependencies
+        run: composer install
+      
+      - name: Run PHPUnit
+        run: phpunit

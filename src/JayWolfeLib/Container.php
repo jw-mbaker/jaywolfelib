@@ -3,6 +3,7 @@
 namespace JayWolfeLib;
 
 use JayWolfeLib\Exception\InvalidClass;
+use DownShift\WordPress\EventEmitter;
 
 class Container extends \Pimple\Container
 {
@@ -38,5 +39,22 @@ class Container extends \Pimple\Container
 		foreach ($this->keys() as $key) {
 			$this->offsetUnset($key);
 		}
+	}
+
+	/**
+	 * Bootstrap the global container.
+	 *
+	 * @param Container $container
+	 * @return void
+	 */
+	public static function bootstrap(Container $container)
+	{
+		$container->set('hooks', new EventEmitter());
+		$container->set('wpdb', function() {
+			global $wpdb;
+			return $wpdb;
+		});
+		$container->set('models', new Models\Factory(new self(), $container));
+		$container->set('controllers', new Controllers\Factory(new self()));
 	}
 }
