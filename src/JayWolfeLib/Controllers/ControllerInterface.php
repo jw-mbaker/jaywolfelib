@@ -8,5 +8,5 @@ namespace JayWolfeLib\Controllers;
  */
 interface ControllerInterface
 {
-	public function render(string $view_path);
+	public function render(string $view, string $plugin_file);
 }
