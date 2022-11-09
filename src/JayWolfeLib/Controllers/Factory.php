@@ -8,16 +8,30 @@ use JayWolfeLib\Container;
 
 class Factory implements ControllerFactoryInterface
 {
+	/**
+	 * The controller container.
+	 *
+	 * @var Container
+	 */
 	protected $controllerContainer;
+
+	/**
+	 * The main container.
+	 *
+	 * @var Container
+	 */
+	protected $mainContainer;
 
 	/**
 	 * Constructor.
 	 *
 	 * @param Container $controllerContainer
+	 * @param Container $mainContainer
 	 */
-	public function __construct(Container $controllerContainer)
+	public function __construct(Container $controllerContainer, Container $mainContainer)
 	{
 		$this->controllerContainer = $controllerContainer;
+		$this->mainContainer = $mainContainer;
 	}
 
 	/**
@@ -74,7 +88,13 @@ class Factory implements ControllerFactoryInterface
 			$this->throw_controller_not_implement_interface($controller);
 		}
 
-		$this->controllerContainer->init($key, $controller, ...$dependencies);
+		$this->controllerContainer->init(
+			$key,
+			$controller,
+			$this->mainContainer->get('input'),
+			$this->mainContainer->get('models'),
+			...$dependencies
+		);
 
 		return $this->controllerContainer[$key];
 	}

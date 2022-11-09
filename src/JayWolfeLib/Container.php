@@ -53,11 +53,12 @@ class Container extends \Pimple\Container
 			$container->set('hooks', new EventEmitter());
 		}
 
+		if (!isset($container['input'])) {
+			$container->set('input', new Input());
+		}
+
 		if (!isset($container['wpdb'])) {
-			$container->set('wpdb', function() {
-				global $wpdb;
-				return $wpdb;
-			});
+			$container->set('wpdb', $GLOBALS['wpdb']);
 		}
 
 		if (!isset($container['models'])) {
@@ -65,7 +66,7 @@ class Container extends \Pimple\Container
 		}
 		
 		if (!isset($container['controllers'])) {
-			$container->set('controllers', new Controllers\Factory(new self()));
+			$container->set('controllers', new Controllers\Factory(new self(), $container));
 		}
 	}
 }
