@@ -30,14 +30,14 @@ class FunctionsTest extends WP_Mock\Tools\TestCase
 		});
 
 		WP_Mock::onFilter('jwlib_array_path')
-			->with( dirname( __DIR__ ) . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'JayWolfeLib' )
+			->with( dirname( __DIR__ ) . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'JayWolfeLib', '' )
 			->reply(__DIR__);
 
 		$file = __DIR__ . '/test.php';
 
 		file_put_contents($file, "<?php return [1, 2, 3];");
 
-		$arr = fetch_array('test');
+		$arr = fetch_array('test', '');
 		unlink($file);
 
 		$this->assertEquals($arr, [1, 2, 3]);

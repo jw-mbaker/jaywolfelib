@@ -10,12 +10,12 @@ use JayWolfeLib\Hooks\Hooks;
  * @param string $file
  * @return array
  */
-function fetch_array(string $file): array
+function fetch_array(string $file, string $plugin_file): array
 {
 	/**
 	 * Filter the file path for the array directory.
 	 */
-	$file_path = Hooks::apply_filters('jwlib_array_path', __DIR__);
+	$file_path = Hooks::apply_filters('jwlib_array_path', __DIR__, $plugin_file);
 
 	$pathinfo = pathinfo($file);
 	if (!isset($pathinfo['extension']) || $pathinfo['extension'] !== 'php') {

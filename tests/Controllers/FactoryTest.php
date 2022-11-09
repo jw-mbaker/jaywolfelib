@@ -3,17 +3,24 @@
 namespace JayWolfeLib\Tests\Controllers;
 
 use JayWolfeLib\Container;
-use JayWolfeLib\Controllers\Factory;
+use JayWolfeLib\Controllers\Factory as ControllerFactory;
 use JayWolfeLib\Controllers\ControllerInterface;
+use JayWolfeLib\Models\Factory as ModelFactory;
+use JayWolfeLib\Input;
 use JayWolfeLib\Exception\InvalidController;
 use WP_Mock;
 use Mockery;
 
 class FactoryTest extends WP_Mock\Tools\TestCase
 {
+	private $mainContainer;
+
 	public function setUp(): void
 	{
 		WP_Mock::setUp();
+		$this->mainContainer = new Container();
+		$this->mainContainer->set('models', Mockery::mock(ModelFactory::class));
+		$this->mainContainer->set('input', Mockery::mock(Input::class));
 	}
 
 	public function tearDown(): void
@@ -26,7 +33,7 @@ class FactoryTest extends WP_Mock\Tools\TestCase
 	{
 		WP_Mock::passthruFunction('sanitize_key');
 
-		$factory = new Factory(new Container());
+		$factory = new ControllerFactory(new Container(), $this->mainContainer);
 
 		$mock = $factory->create(MockClass::class);
 
@@ -37,7 +44,7 @@ class FactoryTest extends WP_Mock\Tools\TestCase
 	{
 		WP_Mock::passthruFunction('sanitize_key');
 
-		$factory = new Factory(new Container());
+		$factory = new ControllerFactory(new Container(), $this->mainContainer);
 
 		$mock = $factory->create(MockClass::class);
 
@@ -48,7 +55,7 @@ class FactoryTest extends WP_Mock\Tools\TestCase
 	{
 		WP_Mock::passthruFunction('sanitize_key');
 
-		$factory = new Factory(new Container());
+		$factory = new ControllerFactory(new Container(), $this->mainContainer);
 
 		$mock = $factory->create(MockClass::class);
 
@@ -59,7 +66,7 @@ class FactoryTest extends WP_Mock\Tools\TestCase
 	{
 		WP_Mock::passthruFunction('sanitize_key');
 
-		$factory = new Factory(new Container());
+		$factory = new ControllerFactory(new Container(), $this->mainContainer);
 
 		$this->expectException(InvalidController::class);
 		$factory->get('\Test');

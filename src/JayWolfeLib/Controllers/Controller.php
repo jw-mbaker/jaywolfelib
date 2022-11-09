@@ -38,9 +38,9 @@ abstract class Controller implements ControllerInterface
 		$this->models = $models;
 	}
 
-	public function render(string $view)
+	public function render(string $view, string $plugin_file)
 	{
-		$views_path = Hooks::apply_filters('jwlib_views_path', '');
+		$views_path = Hooks::apply_filters('jwlib_views_path', '', $plugin_file);
 
 		if (empty($views_path)) {
 			throw new InvalidView('Views path not set.');
