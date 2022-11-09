@@ -19,6 +19,15 @@ abstract class Controller implements ControllerInterface
 	protected $models;
 
 	/**
+	 * The plugin views path.
+	 * This should be set by any
+	 * controller that extends this class.
+	 * 
+	 * @var string
+	 */
+	protected $views_path;
+
+	/**
 	 * Associative array of data which will be automatically
 	 * available as variables when template is rendered.
 	 *
@@ -38,19 +47,17 @@ abstract class Controller implements ControllerInterface
 		$this->models = $models;
 	}
 
-	public function render(string $view, string $plugin_file)
+	public function render(string $view)
 	{
-		$views_path = Hooks::apply_filters('jwlib_views_path', '', $plugin_file);
-
-		if (empty($views_path)) {
-			throw new InvalidView('Views path not set.');
+		if (null === $this->views_path) {
+			throw new InvalidView('The views path has not been set.');
 		}
 
 		if (!preg_match('/\.php/', $view)) {
 			$view .= '.php';
 		}
 
-		$file_path = trailingslashit($views_path) . $view;
+		$file_path = trailingslashit($this->views_path) . $view;
 
 		if (is_readable($file_path)) {
 			extract($this->data);

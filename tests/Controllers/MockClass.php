@@ -13,7 +13,7 @@ class MockClass implements ControllerInterface
 		$this->val = 1;
 	}
 
-	public function render(string $view, string $plugin_file)
+	public function render(string $view)
 	{
 
 	}
