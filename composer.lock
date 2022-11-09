@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "353e6ed2af2b11f15dbbf4efee66d39d",
+    "content-hash": "5695143d08ff327a63b2af8db2ec3192",
     "packages": [
         {
             "name": "downshiftorg/wp-event-emitter",
@@ -1091,12 +1091,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "01e248b486d7f4a144405c0a83c1a88f59989808"
+                "reference": "2854bdd8a1e8bd3831ee3622c6f0951684d08490"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/01e248b486d7f4a144405c0a83c1a88f59989808",
-                "reference": "01e248b486d7f4a144405c0a83c1a88f59989808",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/2854bdd8a1e8bd3831ee3622c6f0951684d08490",
+                "reference": "2854bdd8a1e8bd3831ee3622c6f0951684d08490",
                 "shasum": ""
             },
             "require": {
@@ -1185,7 +1185,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-11-08T13:59:34+00:00"
+            "time": "2022-11-09T08:31:26+00:00"
         },
         {
             "name": "sebastian/cli-parser",

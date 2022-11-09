@@ -94,8 +94,9 @@ function container(): Container
 
 	if (!$container) {
 		$container = new Container();
-		Container::bootstrap($container);
 	}
+
+	Container::bootstrap($container);
 
 	return $container;
 }

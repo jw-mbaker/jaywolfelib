@@ -2,15 +2,17 @@
 
 namespace JayWolfeLib\Tests\Hooks;
 
+use JayWolfeLib\Container;
 use JayWolfeLib\Hooks\Ajax;
 use DownShift\WordPress\EventEmitter;
 use DownShift\WordPress\EventEmitterInterface;
 use WP_Mock;
 
+use function JayWolfeLib\container;
+
 class AjaxTest extends WP_Mock\Tools\TestCase
 {
 	private $ajaxCallback;
-	private $container;
 
 	public function setUp(): void
 	{
@@ -22,6 +24,7 @@ class AjaxTest extends WP_Mock\Tools\TestCase
 	public function tearDown(): void
 	{
 		WP_Mock::tearDown();
+		container()->flush();
 	}
 
 	public function testCanAddAjax(): void

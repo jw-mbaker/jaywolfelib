@@ -49,12 +49,23 @@ class Container extends \Pimple\Container
 	 */
 	public static function bootstrap(Container $container)
 	{
-		$container->set('hooks', new EventEmitter());
-		$container->set('wpdb', function() {
-			global $wpdb;
-			return $wpdb;
-		});
-		$container->set('models', new Models\Factory(new self(), $container));
-		$container->set('controllers', new Controllers\Factory(new self()));
+		if (!isset($container['hooks'])) {
+			$container->set('hooks', new EventEmitter());
+		}
+
+		if (!isset($container['wpdb'])) {
+			$container->set('wpdb', function() {
+				global $wpdb;
+				return $wpdb;
+			});
+		}
+
+		if (!isset($container['models'])) {
+			$container->set('models', new Models\Factory(new self(), $container));
+		}
+		
+		if (!isset($container['controllers'])) {
+			$container->set('controllers', new Controllers\Factory(new self()));
+		}
 	}
 }

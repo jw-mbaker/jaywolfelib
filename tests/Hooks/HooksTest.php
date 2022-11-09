@@ -2,9 +2,12 @@
 
 namespace JayWolfeLib\Tests\Hooks;
 
+use JayWolfeLib\Container;
 use JayWolfeLib\Hooks\Hooks;
 use DownShift\WordPress\EventEmitterInterface;
 use WP_Mock;
+
+use function JayWolfeLib\container;
 
 class HooksTest extends WP_Mock\Tools\TestCase
 {
@@ -24,6 +27,7 @@ class HooksTest extends WP_Mock\Tools\TestCase
 	public function tearDown(): void
 	{
 		WP_Mock::tearDown();
+		container()->flush();
 	}
 
 	public function testCanAddAction(): void

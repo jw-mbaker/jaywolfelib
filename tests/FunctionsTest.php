@@ -2,6 +2,7 @@
 
 namespace JayWolfeLib\Tests;
 
+use JayWolfeLib\Container;
 use JayWolfeLib\Hooks\Hooks;
 use WP_Mock;
 
@@ -19,6 +20,7 @@ class FunctionsTest extends WP_Mock\Tools\TestCase
 	public function tearDown(): void
 	{
 		WP_Mock::tearDown();
+		container()->flush();
 	}
 
 	public function testFetchArray(): void

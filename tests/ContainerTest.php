@@ -7,8 +7,12 @@ use DownShift\WordPress\EventEmitterInterface;
 use WP_Mock;
 use Mockery;
 
+use function JayWolfeLib\container;
+
 class ContainerTest extends WP_Mock\Tools\TestCase
 {
+	private $container;
+
 	public function setUp(): void
 	{
 		WP_Mock::setUp();
@@ -18,6 +22,7 @@ class ContainerTest extends WP_Mock\Tools\TestCase
 	{
 		WP_Mock::tearDown();
 		Mockery::close();
+		container()->flush();
 	}
 
 	public function testCanAddToContainer(): void
@@ -48,6 +53,23 @@ class ContainerTest extends WP_Mock\Tools\TestCase
 		$this->assertEquals($container->get('mock')->val, 1);
 	}
 
+	public function testCanBootstrapContainer(): void
+	{
+		global $wpdb;
+
+		$wpdb = Mockery::mock('\WPDB');
+		$container = new Container();
+
+		Container::bootstrap($container);
+
+		$this->assertInstanceOf(EventEmitterInterface::class, $container->get('hooks'));
+		$this->assertSame($container->get('wpdb'), $wpdb);
+		$this->assertInstanceOf(\JayWolfeLib\Models\Factory::class, $container->get('models'));
+		$this->assertInstanceOf(\JayWolfeLib\Controllers\Factory::class, $container->get('controllers'));
+
+		Mockery::close();
+	}
+
 	public function testCanEmptyContainer(): void
 	{
 		$container = new Container();
@@ -61,14 +83,24 @@ class ContainerTest extends WP_Mock\Tools\TestCase
 		$container->get('test');
 	}
 
-	public function testCanBootstrapContainer(): void
+	public function testCanEmptyAndBootstrapGlobalContainer(): void
 	{
 		global $wpdb;
 
 		$wpdb = Mockery::mock('\WPDB');
-		$container = new Container();
 
-		Container::bootstrap($container);
+		$container = container();
+
+		$this->assertInstanceOf(EventEmitterInterface::class, $container->get('hooks'));
+		$this->assertSame($container->get('wpdb'), $wpdb);
+		$this->assertInstanceOf(\JayWolfeLib\Models\Factory::class, $container->get('models'));
+		$this->assertInstanceOf(\JayWolfeLib\Controllers\Factory::class, $container->get('controllers'));
+
+		$container->flush();
+
+		$this->assertTrue(!isset($container['hooks']));
+
+		$container = container();
 
 		$this->assertInstanceOf(EventEmitterInterface::class, $container->get('hooks'));
 		$this->assertSame($container->get('wpdb'), $wpdb);
