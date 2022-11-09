@@ -44,7 +44,7 @@ function fetch_array(string $file, string $plugin_file): array
  */
 function fragment_cache(string $key, int $ttl, callable $callback, array $args = [])
 {
-	$key = Hook::apply_filters('fragment_cache_prefix', 'fragment_cache_') . $key;
+	$key = Hooks::apply_filters('fragment_cache_prefix', 'fragment_cache_') . $key;
 	$output = get_transient($key);
 
 	$clear_fragments = false;
@@ -68,7 +68,7 @@ function fragment_cache(string $key, int $ttl, callable $callback, array $args =
  */
 function delete_fragment_cache(string $key)
 {
-	$key = Hook::apply_filters('fragment_cache_prefix', 'fragment_cache_') . $key;
+	$key = Hooks::apply_filters('fragment_cache_prefix', 'fragment_cache_') . $key;
 	delete_transient($key);
 }
 
