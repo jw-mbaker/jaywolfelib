@@ -58,7 +58,10 @@ class Container extends \Pimple\Container
 		}
 
 		if (!isset($container['wpdb'])) {
-			$container->set('wpdb', $GLOBALS['wpdb']);
+			$container->set('wpdb', function(Container $c) {
+				global $wpdb;
+				return $wpdb;
+			});
 		}
 
 		if (!isset($container['models'])) {
