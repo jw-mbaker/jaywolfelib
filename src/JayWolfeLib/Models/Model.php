@@ -51,6 +51,8 @@ abstract class Model implements ModelInterface
 	 */
 	protected function saveData(array $data, ?int $id = NULL)
 	{	
+		$data['date_updated'] = current_time('mysql');
+
 		if ($id) {
 			$this->wpdb->update(
 				$this->table,
