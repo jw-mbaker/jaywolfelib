@@ -2,10 +2,14 @@
 
 namespace JayWolfeLib\Controllers;
 
+use JayWolfeLib\Container;
 use JayWolfeLib\Input;
+use JayWolfeLib\Config\ConfigInterface;
 use JayWolfeLib\Factory\ModelFactoryInterface;
 use JayWolfeLib\Hooks\Hooks;
 use JayWolfeLib\Exception\InvalidView;
+
+use function JayWolfeLib\container;
 
 /**
  * The controller base class.
@@ -19,13 +23,11 @@ abstract class Controller implements ControllerInterface
 	protected $models;
 
 	/**
-	 * The plugin views path.
-	 * This should be set by any
-	 * controller that extends this class.
-	 * 
-	 * @var string
+	 * The config.
+	 *
+	 * @var ConfigInterface
 	 */
-	protected $views_path;
+	protected $config;
 
 	/**
 	 * Associative array of data which will be automatically
@@ -40,24 +42,28 @@ abstract class Controller implements ControllerInterface
 	 *
 	 * @param Input $input
 	 * @param ModelFactoryInterface $models
+	 * @param string $plugin_file
 	 */
-	public function __construct(Input $input, ModelFactoryInterface $models)
+	public function __construct(Input $input, ModelFactoryInterface $models, ConfigInterface $config)
 	{
 		$this->input = $input;
 		$this->models = $models;
+		$this->config = $config;
 	}
 
 	public function render(string $view)
 	{
-		if (null === $this->views_path) {
-			throw new InvalidView('The views path has not been set.');
+		if (null === $this->config->get('views_path')) {
+			throw new InvalidView("Views path not set for " . plugin_basename($this->plugin_file) . ".");
 		}
+
+		$views_path = $this->config->get('views_path');
 
 		if (!preg_match('/\.php/', $view)) {
 			$view .= '.php';
 		}
 
-		$file_path = trailingslashit($this->views_path) . $view;
+		$file_path = trailingslashit($views_path) . $view;
 
 		if (is_readable($file_path)) {
 			extract($this->data);

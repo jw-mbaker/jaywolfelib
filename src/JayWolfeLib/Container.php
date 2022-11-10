@@ -57,6 +57,10 @@ class Container extends \Pimple\Container
 			$container->set('input', new Input());
 		}
 
+		if (!isset($container['config'])) {
+			$container->set('config', new Config\Factory(new self(), $container));
+		}
+
 		if (!isset($container['wpdb'])) {
 			$container->set('wpdb', function(Container $c) {
 				global $wpdb;

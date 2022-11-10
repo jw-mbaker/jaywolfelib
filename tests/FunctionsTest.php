@@ -25,11 +25,18 @@ class FunctionsTest extends WP_Mock\Tools\TestCase
 
 	public function testFetchArray(): void
 	{
+		WP_Mock::passthruFunction('plugin_basename');
+		WP_Mock::alias('trailingslashit', function($str) {
+			return rtrim($str, '/\\') . '/';
+		});
+
 		$file = __DIR__ . '/test.php';
 
 		file_put_contents($file, "<?php return [1, 2, 3];");
 
-		$arr = fetch_array(__DIR__ . '/test');
+		container()->get('config')->get(__FILE__)->set('array_path', __DIR__);
+
+		$arr = fetch_array('test', __FILE__);
 		unlink($file);
 
 		$this->assertEquals($arr, [1, 2, 3]);

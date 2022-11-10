@@ -64,6 +64,7 @@ class ContainerTest extends WP_Mock\Tools\TestCase
 
 		$this->assertInstanceOf(EventEmitterInterface::class, $container->get('hooks'));
 		$this->assertInstanceOf(Input::class, $container->get('input'));
+		$this->assertInstanceOf(\JayWolfeLib\Config\Factory::class, $container->get('config'));
 		$this->assertSame($container->get('wpdb'), $wpdb);
 		$this->assertInstanceOf(\JayWolfeLib\Models\Factory::class, $container->get('models'));
 		$this->assertInstanceOf(\JayWolfeLib\Controllers\Factory::class, $container->get('controllers'));
@@ -94,6 +95,7 @@ class ContainerTest extends WP_Mock\Tools\TestCase
 
 		$this->assertInstanceOf(EventEmitterInterface::class, $container->get('hooks'));
 		$this->assertInstanceOf(Input::class, $container->get('input'));
+		$this->assertInstanceOf(\JayWolfeLib\Config\Factory::class, $container->get('config'));
 		$this->assertSame($container->get('wpdb'), $wpdb);
 		$this->assertInstanceOf(\JayWolfeLib\Models\Factory::class, $container->get('models'));
 		$this->assertInstanceOf(\JayWolfeLib\Controllers\Factory::class, $container->get('controllers'));
@@ -106,6 +108,7 @@ class ContainerTest extends WP_Mock\Tools\TestCase
 
 		$this->assertInstanceOf(EventEmitterInterface::class, $container->get('hooks'));
 		$this->assertInstanceOf(Input::class, $container->get('input'));
+		$this->assertInstanceOf(\JayWolfeLib\Config\Factory::class, $container->get('config'));
 		$this->assertSame($container->get('wpdb'), $wpdb);
 		$this->assertInstanceOf(\JayWolfeLib\Models\Factory::class, $container->get('models'));
 		$this->assertInstanceOf(\JayWolfeLib\Controllers\Factory::class, $container->get('controllers'));

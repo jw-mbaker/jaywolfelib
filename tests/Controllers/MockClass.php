@@ -2,19 +2,14 @@
 
 namespace JayWolfeLib\Tests\Controllers;
 
-use JayWolfeLib\Controllers\ControllerInterface;
+use JayWolfeLib\Controllers\Controller;
 
-class MockClass implements ControllerInterface
+class MockClass extends Controller
 {
 	public $val;
 
 	public function init(): void
 	{
 		$this->val = 1;
-	}
-
-	public function render(string $view)
-	{
-
 	}
 }

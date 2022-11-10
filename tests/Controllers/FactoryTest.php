@@ -6,6 +6,7 @@ use JayWolfeLib\Container;
 use JayWolfeLib\Controllers\Factory as ControllerFactory;
 use JayWolfeLib\Controllers\ControllerInterface;
 use JayWolfeLib\Models\Factory as ModelFactory;
+use JayWolfeLib\Config\Config;
 use JayWolfeLib\Input;
 use JayWolfeLib\Exception\InvalidController;
 use WP_Mock;
@@ -35,7 +36,7 @@ class FactoryTest extends WP_Mock\Tools\TestCase
 
 		$factory = new ControllerFactory(new Container(), $this->mainContainer);
 
-		$mock = $factory->create(MockClass::class);
+		$mock = $factory->create(MockClass::class, [Mockery::mock(Config::class)]);
 
 		$this->assertInstanceOf(MockClass::class, $mock);
 	}
@@ -46,7 +47,7 @@ class FactoryTest extends WP_Mock\Tools\TestCase
 
 		$factory = new ControllerFactory(new Container(), $this->mainContainer);
 
-		$mock = $factory->create(MockClass::class);
+		$mock = $factory->create(MockClass::class, [Mockery::mock(Config::class)]);
 
 		$this->assertSame($mock, $factory->get(MockClass::class));
 	}
@@ -57,7 +58,7 @@ class FactoryTest extends WP_Mock\Tools\TestCase
 
 		$factory = new ControllerFactory(new Container(), $this->mainContainer);
 
-		$mock = $factory->create(MockClass::class);
+		$mock = $factory->create(MockClass::class, [Mockery::mock(Config::class)]);
 
 		$this->assertEquals($mock->val, 1);
 	}

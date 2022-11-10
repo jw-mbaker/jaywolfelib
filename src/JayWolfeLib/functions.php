@@ -10,16 +10,24 @@ use JayWolfeLib\Hooks\Hooks;
  * @param string $file
  * @return array
  */
-function fetch_array(string $file): array
+function fetch_array(string $file, string $plugin_file): array
 {
+	$config = container()->get('config')->get($plugin_file);
+
+	if (null === $config->get('array_path')) {
+		throw new \Exception("Array path not set for " . plugin_basename($plugin_file) . ".");
+	}
+
 	$pathinfo = pathinfo($file);
 	if (!isset($pathinfo['extension']) || $pathinfo['extension'] !== 'php') {
 		$file .= '.php';
 	}
 
+	$dir = trailingslashit( $config->get('array_path') );
+
 	$arr = [];
-	if (is_readable($file)) {
-		$arr = include $file;
+	if (is_readable($dir . $file)) {
+		$arr = include $dir . $file;
 	}
 
 	if (@!is_array($arr)) {
