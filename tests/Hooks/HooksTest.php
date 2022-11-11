@@ -46,6 +46,11 @@ class HooksTest extends WP_Mock\Tools\TestCase
 		$this->assertInstanceOf(EventEmitterInterface::class, $ret);
 	}
 
+	/**
+	 * @depends testCanAddAction
+	 *
+	 * @return void
+	 */
 	public function testCanDoAction(): void
 	{
 		WP_Mock::expectAction('test_action', 'test');
@@ -54,11 +59,56 @@ class HooksTest extends WP_Mock\Tools\TestCase
 		$this->assertInstanceOf(EventEmitterInterface::class, $ret);
 	}
 
+	/**
+	 * @depends testCanAddFilter
+	 *
+	 * @return void
+	 */
 	public function testCanApplyFilters(): void
 	{
 		WP_Mock::expectFilter('test_filter', 'test');
 		$ret = Hooks::apply_filters('test_filter', 'test');
 
 		$this->assertEquals($ret, 'test');
+	}
+
+	/**
+	 * @depends testCanAddAction
+	 *
+	 * @return void
+	 */
+	public function testHasAction(): void
+	{
+		$actions = ['test_action'];
+
+		WP_Mock::alias('has_action', function(string $hook) use ($actions) {
+			return in_array($hook, $actions);
+		});
+
+		$ret = Hooks::has_action('test_action');
+		$this->assertTrue($ret);
+
+		$ret = Hooks::has_action('123');
+		$this->assertFalse($ret);
+	}
+
+	/**
+	 * @depends testCanAddFilter
+	 *
+	 * @return void
+	 */
+	public function testHasFilter(): void
+	{
+		$filters = ['test_filter'];
+
+		WP_Mock::alias('has_filter', function(string $hook) use ($filters) {
+			return in_array($hook, $filters);
+		});
+
+		$ret = Hooks::has_filter('test_filter');
+		$this->assertTrue($ret);
+
+		$ret = Hooks::has_filter('123');
+		$this->assertFalse($ret);
 	}
 }

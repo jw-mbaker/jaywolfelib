@@ -10,4 +10,9 @@ class Ajax extends Hooks
 	{
 		return self::add_action("wp_ajax_{$hook}", $callback);
 	}
+
+	public static function has_ajax(string $hook): bool
+	{
+		return self::has_action("wp_ajax_{$hook}");
+	}
 }

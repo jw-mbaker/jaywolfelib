@@ -44,4 +44,19 @@ class AjaxTest extends WP_Mock\Tools\TestCase
 
 		$this->assertInstanceOf(EventEmitterInterface::class, $ret);
 	}
+
+	public function testHasAjax(): void
+	{
+		$ajax = ['wp_ajax_test_ajax'];
+
+		WP_Mock::alias('has_action', function(string $hook) use ($ajax) {
+			return in_array($hook, $ajax);
+		});
+
+		$ret = Ajax::has_ajax('test_ajax');
+		$this->assertTrue($ret);
+
+		$ret = Ajax::has_ajax('123');
+		$this->assertFalse($ret);
+	}
 }

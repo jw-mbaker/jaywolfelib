@@ -37,6 +37,16 @@ class Hooks
 		return self::get_hook_manager()->applyFilters($hook, ...$args);
 	}
 
+	public static function has_action(string $hook, $callback = false): bool
+	{
+		return self::get_hook_manager()->hasEventListener($hook, $callback);
+	}
+
+	public static function has_filter(string $hook, $callback = false): bool
+	{
+		return self::get_hook_manager()->hasFilter($hook, $callback);
+	}
+
 	public static function get_hook_manager(): EventEmitterInterface
 	{
 		return container()->get('hooks');
