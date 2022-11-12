@@ -42,7 +42,7 @@ abstract class Controller implements ControllerInterface
 	 *
 	 * @param Input $input
 	 * @param ModelFactoryInterface $models
-	 * @param string $plugin_file
+	 * @param ConfigInterface $config
 	 */
 	public function __construct(Input $input, ModelFactoryInterface $models, ConfigInterface $config)
 	{
@@ -51,10 +51,18 @@ abstract class Controller implements ControllerInterface
 		$this->config = $config;
 	}
 
+	/**
+	 * Render a view from the path specified
+	 * in the views_path config setting.
+	 *
+	 * @param string $view
+	 * @return void
+	 * @throws InvalidView
+	 */
 	public function render(string $view)
 	{
 		if (null === $this->config->get('views_path')) {
-			throw new InvalidView("Views path not set for " . plugin_basename($this->plugin_file) . ".");
+			throw new InvalidView("Views path not set for " . plugin_basename($this->config->get('plugin_file')) . ".");
 		}
 
 		$views_path = $this->config->get('views_path');
