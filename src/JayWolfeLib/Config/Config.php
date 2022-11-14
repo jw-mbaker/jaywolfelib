@@ -2,15 +2,10 @@
 
 namespace JayWolfeLib\Config;
 
+use JayWolfeLib\Includes\Dependencies;
+
 class Config implements ConfigInterface
 {
-	/**
-	 * The plugin file.
-	 *
-	 * @var string
-	 */
-	protected $plugin_file;
-
 	/**
 	 * An associative array of configuation settings.
 	 *
@@ -19,13 +14,16 @@ class Config implements ConfigInterface
 	protected $config = [];
 
 	/**
-	 * Constructor.
+	 * The Dependencies object.
 	 *
-	 * @param string $plugin_file
+	 * @var Dependencies
 	 */
-	public function __construct(string $plugin_file)
+	protected $dependencies;
+
+	public function __construct(array $settings, Dependencies $dependencies)
 	{
-		$this->plugin_file = $this->config['plugin_file'] = $plugin_file;
+		$this->config = $settings;
+		$this->dependencies = $dependencies;
 	}
 
 	/**
@@ -62,6 +60,16 @@ class Config implements ConfigInterface
 	}
 
 	/**
+	 * Check if plugin requirements are met.
+	 *
+	 * @return bool
+	 */
+	public function requirements_met(): bool
+	{
+		return $this->dependencies->requirements_met();
+	}
+
+	/**
 	 * Delete a config setting.
 	 *
 	 * @param string $key
@@ -84,5 +92,10 @@ class Config implements ConfigInterface
 	public function get_config(): array
 	{
 		return $this->config;
+	}
+
+	public function get_dependencies(): Dependencies
+	{
+		return $this->dependencies;
 	}
 }

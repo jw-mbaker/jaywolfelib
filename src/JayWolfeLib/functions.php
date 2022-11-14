@@ -107,6 +107,12 @@ function container(): Container
 	return $container;
 }
 
+/**
+ * Recursively delete a directory and its contents.
+ *
+ * @param string $dir The directory to delete.
+ * @return void
+ */
 function rrmdir(string $dir): void
 {
 	if (is_dir($dir)) {
