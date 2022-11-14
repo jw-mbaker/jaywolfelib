@@ -70,6 +70,16 @@ class Config implements ConfigInterface
 	}
 
 	/**
+	 * Get the dependency errors.
+	 *
+	 * @return array
+	 */
+	public function get_errors(): array
+	{
+		return $this->dependencies->get_errors();
+	}
+
+	/**
 	 * Delete a config setting.
 	 *
 	 * @param string $key

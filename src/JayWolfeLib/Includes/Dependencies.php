@@ -11,6 +11,13 @@ class Dependencies
 	 */
 	private $dependencies = [];
 
+	/**
+	 * An array of errors.
+	 *
+	 * @var array
+	 */
+	private $errors = [];
+
 	public function __construct(array $dependencies)
 	{
 		$this->dependencies = $dependencies;
@@ -35,6 +42,16 @@ class Dependencies
 		return $requirements_met;
 	}
 
+	/**
+	 * Get the errors.
+	 *
+	 * @return array
+	 */
+	public function get_errors(): array
+	{
+		return $this->errors;
+	}
+
 	private function is_php_version_dependency_met(): bool
 	{
 		if (!isset($this->dependencies['min_php_version'])) {
@@ -44,6 +61,11 @@ class Dependencies
 		if ( 1 == version_compare( PHP_VERSION, $this->dependencies['min_php_version'], '>=' ) ) {
 			return true;
 		}
+
+		$this->add_error_notice(
+			"PHP {$this->dependencies['min_php_version']} is required.",
+			"You're running version " . PHP_VERSION
+		);
 
 		return false;
 	}
@@ -60,6 +82,11 @@ class Dependencies
 			return true;
 		}
 
+		$this->add_error_notice(
+			"WordPress {$this->dependencies['min_wp_version']} is required.",
+			"You're running version $wp_version"
+		);
+
 		return false;
 	}
 
@@ -67,7 +94,16 @@ class Dependencies
 	{
 		require_once ABSPATH . 'wp-admin/includes/plugin.php';
 
-		return is_plugin_active( $plugin_slug );
+		if (is_plugin_active($slug)) {
+			return true;
+		}
+
+		$this->add_error_notice(
+			"$slug is a required plugin.",
+			"$slug needs to be installed and activated."
+		);
+
+		return false;
 	}
 
 	private function are_required_plugins_dependency_met(): bool
@@ -87,5 +123,13 @@ class Dependencies
 		}
 
 		return $plugin_dependency_met;
+	}
+
+	private function add_error_notice(string $message, string $info)
+	{
+		$this->errors[] = (object) [
+			'error_message' => $message,
+			'info' => $info
+		];
 	}
 }
