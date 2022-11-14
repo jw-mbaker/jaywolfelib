@@ -106,11 +106,11 @@ class Router
 		return $this;
 	}
 
-	public function with_dependency($dependency, string $key): self
+	public function with_dependency($dependency): self
 	{
 		if (isset(static::$components[$this->route_type_to_register][$this->current_controller]['controller'])) {
 			static::$components[$this->route_type_to_register][$this->current_controller]['dependencies'] ??= [];
-			static::$components[$this->route_type_to_register][$this->current_controller]['dependencies'][$key] = $dependency;
+			static::$components[$this->route_type_to_register][$this->current_controller]['dependencies'][] = $dependency;
 		}
 
 		return $this;
@@ -198,7 +198,7 @@ class Router
 		$view ??= new View($this->config);
 
 		if (isset($component['dependencies'])) {
-			foreach ($component['dependencies'] as $key => $dependency) {
+			foreach ($component['dependencies'] as $dependency) {
 				if (is_callable($dependency)) {
 					$dependency = call_user_func($dependency);
 				}
