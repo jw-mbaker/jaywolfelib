@@ -20,5 +20,5 @@ class RouteType
 
 	public const LATE_FRONTEND = 'late_frontend';
 
-	const LATE_FRONTEND_WITH_POSSIBLE_AJAX = 'late_frontend_with_possible_ajax';
+	public const LATE_FRONTEND_WITH_POSSIBLE_AJAX = 'late_frontend_with_possible_ajax';
 }

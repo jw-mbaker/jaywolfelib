@@ -3,6 +3,8 @@
 namespace JayWolfeLib\Controllers;
 
 use JayWolfeLib\Factory\ControllerFactoryInterface;
+use JayWolfeLib\Views\ViewInterface;
+use JayWolfeLib\Views\View;
 use JayWolfeLib\Exception\InvalidController;
 use JayWolfeLib\Container;
 
@@ -39,11 +41,11 @@ class Factory implements ControllerFactoryInterface
 	 * Instantiates it if it does not exist.
 	 *
 	 * @param string $controller
-	 * @param array $dependencies
+	 * @param ViewInterface|null $view
 	 * @return ControllerInterface
 	 * @throws InvalidController
 	 */
-	public function get(string $controller, array $dependencies = []): ControllerInterface
+	public function get(string $controller, ?ViewInterface $view = null, ...$dependencies): ControllerInterface
 	{
 		if (!class_exists($controller)) {
 			$this->throw_controller_not_found($controller);
@@ -57,7 +59,7 @@ class Factory implements ControllerFactoryInterface
 				$this->throw_controller_not_implement_interface($controller);
 			}
 
-			return $this->create($controller, $dependencies);
+			return $this->create($controller, $view, ...$dependencies);
 		}
 
 		return $this->controllerContainer[$key];
@@ -67,11 +69,12 @@ class Factory implements ControllerFactoryInterface
 	 * Instantiate a controller and trigger its init method.
 	 *
 	 * @param string $controller
-	 * @param array $dependencies
+	 * @param ViewInterface|null $view
+	 * @param mixed $dependencies
 	 * @return ControllerInterface
 	 * @throws InvalidController
 	 */
-	public function create(string $controller, array $dependencies = []): ControllerInterface
+	public function create(string $controller, ViewInterface $view, ...$dependencies): ControllerInterface
 	{
 		if (!class_exists($controller)) {
 			$this->throw_controller_not_found($controller);
@@ -93,6 +96,7 @@ class Factory implements ControllerFactoryInterface
 			$controller,
 			$this->mainContainer->get('input'),
 			$this->mainContainer->get('models'),
+			$view,
 			...$dependencies
 		);
 
