@@ -8,5 +8,4 @@ namespace JayWolfeLib\Controllers;
  */
 interface ControllerInterface
 {
-	public function render(string $view);
 }

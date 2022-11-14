@@ -14,7 +14,7 @@ function fetch_array(string $file, string $plugin_file): array
 {
 	$config = container()->get('config')->get($plugin_file);
 
-	if (null === $config->get('array_path')) {
+	if (null === $config->get('paths')['arrays']) {
 		throw new \Exception("Array path not set for " . plugin_basename($plugin_file) . ".");
 	}
 
@@ -23,7 +23,7 @@ function fetch_array(string $file, string $plugin_file): array
 		$file .= '.php';
 	}
 
-	$dir = trailingslashit( $config->get('array_path') );
+	$dir = trailingslashit( $config->get('paths')['arrays'] );
 
 	$arr = [];
 	if (is_readable($dir . $file)) {

@@ -3,6 +3,7 @@
 namespace JayWolfeLib\Factory;
 
 use JayWolfeLib\Controllers\ControllerInterface;
+use JayWolfeLib\Views\ViewInterface;
 
 interface ControllerFactoryInterface extends BaseFactoryInterface
 {
@@ -11,8 +12,9 @@ interface ControllerFactoryInterface extends BaseFactoryInterface
 	 * Instantiates it if it does not exist.
 	 *
 	 * @param string $controller
-	 * @param array $dependencies
+	 * @param ViewInterface|null $view
+	 * @param mixed $dependencies
 	 * @return ControllerInterface
 	 */
-	public function get(string $controller, array $dependencies = []): ControllerInterface;
+	public function get(string $controller, ?ViewInterface $view = null, ...$dependencies): ControllerInterface;
 }

@@ -22,9 +22,12 @@ class FactoryTest extends WP_Mock\Tools\TestCase
 	public function testCanCreateConfigInstance(): void
 	{
 		WP_Mock::passthruFunction('plugin_basename');
+
 		$factory = new Factory(new Container(), new Container());
 
-		$config = $factory->get(__FILE__);
+		$config_file = __DIR__ . '/config.php';
+
+		$config = $factory->set($config_file);
 
 		$this->assertInstanceOf(ConfigInterface::class, $config);
 	}

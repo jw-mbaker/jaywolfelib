@@ -189,13 +189,13 @@ class Router
 			if (is_callable($component['view'])) {
 				$component['view'] = call_user_func($component['view']);
 			}
+
+			if (class_exists($component['view'])) {
+				$view = new $component['view']($this->config);
+			}
 		}
 
-		if (class_exists($component['view'])) {
-			$view = new $component['view']($this->config);
-		} else {
-			$view = new View($this->config);
-		}
+		$view ??= new View($this->config);
 
 		if (isset($component['dependencies'])) {
 			foreach ($component['dependencies'] as $key => $dependency) {
@@ -239,5 +239,10 @@ class Router
 			case RouteType::LATE_FRONTEND_WITH_POSSIBLE_AJAX:
 				return $this->is_request(RouteType::FRONTEND) || ( current_action() == 'wp' ) || ( did_action('wp') === 1 );
 		}
+	}
+
+	public static function get_components(): array
+	{
+		return static::$components;
 	}
 }
