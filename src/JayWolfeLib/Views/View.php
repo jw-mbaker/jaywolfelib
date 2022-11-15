@@ -24,7 +24,7 @@ class View implements ViewInterface
 	{
 		extract($args);
 
-		$located = $this->locate_tempate($template, $template_path);
+		$located = $this->locate_template($template, $template_path);
 
 		if (null === $located) return;
 
