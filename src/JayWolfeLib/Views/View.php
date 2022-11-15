@@ -22,7 +22,7 @@ class View implements ViewInterface
 
 	public function render(string $_template, array $_args = [], ?string $_template_path = null)
 	{
-		extract($args);
+		extract($_args);
 
 		$located = $this->locate_template($_template, $_template_path);
 
