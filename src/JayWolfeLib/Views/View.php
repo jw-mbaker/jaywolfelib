@@ -20,18 +20,18 @@ class View implements ViewInterface
 		$this->config = $config;
 	}
 
-	public function render(string $template, array $args = [], ?string $template_path = null)
+	public function render(string $_template, array $_args = [], ?string $_template_path = null)
 	{
 		extract($args);
 
-		$located = $this->locate_template($template, $template_path);
+		$located = $this->locate_template($_template, $_template_path);
 
 		if (null === $located) return;
 
 		ob_start();
-		Hooks::do_action('jwlib_before_template_render', $template, $template_path, $located, $args);
+		Hooks::do_action('jwlib_before_template_render', $_template, $_template_path, $located, $_args);
 		include $located;
-		Hooks::do_action('jwlib_after_template_render', $template, $template_path, $located, $args);
+		Hooks::do_action('jwlib_after_template_render', $_template, $_template_path, $located, $_args);
 
 		echo ob_get_clean();
 	}
