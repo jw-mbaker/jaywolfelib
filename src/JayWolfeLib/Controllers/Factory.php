@@ -69,7 +69,7 @@ class Factory implements ControllerFactoryInterface
 	 * Instantiate a controller and trigger its init method.
 	 *
 	 * @param string $controller
-	 * @param ViewInterface|null $view
+	 * @param ViewInterface $view
 	 * @param mixed $dependencies
 	 * @return ControllerInterface
 	 * @throws InvalidController
@@ -94,8 +94,6 @@ class Factory implements ControllerFactoryInterface
 		$this->controllerContainer->init(
 			$key,
 			$controller,
-			$this->mainContainer->get('input'),
-			$this->mainContainer->get('models'),
 			$view,
 			...$dependencies
 		);

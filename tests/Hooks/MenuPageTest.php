@@ -1,0 +1,71 @@
+<?php
+
+namespace JayWolfeLib\Tests\Hooks;
+
+use JayWolfeLib\Input;
+use JayWolfeLib\Hooks\MenuPage;
+use JayWolfeLib\Hooks\Handler;
+use WP_Mock;
+use Mockery;
+
+use function JayWolfeLib\container;
+
+class MenuPageTest extends WP_Mock\Tools\TestCase
+{
+	public function setUp(): void
+	{
+		WP_Mock::setUp();
+		WP_Mock::userFunction('add_menu_page', ['return' => '']);
+		WP_Mock::userFunction('add_submenu_page', ['return' => '']);
+		container(false)->set('input', Mockery::mock(Input::class));
+	}
+
+	public function tearDown(): void
+	{
+		WP_Mock::tearDown();
+		container()->flush();
+		Mockery::close();
+	}
+
+	public function testAddMenuPageReturnsHandler(): void
+	{
+		$handler = MenuPage::add_menu_page(
+			'test',
+			'test',
+			'test',
+			'test',
+			function() {
+				echo 'test';
+			}
+		);
+
+		$this->assertInstanceOf(Handler::class, $handler);
+	}
+
+	public function testAddMenuPageCanInvokeCallback(): void
+	{
+		$_GET['test'] = 1;
+
+		$input = container(false)->get('input');
+
+		$input->expects()->get('test')->andReturn($_GET['test']);
+
+		$callback = function (Input $input, $foo, $bar) {
+			$this->assertEquals($input->get('test'), 1);
+			$this->assertEquals($foo, 'foo');
+			$this->assertEquals($bar, 'bar');
+		};
+
+		$handler = MenuPage::add_menu_page(
+			'test',
+			'test',
+			'test',
+			'test',
+			$callback
+		)
+			->with('foo')
+			->with('bar');
+
+		call_user_func($handler);
+	}
+}

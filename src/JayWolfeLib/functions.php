@@ -94,7 +94,7 @@ function validate_bool($var): ?bool
  *
  * @return Container
  */
-function container(): Container
+function container(bool $bootstrap = true): Container
 {
 	static $container;
 
@@ -102,7 +102,9 @@ function container(): Container
 		$container = new Container();
 	}
 
-	Container::bootstrap($container);
+	if ($bootstrap) {
+		Container::bootstrap($container);
+	}
 
 	return $container;
 }

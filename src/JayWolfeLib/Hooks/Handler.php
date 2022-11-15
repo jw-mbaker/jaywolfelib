@@ -46,7 +46,7 @@ class Handler
 	{
 		foreach ($this->dependencies as $k => $dependency) {
 			if (is_string($dependency) && class_exists($dependency)) {
-				$dependency = new $dependency;
+				$dependency = new $dependency();
 			} elseif (is_array($dependency) && $dependency[0] instanceof Container) {
 				$dependency = $dependency[0]->get($dependency[1]);
 			}

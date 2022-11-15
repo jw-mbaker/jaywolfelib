@@ -54,7 +54,7 @@ class Container extends \Pimple\Container
 		}
 
 		if (!isset($container['input'])) {
-			$container->set('input', new Input());
+			$container->set('input', $container->factory(fn() => new Input()));
 		}
 
 		if (!isset($container['config'])) {

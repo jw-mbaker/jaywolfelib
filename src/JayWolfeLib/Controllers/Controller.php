@@ -16,26 +16,16 @@ use function JayWolfeLib\container;
  */
 abstract class Controller implements ControllerInterface
 {
-	/** @var Input */
-	protected $input;
-
-	/** @var ModelFactoryInterface */
-	protected $models;
-
 	/** @var ViewInterface */
 	protected $view;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param Input $input
-	 * @param ModelFactoryInterface $models
-	 * @param ConfigInterface $config
+	 * @param ViewInterface $view
 	 */
-	public function __construct(Input $input, ModelFactoryInterface $models, ViewInterface $view)
+	public function __construct(ViewInterface $view)
 	{
-		$this->input = $input;
-		$this->models = $models;
 		$this->view = $view;
 	}
 }

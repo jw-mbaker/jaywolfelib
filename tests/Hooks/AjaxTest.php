@@ -3,12 +3,14 @@
 namespace JayWolfeLib\Tests\Hooks;
 
 use JayWolfeLib\Container;
+use JayWolfeLib\Input;
 use JayWolfeLib\Hooks\Ajax;
 use JayWolfeLib\Hooks\Handler;
 use DownShift\WordPress\EventEmitter;
 use DownShift\WordPress\EventEmitterInterface;
 use WP_Mock;
 use WP_Mock\Matcher\AnyInstance;
+use Mockery;
 
 use function JayWolfeLib\container;
 
@@ -21,12 +23,14 @@ class AjaxTest extends WP_Mock\Tools\TestCase
 		WP_Mock::setUp();
 
 		$this->ajaxCallback = function() {};
+		container(false)->set('input', Mockery::mock(Input::class));
 	}
 
 	public function tearDown(): void
 	{
 		WP_Mock::tearDown();
 		container()->flush();
+		Mockery::close();
 	}
 
 	public function testCanAddAjax(): void

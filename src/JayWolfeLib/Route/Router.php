@@ -108,6 +108,11 @@ class Router
 		return $this;
 	}
 
+	public function with_model($model): self
+	{
+		return $this->with_dependency($model);
+	}
+
 	public function with_dependency($dependency): self
 	{
 		if (isset($this->components[$this->route_type_to_register][$this->current_controller]['controller'])) {
@@ -231,16 +236,6 @@ class Router
 		}
 
 		$controller = $this->controllers->create($component['controller'], $view, ...$dependencies);
-
-		if (
-			$route_type == RouteType::API &&
-			isset($_REQUEST['key'], $_REQUEST['action']) &&
-			$_REQUEST['key'] == $component['api_key']
-		) {
-			Hooks::add_action('wp', function() {
-				Hooks::do_action('jwlib_api_' . $_REQUEST['action']);
-			});
-		}
 	}
 
 	/**

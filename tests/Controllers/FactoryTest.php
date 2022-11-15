@@ -23,8 +23,6 @@ class FactoryTest extends WP_Mock\Tools\TestCase
 		WP_Mock::setUp();
 		WP_Mock::passthruFunction('sanitize_key');
 		$this->mainContainer = new Container();
-		$this->mainContainer->set('models', Mockery::mock(ModelFactory::class));
-		$this->mainContainer->set('input', Mockery::mock(Input::class));
 		$this->view = Mockery::mock(View::class);
 	}
 
