@@ -252,7 +252,7 @@ class Router
 			case RouteType::AJAX:
 				return defined( 'DOING_AJAX' );
 			case RouteType::CRON:
-				return defined( 'DOING_CRON' );
+				return defined( 'DOING_CRON' ) || defined( 'JW_DOING_CRON' );
 			case RouteType::FRONTEND:
 			case RouteType::FRONTEND_WITH_POSSIBLE_AJAX:
 				return (!is_admin() || defined( 'DOING_AJAX' )) && !defined( 'DOING_CRON' ) && !defined( 'REST_REQUEST' );
