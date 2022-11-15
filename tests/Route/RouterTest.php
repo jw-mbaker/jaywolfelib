@@ -6,6 +6,8 @@ use JayWolfeLib\Container;
 use JayWolfeLib\Route\Router;
 use JayWolfeLib\Route\RouteType;
 use JayWolfeLib\Controllers\Factory as ControllerFactory;
+use JayWolfeLib\Models\Factory as ModelFactory;
+use JayWolfeLib\Models\ModelInterface;
 use JayWolfeLib\Controllers\Controller;
 use JayWolfeLib\Config\Config;
 use WP_Mock;
@@ -69,6 +71,32 @@ class RouterTest extends WP_Mock\Tools\TestCase
 		$this->assertEquals($router->route_type_to_register, RouteType::ADMIN);
 
 		$router->with_controller(Controller::class);
+
+		$router->register_generic_routes();
+	}
+
+	public function testCanRegisterModel(): void
+	{
+		WP_Mock::userFunction('is_admin', ['return' => false]);
+
+		$router = new Router($this->controllers, $this->config);
+
+		$factory = Mockery::mock(ModelFactory::class);
+
+		$mock = Mockery::mock(ModelInterface::class);
+
+		$factory->expects()->get('mock')->andReturn($mock);
+
+		$controller = Mockery::mock(Controller::class);
+
+		$this->controllers->shouldReceive('create')->once()->andReturn($controller);
+
+		$router
+			->register_route_of_type(RouteType::ANY)
+			->with_controller(Controller::class)
+			->with_model([$factory, 'mock']);
+
+		$this->assertEquals($router->route_type_to_register, RouteType::ANY);
 
 		$router->register_generic_routes();
 	}

@@ -3,6 +3,7 @@
 namespace JayWolfeLib\Route;
 
 use JayWolfeLib\Factory\ControllerFactoryInterface;
+use JayWolfeLib\Factory\BaseFactoryInterface;
 use JayWolfeLib\Config\ConfigInterface;
 use JayWolfeLib\Views\View;
 use JayWolfeLib\Hooks\Hooks;
@@ -219,16 +220,12 @@ class Router
 
 		if (isset($component['dependencies'])) {
 			foreach ($component['dependencies'] as $dependency) {
-				if (is_callable($dependency)) {
-					$dependency = call_user_func($dependency);
-				}
-
 				if (is_string($dependency) && class_exists($dependency)) {
 					$dependency = new $dependency();
-				}
-
-				if (is_array($dependency) && $dependency[0] instanceof Container) {
+				} elseif (is_array($dependency) && ($dependency[0] instanceof Container || $dependency[0] instanceof BaseFactoryInterface)) {
 					$dependency = $dependency[0]->get($dependency[1]);
+				} elseif (is_callable($dependency)) {
+					$dependency = call_user_func($dependency);
 				}
 
 				$dependencies[] = $dependency;
