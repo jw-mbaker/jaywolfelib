@@ -49,6 +49,8 @@ class Handler
 				$dependency = new $dependency();
 			} elseif (is_array($dependency) && $dependency[0] instanceof Container) {
 				$dependency = $dependency[0]->get($dependency[1]);
+			} elseif (is_callable($dependency)) {
+				$dependency = call_user_func($dependency);
 			}
 
 			$this->dependencies[$k] = $dependency;
