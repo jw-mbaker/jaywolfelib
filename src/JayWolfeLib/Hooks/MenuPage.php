@@ -29,7 +29,11 @@ class MenuPage
 		string $icon_url = '',
 		$position = null
 	): Handler {
-		$handler = new Handler( container()->get('input'), $callback );
+		if ($callback instanceof Handler) {
+			$handler = $callback;
+		} else {
+			$handler = new Handler( container()->get('input'), $callback );
+		}
 
 		add_menu_page(
 			$page_title,
@@ -52,7 +56,7 @@ class MenuPage
 	 * @param string $menu_title
 	 * @param string $capability
 	 * @param string $menu_slug
-	 * @param callable $callback
+	 * @param Handler|callable $callback
 	 * @param int|float $position
 	 * @return Handler
 	 */
@@ -65,7 +69,11 @@ class MenuPage
 		callable $callback,
 		$position = null
 	): Handler {
-		$handler = new Handler( container()->get('input'), $callback );
+		if ($callback instanceof Handler) {
+			$handler = $callback;
+		} else {
+			$handler = new Handler( container()->get('input'), $callback );
+		}
 
 		add_submenu_page(
 			$parent_slug,
