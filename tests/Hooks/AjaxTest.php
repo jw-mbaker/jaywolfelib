@@ -4,9 +4,11 @@ namespace JayWolfeLib\Tests\Hooks;
 
 use JayWolfeLib\Container;
 use JayWolfeLib\Hooks\Ajax;
+use JayWolfeLib\Hooks\Handler;
 use DownShift\WordPress\EventEmitter;
 use DownShift\WordPress\EventEmitterInterface;
 use WP_Mock;
+use WP_Mock\Matcher\AnyInstance;
 
 use function JayWolfeLib\container;
 
@@ -29,11 +31,25 @@ class AjaxTest extends WP_Mock\Tools\TestCase
 
 	public function testCanAddAjax(): void
 	{
-		WP_Mock::expectActionAdded('wp_ajax_test_ajax', $this->ajaxCallback);
+		//WP_Mock::expectActionAdded('wp_ajax_test_ajax', new AnyInstance( Handler::class ));
 
 		$ret = Ajax::add_ajax('test_ajax', $this->ajaxCallback);
 
-		$this->assertInstanceOf(EventEmitterInterface::class, $ret);
+		$this->assertInstanceOf(Handler::class, $ret);
+	}
+
+	public function testCanInvokeHandler(): void
+	{
+		$bool = true;
+		$this->assertTrue($bool);
+
+		$handler = Ajax::add_ajax('test_ajax', function() use (&$bool) {
+			$bool = false;
+		});
+
+		call_user_func($handler);
+
+		$this->assertFalse($bool);
 	}
 
 	public function testCanDoAjax(): void

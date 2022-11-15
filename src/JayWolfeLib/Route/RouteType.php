@@ -6,6 +6,8 @@ class RouteType
 {
 	public const ANY = 'any';
 
+	public const API = 'api';
+
 	public const ADMIN = 'admin';
 
 	public const ADMIN_WITH_POSSIBLE_AJAX = 'admin_with_possible_ajax';

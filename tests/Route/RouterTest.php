@@ -2,6 +2,7 @@
 
 namespace JayWolfeLib\Tests\Route;
 
+use JayWolfeLib\Container;
 use JayWolfeLib\Route\Router;
 use JayWolfeLib\Route\RouteType;
 use JayWolfeLib\Controllers\Factory as ControllerFactory;

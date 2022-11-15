@@ -6,6 +6,7 @@ use JayWolfeLib\Factory\ControllerFactoryInterface;
 use JayWolfeLib\Config\ConfigInterface;
 use JayWolfeLib\Views\View;
 use JayWolfeLib\Hooks\Hooks;
+use JayWolfeLib\Container;
 
 class Router
 {
@@ -15,7 +16,7 @@ class Router
 	/** @var ConfigInterface */
 	protected $config;
 
-	protected static $components = [];
+	private $components = [];
 
 	/**
 	 * The current controller being registered.
@@ -62,6 +63,7 @@ class Router
 	{
 		return [
 			RouteType::ANY,
+			RouteType::API,
 			RouteType::ADMIN,
 			RouteType::ADMIN_WITH_POSSIBLE_AJAX,
 			RouteType::AJAX,
@@ -101,16 +103,16 @@ class Router
 
 		$this->current_controller = $this->build_controller_unique_id($controller);
 
-		static::$components[$this->route_type_to_register][$this->current_controller] = ['controller' => $controller];
+		$this->components[$this->route_type_to_register][$this->current_controller] = ['controller' => $controller];
 
 		return $this;
 	}
 
 	public function with_dependency($dependency): self
 	{
-		if (isset(static::$components[$this->route_type_to_register][$this->current_controller]['controller'])) {
-			static::$components[$this->route_type_to_register][$this->current_controller]['dependencies'] ??= [];
-			static::$components[$this->route_type_to_register][$this->current_controller]['dependencies'][] = $dependency;
+		if (isset($this->components[$this->route_type_to_register][$this->current_controller]['controller'])) {
+			$this->components[$this->route_type_to_register][$this->current_controller]['dependencies'] ??= [];
+			$this->components[$this->route_type_to_register][$this->current_controller]['dependencies'][] = $dependency;
 		}
 
 		return $this;
@@ -118,8 +120,21 @@ class Router
 
 	public function with_view($view): self
 	{
-		if (isset(static::$components[$this->route_type_to_register][$this->current_controller]['controller'])) {
-			static::$components[$this->route_type_to_register][$this->current_controller]['view'] = $view;
+		if (isset($this->components[$this->route_type_to_register][$this->current_controller]['controller'])) {
+			$this->components[$this->route_type_to_register][$this->current_controller]['view'] = $view;
+		}
+
+		return $this;
+	}
+
+	public function with_api_key(string $api_key): self
+	{
+		if ($this->route_type_to_register !== RouteType::API) {
+			return $this;
+		}
+
+		if (isset($this->components[$this->route_type_to_register][$this->current_controller]['controller'])) {
+			$this->components[$this->route_type_to_register][$this->current_controller]['api_key'] = $api_key;
 		}
 
 		return $this;
@@ -161,15 +176,15 @@ class Router
 		}
 
 		foreach ($route_types as $route_type) {
-			if ($this->is_request($route_type) && !empty(static::$components[$route_type])) {
-				foreach (static::$components[$route_type] as $component) {
-					$this->dispatch($component);
+			if ($this->is_request($route_type) && !empty($this->components[$route_type])) {
+				foreach ($this->components[$route_type] as $component) {
+					$this->dispatch($component, $route_type);
 				}
 			}
 		}
 	}
 
-	private function dispatch(array $component)
+	private function dispatch(array $component, string $route_type)
 	{
 		$dependencies = [];
 
@@ -207,11 +222,25 @@ class Router
 					$dependency = new $dependency();
 				}
 
+				if (is_array($dependency) && $dependency[0] instanceof Container) {
+					$dependency = $dependency[0]->get($dependency[1]);
+				}
+
 				$dependencies[] = $dependency;
 			}
 		}
 
 		$controller = $this->controllers->create($component['controller'], $view, ...$dependencies);
+
+		if (
+			$route_type == RouteType::API &&
+			isset($_REQUEST['key'], $_REQUEST['action']) &&
+			$_REQUEST['key'] == $component['api_key']
+		) {
+			Hooks::add_action('wp', function() {
+				Hooks::do_action('jwlib_api_' . $_REQUEST['action']);
+			});
+		}
 	}
 
 	/**
@@ -235,14 +264,16 @@ class Router
 			case RouteType::FRONTEND:
 			case RouteType::FRONTEND_WITH_POSSIBLE_AJAX:
 				return (!is_admin() || defined( 'DOING_AJAX' )) && !defined( 'DOING_CRON' ) && !defined( 'REST_REQUEST' );
+			case RouteType::API:
+				return !is_admin() && !defined( 'DOING_AJAX' ) && !defined( 'DOING_CRON' ) && !defined( 'REST_REQUEST' );
 			case RouteType::LATE_FRONTEND:
 			case RouteType::LATE_FRONTEND_WITH_POSSIBLE_AJAX:
 				return $this->is_request(RouteType::FRONTEND) || ( current_action() == 'wp' ) || ( did_action('wp') === 1 );
 		}
 	}
 
-	public static function get_components(): array
+	public function get_components(): array
 	{
-		return static::$components;
+		return $this->components;
 	}
 }

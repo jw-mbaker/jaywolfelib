@@ -103,4 +103,9 @@ class Input
 
 		return $val;
 	}
+
+	public function send_json($response, int $status_code = null, int $options = 0)
+	{
+		wp_send_json($response, $status_code, $options);
+	}
 }
