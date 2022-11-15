@@ -5,6 +5,29 @@ namespace JayWolfeLib;
 use JayWolfeLib\Hooks\Hooks;
 
 /**
+ * Print log in the log directory.
+ *
+ * @param string $message
+ * @return void
+ */
+function error_log(string $message, string $plugin_file)
+{
+	$config = container()->get('config')->get($plugin_file);
+
+	if (null === $config->get('paths')['log']) {
+		throw new \Exception("Log path not set for " . plugin_basename($plugin_file) . ".");
+	}
+
+	$log_path = $config->get('paths')['log'];
+
+	if (!is_dir($log_path)) {
+		mkdir($log_path, 0755, true);
+	}
+
+	\error_log($message . PHP_EOL, 3, trailingslashit($log_path) . 'log.txt');
+}
+
+/**
  * Fetch an array from the specified file.
  *
  * @param string $file
