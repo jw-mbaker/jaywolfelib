@@ -5,7 +5,8 @@ return [
 
 	'paths' => [
 		'base' => dirname( __DIR__ ),
-		'arrays' => dirname( __DIR__ )
+		'arrays' => dirname( __DIR__ ),
+		'log' => dirname( __DIR__ )
 	],
 
 	'test' => [1, 2, 3],

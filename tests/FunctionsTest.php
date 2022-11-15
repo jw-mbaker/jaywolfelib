@@ -15,6 +15,11 @@ class FunctionsTest extends WP_Mock\Tools\TestCase
 	public function setUp(): void
 	{
 		WP_Mock::setUp();
+		WP_Mock::passthruFunction('plugin_basename');
+		WP_Mock::passthruFunction('sanitize_key');
+		WP_Mock::alias('trailingslashit', function($str) {
+			return rtrim($str, '/\\') . '/';
+		});
 	}
 
 	public function tearDown(): void
@@ -23,14 +28,23 @@ class FunctionsTest extends WP_Mock\Tools\TestCase
 		container()->flush();
 	}
 
+	public function testErrorLog(): void
+	{
+		container()->get('config')->set(__DIR__ . '/Config/config.php');
+
+		\JayWolfeLib\error_log('test', __DIR__ . '/Config/config.php');
+
+		$this->assertFileExists(__DIR__ . '/log.txt');
+
+		$contents = file_get_contents(__DIR__ . '/log.txt');
+
+		$this->assertEquals($contents, 'test' . PHP_EOL);
+
+		unlink(__DIR__ . '/log.txt');
+	}
+
 	public function testFetchArray(): void
 	{
-		WP_Mock::passthruFunction('plugin_basename');
-		WP_Mock::passthruFunction('sanitize_key');
-		WP_Mock::alias('trailingslashit', function($str) {
-			return rtrim($str, '/\\') . '/';
-		});
-
 		$file = __DIR__ . '/test.php';
 
 		file_put_contents($file, "<?php return [1, 2, 3];");
