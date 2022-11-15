@@ -5,6 +5,7 @@ namespace JayWolfeLib\Tests\Hooks;
 use JayWolfeLib\Hooks\Handler;
 use JayWolfeLib\Input;
 use JayWolfeLib\Container;
+use JayWolfeLib\Models\Factory as ModelFactory;
 use WP_Mock;
 use Mockery;
 
@@ -91,6 +92,27 @@ class HandlerTest extends WP_Mock\Tools\TestCase
 		});
 
 		$handler->with(fn() => 123);
+
+		call_user_func($handler);
+	}
+
+	/**
+	 * @depends testCanPassDependency
+	 * 
+	 * @return void
+	 */
+	public function testCanPassFactoryKey(): void
+	{
+		$factory = Mockery::mock(ModelFactory::class);
+		$mock = Mockery::mock(\JayWolfeLib\Models\ModelInterface::class);
+
+		$factory->expects()->get('mock')->andReturn($mock);
+
+		$handler = new Handler($this->input, function(Input $input, $mock) {
+			$this->assertInstanceOf(\JayWolfeLib\Models\ModelInterface::class, $mock);
+		});
+
+		$handler->with([$factory, 'mock']);
 
 		call_user_func($handler);
 	}

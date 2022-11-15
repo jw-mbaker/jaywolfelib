@@ -4,6 +4,7 @@ namespace JayWolfeLib\Hooks;
 
 use JayWolfeLib\Input;
 use JayWolfeLib\Container;
+use JayWolfeLib\Factory\BaseFactoryInterface;
 
 /**
  * Handler class
@@ -47,7 +48,7 @@ class Handler
 		foreach ($this->dependencies as $k => $dependency) {
 			if (is_string($dependency) && class_exists($dependency)) {
 				$dependency = new $dependency();
-			} elseif (is_array($dependency) && $dependency[0] instanceof Container) {
+			} elseif (is_array($dependency) && ($dependency[0] instanceof Container || $dependency[0] instanceof BaseFactoryInterface)) {
 				$dependency = $dependency[0]->get($dependency[1]);
 			} elseif (is_callable($dependency)) {
 				$dependency = call_user_func($dependency);
