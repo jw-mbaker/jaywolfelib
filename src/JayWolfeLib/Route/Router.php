@@ -232,7 +232,13 @@ class Router
 			}
 		}
 
-		$controller = $this->controllers->create($component['controller'], $view, ...$dependencies);
+		@list($controller, $action) = explode('@', $component['controller']);
+
+		$controller = $this->controllers->create($controller, $view, ...$dependencies);
+
+		if (null !== $action) {
+			$contoller->$action();
+		}
 	}
 
 	/**
