@@ -7,4 +7,6 @@ interface ConfigInterface
 	public function set(string $key, $val);
 	public function get(string $key);
 	public function get_config(): array;
+	public function requirements_met(): bool;
+	public function get_errors(): array;
 }

@@ -61,6 +61,10 @@ class Container extends \Pimple\Container
 			$container->set('config', new Config\Factory(new self(), $container));
 		}
 
+		if (!isset($container['guzzle'])) {
+			$container->set('guzzle', fn() => new Guzzle\Factory());
+		}
+
 		if (!isset($container['wpdb'])) {
 			$container->set('wpdb', function(Container $c) {
 				global $wpdb;
