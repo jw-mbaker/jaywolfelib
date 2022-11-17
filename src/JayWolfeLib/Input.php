@@ -74,6 +74,11 @@ class Input
 		return $this->read($_SERVER, $param_name, $default);
 	}
 
+	public function files($param_name, $default = null)
+	{
+		return $this->read($_FILES, $param_name, $default);
+	}
+
 	public function add_filter(callable $callback): self
 	{
 		if (!in_array($callback, $this->filters)) {
