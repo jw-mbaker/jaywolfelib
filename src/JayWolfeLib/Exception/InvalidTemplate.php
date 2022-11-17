@@ -2,7 +2,7 @@
 
 namespace JayWolfeLib\Exception;
 
-class InvalidView extends \Exception
+class InvalidTemplate extends \Exception
 {
 	
 }

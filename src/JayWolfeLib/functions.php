@@ -3,6 +3,7 @@
 namespace JayWolfeLib;
 
 use JayWolfeLib\Hooks\Hooks;
+use JayWolfeLib\Exception\InvalidConfig;
 
 /**
  * Print log in the log directory.
@@ -15,7 +16,7 @@ function error_log(string $message, string $plugin_file)
 	$config = container()->get('config')->get($plugin_file);
 
 	if (null === $config->get('paths')['log']) {
-		throw new \Exception("Log path not set for " . plugin_basename($plugin_file) . ".");
+		throw new InvalidConfig("Log path not set for " . plugin_basename($plugin_file) . ".");
 	}
 
 	$log_path = $config->get('paths')['log'];
@@ -38,7 +39,7 @@ function fetch_array(string $file, string $plugin_file): array
 	$config = container()->get('config')->get($plugin_file);
 
 	if (null === $config->get('paths')['arrays']) {
-		throw new \Exception("Array path not set for " . plugin_basename($plugin_file) . ".");
+		throw new InvalidConfig("Array path not set for " . plugin_basename($plugin_file) . ".");
 	}
 
 	$pathinfo = pathinfo($file);
@@ -54,7 +55,7 @@ function fetch_array(string $file, string $plugin_file): array
 	}
 
 	if (@!is_array($arr)) {
-		throw new \Exception("$file did not return an array.");
+		throw new InvalidConfig("$file did not return an array.");
 	}
 
 	return $arr;

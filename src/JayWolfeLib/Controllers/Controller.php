@@ -7,7 +7,6 @@ use JayWolfeLib\Views\ViewInterface;
 use JayWolfeLib\Input;
 use JayWolfeLib\Factory\ModelFactoryInterface;
 use JayWolfeLib\Hooks\Hooks;
-use JayWolfeLib\Exception\InvalidView;
 
 use function JayWolfeLib\container;
 

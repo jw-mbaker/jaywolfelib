@@ -4,6 +4,7 @@ namespace JayWolfeLib\Views;
 
 use JayWolfeLib\Config\ConfigInterface;
 use JayWolfeLib\Hooks\Hooks;
+use JayWolfeLib\Exception\InvalidTemplate;
 
 class View implements ViewInterface
 {
@@ -20,6 +21,14 @@ class View implements ViewInterface
 		$this->config = $config;
 	}
 
+	/**
+	 * Render the template.
+	 *
+	 * @param string $_template
+	 * @param array $_args
+	 * @param string|null $_template_path
+	 * @return void
+	 */
 	public function render(string $_template, array $_args = [], ?string $_template_path = null)
 	{
 		extract($_args);
@@ -36,8 +45,20 @@ class View implements ViewInterface
 		echo ob_get_clean();
 	}
 	
+	/**
+	 * Locate the template file.
+	 *
+	 * @param string $template
+	 * @param string|null $template_path
+	 * @return string|null
+	 * @throws InvalidView
+	 */
 	protected function locate_template(string $template, ?string $template_path = null): ?string
 	{
+		if (null === $this->config->get('paths')['templates']) {
+			throw new InvalidTemplate('Template path not set for ' . $this->config->get('plugin_file') . '.');
+		}
+
 		$template_path ??= $this->config->get('paths')['templates'];
 
 		if (!preg_match('/\.php/', $template)) {

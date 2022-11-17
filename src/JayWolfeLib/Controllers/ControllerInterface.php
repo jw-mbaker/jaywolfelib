@@ -8,4 +8,10 @@ namespace JayWolfeLib\Controllers;
  */
 interface ControllerInterface
 {
+	/**
+	 * Intialize the controller.
+	 *
+	 * @return mixed
+	 */
+	public function init();
 }
