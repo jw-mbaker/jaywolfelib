@@ -79,5 +79,9 @@ class Container extends \Pimple\Container
 		if (!isset($container['controllers'])) {
 			$container->set('controllers', new Controllers\Factory(new self(), $container));
 		}
+
+		if (!isset($container['api'])) {
+			$container->set('api', fn(Container $c) => new Api\Api($c->get('input')));
+		}
 	}
 }
