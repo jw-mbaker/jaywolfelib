@@ -47,7 +47,7 @@ return [
         'base' => __DIR__,
         'controllers' => __DIR__ . '/src/Plugin/Controllers',
         'views' => __DIR__ . '/src/Plugin/Views',
-        'templates => __DIR__ . '/src/Plugin/templates',
+        'templates' => __DIR__ . '/src/Plugin/templates',
         'arrays' => __DIR__ . '/src/Plugin/arrays',
         'log' => __DIR__ . '/logs'
     ],
