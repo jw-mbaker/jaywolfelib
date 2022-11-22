@@ -98,7 +98,7 @@ $router
     ->register_route_of_type(RouteType::ADMIN_WITH_POSSIBLE_AJAX)
     ->with_controller(\Plugin\Controllers\Controller2::class)
     ->with_model([container()->get('models'), \Plugin\Models\Model::class])
-    ->with_dependency([container(), 'guzzle');
+    ->with_dependency([container(), 'guzzle']);
 ```
 
 And then initialized when you bootstrap the plugin:
