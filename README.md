@@ -321,7 +321,7 @@ The template path is set in the `paths -> templates` setting in `config.php`.
 
 ## The Service Container
 
-`JayWolfeLib` stores reusable objects in the global container which makes it easier to inject dependencies into your controllers. The container can be accessed using the `JayWolfeLib\container` function.
+`JayWolfeLib` stores reusable objects in the global container which makes it easier to inject dependencies into your controllers and callbacks. The container can be accessed using the `JayWolfeLib\container` function.
 
 You can pass your own values / objects into the container using the `set` method.
 ```php
