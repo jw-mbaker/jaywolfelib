@@ -306,7 +306,7 @@ Templates are the actual files which generate html for the `View`.
 
 A template file can be called by invoking the `render` method on any `View` class's object.
 
-The template path is set in the `paths -> templates` setting in `config.php`.;
+The template path is set in the `paths -> templates` setting in `config.php`.
 
 <details>
     <summary><b>SHOW TEMPLATE EXAMPLE</b></summary>
