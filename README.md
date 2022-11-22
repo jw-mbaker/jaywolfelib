@@ -136,7 +136,7 @@ The `init` method is where callbacks for actions and filters are registered. Mos
 
 The `init` method is called automatically when the controller is loaded.
 
-> NOTE: If you create a constructor inside a controller extending `\JayWolfeLib\Controllers\Controller`, you need to make sure to call the parent class's constructor the pass the `View` object into the instance.
+> NOTE: If you create a constructor inside a controller extending `\JayWolfeLib\Controllers\Controller`, you need to make sure to call the parent class's constructor to pass the `View` object into the instance.
 
 <details>
     <summary><b>SHOW CONTROLLER EXAMPLE</b></summary>
