@@ -118,7 +118,7 @@ function init_router(Router $router, string $routes)
 }
 
 add_action('plugins_loaded', function() use ($config) {
-    init_router(new Router(container()->get('controllers'), $config, __DIR__ . '/routes.php');
+    init_router(new Router(container()->get('controllers'), $config), __DIR__ . '/routes.php');
 });
 ```
 
