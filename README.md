@@ -92,7 +92,7 @@ $router
     ->with_controller(\Plugin\Controllers\Controller::class)
     ->with_model([container()->get('models'), \Plugin\Models\Model::class])
     ->with_model([container()->get('models'), \Plugin\Models\Model2::class])
-    ->with_view(\Plugins\Views\View::class);
+    ->with_view(\Plugin\Views\View::class);
     
 $router
     ->register_route_of_type(RouteType::ADMIN_WITH_POSSIBLE_AJAX)
