@@ -64,6 +64,7 @@ class RouterTest extends WP_Mock\Tools\TestCase
 		$router = new Router($this->controllers, $this->config);
 
 		$controller = Mockery::mock(Controller::class);
+		$controller->expects()->set_config($this->config)->once();
 
 		$this->controllers->shouldReceive('create')->once()->andReturn($controller);
 
@@ -88,6 +89,7 @@ class RouterTest extends WP_Mock\Tools\TestCase
 		$factory->expects()->get('mock')->andReturn($mock);
 
 		$controller = Mockery::mock(Controller::class);
+		$controller->expects()->set_config($this->config)->once();
 
 		$this->controllers->shouldReceive('create')->once()->andReturn($controller);
 

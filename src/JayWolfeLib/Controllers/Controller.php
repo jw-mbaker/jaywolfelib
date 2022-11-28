@@ -4,17 +4,15 @@ namespace JayWolfeLib\Controllers;
 
 use JayWolfeLib\Container;
 use JayWolfeLib\Views\ViewInterface;
-use JayWolfeLib\Input;
-use JayWolfeLib\Factory\ModelFactoryInterface;
-use JayWolfeLib\Hooks\Hooks;
-
-use function JayWolfeLib\container;
+use JayWolfeLib\Config\ConfigTrait;
 
 /**
  * The controller base class.
  */
 abstract class Controller implements ControllerInterface
 {
+	use ConfigTrait;
+
 	/** @var ViewInterface */
 	protected $view;
 

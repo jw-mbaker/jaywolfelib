@@ -59,12 +59,12 @@ class ConfigTest extends WP_Mock\Tools\TestCase
 	{
 		$config = new Config($cfg, $this->dependencies);
 
-		$arr = $config->get_config();
+		$arr = $config->get_settings();
 		$this->assertArrayHasKey('test', $arr);
 
 		$config->delete('test');
 
-		$arr = $config->get_config();
+		$arr = $config->get_settings();
 		$this->assertFalse(isset($arr['test']));
 	}
 
@@ -77,7 +77,7 @@ class ConfigTest extends WP_Mock\Tools\TestCase
 	{
 		$config = new Config($cfg, $this->dependencies);
 
-		$arr = $config->get_config();
+		$arr = $config->get_settings();
 
 		$this->assertArrayHasKey('plugin_file', $arr);
 		$this->assertArrayHasKey('paths', $arr);

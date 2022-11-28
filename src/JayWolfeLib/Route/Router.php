@@ -5,17 +5,17 @@ namespace JayWolfeLib\Route;
 use JayWolfeLib\Factory\ControllerFactoryInterface;
 use JayWolfeLib\Factory\BaseFactoryInterface;
 use JayWolfeLib\Config\ConfigInterface;
+use JayWolfeLib\Config\ConfigTrait;
 use JayWolfeLib\Views\View;
 use JayWolfeLib\Hooks\Hooks;
 use JayWolfeLib\Container;
 
 class Router
 {
+	use ConfigTrait;
+
 	/** @var ControllerFactoryInterface */
 	protected $controllers;
-
-	/** @var ConfigInterface */
-	protected $config;
 
 	private $components = [];
 
@@ -36,7 +36,7 @@ class Router
 	public function __construct(ControllerFactoryInterface $controllers, ConfigInterface $config)
 	{
 		$this->controllers = $controllers;
-		$this->config = $config;
+		$this->set_config($config);
 		$this->init();
 	}
 
@@ -235,6 +235,8 @@ class Router
 		@list($controller, $action) = explode('@', $component['controller']);
 
 		$controller = $this->controllers->create($controller, $view, ...$dependencies);
+
+		$controller->set_config($this->config);
 
 		if (null !== $action) {
 			$contoller->$action();

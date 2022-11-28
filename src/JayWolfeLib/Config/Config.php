@@ -11,7 +11,7 @@ class Config implements ConfigInterface
 	 *
 	 * @var array
 	 */
-	protected $config = [];
+	protected $settings = [];
 
 	/**
 	 * The Dependencies object.
@@ -22,7 +22,7 @@ class Config implements ConfigInterface
 
 	public function __construct(array $settings, Dependencies $dependencies)
 	{
-		$this->config = $settings;
+		$this->settings = $settings;
 		$this->dependencies = $dependencies;
 	}
 
@@ -37,9 +37,9 @@ class Config implements ConfigInterface
 	{
 		$key = sanitize_key($key);
 
-		$this->config[$key] = $val;
+		$this->settings[$key] = $val;
 
-		return $this->config[$key];
+		return $this->settings[$key];
 	}
 
 	/**
@@ -52,11 +52,11 @@ class Config implements ConfigInterface
 	{
 		$key = sanitize_key($key);
 
-		if (!isset($this->config[$key])) {
+		if (!isset($this->settings[$key])) {
 			return $this->set($key, null);
 		}
 
-		return $this->config[$key];
+		return $this->settings[$key];
 	}
 
 	/**
@@ -89,19 +89,19 @@ class Config implements ConfigInterface
 	{
 		$key = sanitize_key($key);
 
-		if (isset($this->config[$key])) {
-			unset($this->config[$key]);
+		if (isset($this->settings[$key])) {
+			unset($this->settings[$key]);
 		}
 	}
 
 	/**
-	 * Get the config array.
+	 * Get the settings array.
 	 *
 	 * @return array
 	 */
-	public function get_config(): array
+	public function get_settings(): array
 	{
-		return $this->config;
+		return $this->settings;
 	}
 
 	public function get_dependencies(): Dependencies

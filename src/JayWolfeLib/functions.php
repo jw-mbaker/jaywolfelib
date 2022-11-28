@@ -5,62 +5,6 @@ namespace JayWolfeLib;
 use JayWolfeLib\Hooks\Hooks;
 use JayWolfeLib\Exception\InvalidConfig;
 
-/**
- * Print log in the log directory.
- *
- * @param string $message
- * @return void
- */
-function error_log(string $message, string $plugin_file)
-{
-	$config = container()->get('config')->get($plugin_file);
-
-	if (null === $config->get('paths')['log']) {
-		throw new InvalidConfig("Log path not set for " . plugin_basename($plugin_file) . ".");
-	}
-
-	$log_path = $config->get('paths')['log'];
-
-	if (!is_dir($log_path)) {
-		mkdir($log_path, 0755, true);
-	}
-
-	\error_log($message . PHP_EOL, 3, trailingslashit($log_path) . 'log.txt');
-}
-
-/**
- * Fetch an array from the specified file.
- *
- * @param string $file
- * @return array
- */
-function fetch_array(string $file, string $plugin_file): array
-{
-	$config = container()->get('config')->get($plugin_file);
-
-	if (null === $config->get('paths')['arrays']) {
-		throw new InvalidConfig("Array path not set for " . plugin_basename($plugin_file) . ".");
-	}
-
-	$pathinfo = pathinfo($file);
-	if (!isset($pathinfo['extension']) || $pathinfo['extension'] !== 'php') {
-		$file .= '.php';
-	}
-
-	$dir = trailingslashit( $config->get('paths')['arrays'] );
-
-	$arr = [];
-	if (is_readable($dir . $file)) {
-		$arr = include $dir . $file;
-	}
-
-	if (@!is_array($arr)) {
-		throw new InvalidConfig("$file did not return an array.");
-	}
-
-	return $arr;
-}
-
 
 /**
  * Store data in cache for quick retrieval.

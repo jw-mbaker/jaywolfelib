@@ -28,35 +28,6 @@ class FunctionsTest extends WP_Mock\Tools\TestCase
 		container()->flush();
 	}
 
-	public function testErrorLog(): void
-	{
-		container()->get('config')->set(__DIR__ . '/Config/config.php');
-
-		\JayWolfeLib\error_log('test', __DIR__ . '/Config/config.php');
-
-		$this->assertFileExists(__DIR__ . '/log.txt');
-
-		$contents = file_get_contents(__DIR__ . '/log.txt');
-
-		$this->assertEquals($contents, 'test' . PHP_EOL);
-
-		unlink(__DIR__ . '/log.txt');
-	}
-
-	public function testFetchArray(): void
-	{
-		$file = __DIR__ . '/test.php';
-
-		file_put_contents($file, "<?php return [1, 2, 3];");
-
-		container()->get('config')->set(__DIR__ . '/Config/config.php');
-
-		$arr = fetch_array('test', __DIR__ . '/Config/config.php');
-		unlink($file);
-
-		$this->assertEquals($arr, [1, 2, 3]);
-	}
-
 	public function testValidateBool(): void
 	{
 		$this->assertTrue(validate_bool('true'));
