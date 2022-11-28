@@ -4,14 +4,14 @@ namespace JayWolfeLib\Controllers;
 
 use JayWolfeLib\Container;
 use JayWolfeLib\Views\ViewInterface;
-use JayWolfeLib\Config\ConfigTrait;
+use JayWolfeLib\Traits\JayWolfeTrait;
 
 /**
  * The controller base class.
  */
 abstract class Controller implements ControllerInterface
 {
-	use ConfigTrait;
+	use JayWolfeTrait;
 
 	/** @var ViewInterface */
 	protected $view;

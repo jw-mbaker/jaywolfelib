@@ -6,7 +6,6 @@ use JayWolfeLib\Container;
 use JayWolfeLib\Hooks\Hooks;
 use WP_Mock;
 
-use function JayWolfeLib\fetch_array;
 use function JayWolfeLib\validate_bool;
 use function JayWolfeLib\container;
 
