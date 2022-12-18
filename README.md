@@ -4,11 +4,34 @@ This library is useful to help WordPress plugins follow the MVC design pattern.
 
 ## Installation
 
-Download the latest [release](https://github.com/jw-mbaker/jaywolfelib/releases/download/2.0.0/jaywolfelib.zip) and copy its contents to the mu-plugins folder of an existing WordPress installation.
+To use this library as a must-use plugin, download the latest [release](https://github.com/jw-mbaker/jaywolfelib/releases/download/2.0.2/jaywolfelib.zip) and copy its contents to the mu-plugins folder of an existing WordPress installation.
 
 Then, make sure your main plugin file is loading the library's autoloader:
 ```php
 require_once JayWolfeLib\VENDOR_PATH . '/autoload.php';
+```
+
+To use this library within your plugin folder, add this library as a repository in your [composer.json](https://getcomposer.org) file:
+
+```json
+{
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/jw-mbaker/jaywolfelib"
+        }
+    ]
+}
+```
+
+Then, add JayWolfeLib as a dependency:
+```
+composer require jw-mbaker/jaywolfelib
+```
+
+Make sure in your plugin is loading its autoloader:
+```php
+require_once 'vendor/autoload.php';
 ```
 
 ## How to Use
@@ -316,29 +339,4 @@ container()->set('example', fn(Container $c) => new Example($c->get('guzzle')));
 The instance can be retrieved with the `get` method.
 ```php
 $example = container()->get('example');
-```
-
-## Development
-
-To use this library in a development environment, add this library as a repository in your [composer.json](https://getcomposer.org) file:
-
-```json
-{
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/jw-mbaker/jaywolfelib"
-        }
-    ]
-}
-```
-
-Then, add JayWolfeLib as a dependency:
-```
-composer require --dev jw-mbaker/jaywolfelib
-```
-
-Make sure in your plugin is loading its autoloader:
-```php
-require_once 'vendor/autoload.php';
 ```

@@ -23,8 +23,7 @@
     "autoload-dev": {
         "psr-4": {
             "JayWolfeLib\\Tests\\": "tests/"
-        },
-        "files": ["jaywolfelib.php"]
+        }
     },
     "scripts": {
         "test": "./vendor/bin/phpunit"
