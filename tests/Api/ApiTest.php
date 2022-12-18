@@ -4,7 +4,8 @@ namespace JayWolfeLib\Tests\Api;
 
 use JayWolfeLib\Api\Api;
 use JayWolfeLib\Hooks\Handler;
-use JayWolfeLib\Input;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Componenet\HttpFoundation\JsonResponse;
 use WP_Mock;
 use Mockery;
 
@@ -14,7 +15,7 @@ class ApiTest extends WP_Mock\Tools\TestCase
 {
 	private $apiCallback;
 	private $api;
-	private $input;
+	private $request;
 
 	public function setUp(): void
 	{
@@ -22,8 +23,8 @@ class ApiTest extends WP_Mock\Tools\TestCase
 		WP_Mock::userFunction('wp_die');
 
 		$this->apiCallback = function() {};
-		$this->input = Mockery::mock(Input::class);
-		$this->api = new Api($this->input);
+		$this->request = Mockery::mock(Request::class);
+		$this->api = new Api($this->request);
 	}
 
 	public function tearDown(): void
@@ -63,9 +64,9 @@ class ApiTest extends WP_Mock\Tools\TestCase
 
 		WP_Mock::expectAction('test_api');
 
-		$this->input->expects()->server('REQUEST_METHOD')->twice()->andReturn('GET');
-		$this->input->expects()->request('action')->twice()->andReturn('test_api');
-		$this->input->expects()->request('key')->andReturn(null);
+		$this->request->expects()->getMethod()->twice()->andReturn('GET');
+		$this->request->expects()->get('action')->twice()->andReturn('test_api');
+		$this->request->expects()->get('key')->andReturn(null);
 
 		$this->api->do_api();
 	}
@@ -79,8 +80,8 @@ class ApiTest extends WP_Mock\Tools\TestCase
 	{
 		$this->api->register_hook('tessst_api', $this->apiCallback);
 
-		$this->input->expects()->server('REQUEST_METHOD')->andReturn('GET');
-		$this->input->expects()->request('action')->twice()->andReturn('test_api');
+		$this->request->expects()->getMethod()->andReturn('GET');
+		$this->request->expects()->get('action')->twice()->andReturn('test_api');
 
 		$this->api->do_api();
 	}
@@ -90,14 +91,13 @@ class ApiTest extends WP_Mock\Tools\TestCase
 	 *
 	 * @return void
 	 */
-	public function testInputSendsActionNotRecognizedResponse(): void
+	public function testSendsActionNotRecognizedResponse(): void
 	{
 		$this->api->register_hook('test_api', $this->apiCallback, 'GET', '123');
 
-		$this->input->expects()->server('REQUEST_METHOD')->andReturn('GET');
-		$this->input->expects()->request('action')->twice()->andReturn('test_api');
-		$this->input->expects()->request('key')->twice()->andReturn('1234');
-		$this->input->expects()->send_json(Api::ACTION_NOT_RECOGNIZED);
+		$this->request->expects()->getMethod()->andReturn('GET');
+		$this->request->expects()->get('action')->twice()->andReturn('test_api');
+		$this->request->expects()->get('key')->twice()->andReturn('1234');
 
 		$this->api->do_api();
 	}
@@ -107,14 +107,13 @@ class ApiTest extends WP_Mock\Tools\TestCase
 	 *
 	 * @return void
 	 */
-	public function testInputSendsInvalidMethodResponse(): void
+	public function testSendsInvalidMethodResponse(): void
 	{
 		$this->api->register_hook('test_api', $this->apiCallback, 'POST');
 
-		$this->input->expects()->server('REQUEST_METHOD')->twice()->andReturn('GET');
-		$this->input->expects()->request('action')->twice()->andReturn('test_api');
-		$this->input->expects()->request('key')->andReturn(null);
-		$this->input->expects()->send_json(Api::INVALID_METHOD);
+		$this->request->expects()->getMethod()->twice()->andReturn('GET');
+		$this->request->expects()->get('action')->twice()->andReturn('test_api');
+		$this->request->expects()->get('key')->andReturn(null);
 
 		$this->api->do_api();
 	}

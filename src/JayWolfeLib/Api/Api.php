@@ -4,18 +4,16 @@ namespace JayWolfeLib\Api;
 
 use JayWolfeLib\Hooks\Hooks;
 use JayWolfeLib\Hooks\Handler;
-use JayWolfeLib\Input;
+use JayWolfeLib\Traits\RequestTrait;
+use JayWolfeLib\Traits\ResponseTrait;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 use function JayWolfeLib\container;
 
 class Api
 {
-	/**
-	 * The input object.
-	 *
-	 * @var Input
-	 */
-	private $input;
+	use RequestTrait, ResponseTrait;
 
 	/**
 	 * The Api hooks.
@@ -40,12 +38,10 @@ class Api
 
 	/**
 	 * Constructor.
-	 * 
-	 * @param Input $input
 	 */
-	public function __construct(Input $input)
+	public function __construct(Request $request)
 	{
-		$this->input = $input;
+		$this->set_request($request);
 		Hooks::add_action('wp', [$this, 'do_api']);
 	}
 
@@ -85,16 +81,16 @@ class Api
 		$headers = [];
 		$data = [];
 
-		if ($this->input->server('REQUEST_METHOD') == 'POST') {
+		if ($this->request->getMethod() == 'POST') {
 			$headers[] = "Access-Control-Allow-Origin: *";
 		}
 
-		if (null === $this->input->request('action'))
+		if (null === $this->request->get('action'))
 			return;
 		
 		$headers[] = "Content-Type:application/json";
 
-		$hook = $this->input->request('action');
+		$hook = $this->request->get('action');
 
 		if (!isset($this->hooks[$hook]))
 			return;
@@ -105,13 +101,13 @@ class Api
 			}
 		}
 
-		if (null !== $this->input->request('key') && $this->input->request('key') !== $this->hooks[$hook]['api_key']) {
-			$this->input->send_json(self::ACTION_NOT_RECOGNIZED);
+		if (null !== $this->request->get('key') && $this->request->get('key') !== $this->hooks[$hook]['api_key']) {
+			$this->send_json(self::ACTION_NOT_RECOGNIZED, 404);
 			return;
 		}
 			
-		if ($this->input->server('REQUEST_METHOD') !== $this->hooks[$hook]['method']) {
-			$this->input->send_json(self::INVALID_METHOD);
+		if ($this->request->getMethod() !== $this->hooks[$hook]['method']) {
+			$this->send_json(self::INVALID_METHOD, 404);
 			return;
 		}
 		
@@ -134,7 +130,7 @@ class Api
 		string $method = 'GET',
 		?string $api_key = null
 	): Handler {
-		$handler = new Handler( container()->get('input'), $callback );
+		$handler = new Handler( container()->get('request'), $callback );
 
 		self::get_api_manager()->register_hook($hook, $handler, $method, $api_key);
 

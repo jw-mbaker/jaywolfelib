@@ -2,7 +2,6 @@
 
 namespace JayWolfeLib\Hooks;
 
-use JayWolfeLib\Input;
 use DownShift\WordPress\EventEmitterInterface;
 
 use function JayWolfeLib\container;
@@ -18,7 +17,7 @@ class Ajax extends Hooks
 	 */
 	public static function add_ajax(string $hook, callable $callback): Handler
 	{
-		$handler = new Handler( container()->get('input'), $callback );
+		$handler = new Handler( container()->get('request'), $callback );
 
 		self::add_action("wp_ajax_{$hook}", $handler);
 

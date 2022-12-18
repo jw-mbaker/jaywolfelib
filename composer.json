@@ -1,7 +1,7 @@
 {
     "name": "jw-mbaker/jaywolfelib",
-    "type": "wordpress-dropin",
-    "version": "1.11.2",
+    "type": "mu-plugin",
+    "version": "2.0.0",
     "minimum-stability": "dev",
     "require-dev": {
         "10up/wp_mock": "^0.5.0"
@@ -11,7 +11,8 @@
         "pimple/pimple": "^3.0",
         "symfony/polyfill-php80": "^1.26",
         "downshiftorg/wp-event-emitter": "^6.0",
-        "guzzlehttp/guzzle": "~6.0 || ~7.0"
+        "guzzlehttp/guzzle": "~6.0 || ~7.0",
+        "symfony/http-foundation": "^5.4"
     },
     "autoload": {
         "psr-4": {
@@ -23,5 +24,8 @@
         "psr-4": {
             "JayWolfeLib\\Tests\\": "tests/"
         }
+    },
+    "scripts": {
+        "test": "./vendor/bin/phpunit"
     }
 }

@@ -3,8 +3,8 @@
 namespace JayWolfeLib\Tests;
 
 use JayWolfeLib\Container;
-use JayWolfeLib\Input;
 use DownShift\WordPress\EventEmitterInterface;
+use Symfony\Component\HttpFoundation\Request;
 use WP_Mock;
 use Mockery;
 
@@ -63,7 +63,7 @@ class ContainerTest extends WP_Mock\Tools\TestCase
 		Container::bootstrap($container);
 
 		$this->assertInstanceOf(EventEmitterInterface::class, $container->get('hooks'));
-		$this->assertInstanceOf(Input::class, $container->get('input'));
+		$this->assertInstanceOf(Request::class, $container->get('request'));
 		$this->assertInstanceOf(\JayWolfeLib\Config\Factory::class, $container->get('config'));
 		$this->assertSame($container->get('wpdb'), $wpdb);
 		$this->assertInstanceOf(\JayWolfeLib\Models\Factory::class, $container->get('models'));
@@ -94,7 +94,7 @@ class ContainerTest extends WP_Mock\Tools\TestCase
 		$container = container();
 
 		$this->assertInstanceOf(EventEmitterInterface::class, $container->get('hooks'));
-		$this->assertInstanceOf(Input::class, $container->get('input'));
+		$this->assertInstanceOf(Request::class, $container->get('request'));
 		$this->assertInstanceOf(\JayWolfeLib\Config\Factory::class, $container->get('config'));
 		$this->assertSame($container->get('wpdb'), $wpdb);
 		$this->assertInstanceOf(\JayWolfeLib\Models\Factory::class, $container->get('models'));
@@ -107,7 +107,7 @@ class ContainerTest extends WP_Mock\Tools\TestCase
 		$container = container();
 
 		$this->assertInstanceOf(EventEmitterInterface::class, $container->get('hooks'));
-		$this->assertInstanceOf(Input::class, $container->get('input'));
+		$this->assertInstanceOf(Request::class, $container->get('request'));
 		$this->assertInstanceOf(\JayWolfeLib\Config\Factory::class, $container->get('config'));
 		$this->assertSame($container->get('wpdb'), $wpdb);
 		$this->assertInstanceOf(\JayWolfeLib\Models\Factory::class, $container->get('models'));

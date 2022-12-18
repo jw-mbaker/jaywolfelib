@@ -4,6 +4,7 @@ namespace JayWolfeLib;
 
 use JayWolfeLib\Exception\InvalidClass;
 use DownShift\WordPress\EventEmitter;
+use Symfony\Component\HttpFoundation\Request;
 
 class Container extends \Pimple\Container
 {
@@ -53,8 +54,8 @@ class Container extends \Pimple\Container
 			$container->set('hooks', new EventEmitter());
 		}
 
-		if (!isset($container['input'])) {
-			$container->set('input', $container->factory(fn() => new Input()));
+		if (!isset($container['request'])) {
+			$container->set('request', fn() => Request::createFromGlobals());
 		}
 
 		if (!isset($container['config'])) {
@@ -81,7 +82,7 @@ class Container extends \Pimple\Container
 		}
 
 		if (!isset($container['api'])) {
-			$container->set('api', fn(Container $c) => new Api\Api($c->get('input')));
+			$container->set('api', fn(Container $c) => new Api\Api($c->get('request')));
 		}
 	}
 }

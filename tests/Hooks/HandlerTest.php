@@ -3,20 +3,20 @@
 namespace JayWolfeLib\Tests\Hooks;
 
 use JayWolfeLib\Hooks\Handler;
-use JayWolfeLib\Input;
 use JayWolfeLib\Container;
 use JayWolfeLib\Models\Factory as ModelFactory;
+use Symfony\Component\HttpFoundation\Request;
 use WP_Mock;
 use Mockery;
 
 class HandlerTest extends WP_Mock\Tools\TestCase
 {
-	private $input;
+	private $request;
 
 	public function setUp(): void
 	{
 		WP_Mock::setUp();
-		$this->input = Mockery::mock(Input::class);
+		$this->request = Mockery::mock(Request::class);
 	}
 
 	public function tearDown(): void
@@ -27,7 +27,7 @@ class HandlerTest extends WP_Mock\Tools\TestCase
 
 	public function testCanInvokeCallback(): void
 	{
-		$handler = new Handler($this->input, function() {
+		$handler = new Handler($this->request, function() {
 			$this->assertTrue(true);
 		});
 
@@ -36,7 +36,7 @@ class HandlerTest extends WP_Mock\Tools\TestCase
 
 	public function testCanPassDependency(): void
 	{
-		$handler = new Handler($this->input, function(Input $input, $test) {
+		$handler = new Handler($this->request, function(Request $request, $test) {
 			$this->assertEquals($test, 'test');
 		});
 
@@ -52,7 +52,7 @@ class HandlerTest extends WP_Mock\Tools\TestCase
 	 */
 	public function testCanPassClassAsString(): void
 	{
-		$handler = new Handler($this->input, function(Input $input, $obj) {
+		$handler = new Handler($this->request, function(Request $request, $obj) {
 			$this->assertInstanceOf(\stdClass::class, $obj);
 		});
 
@@ -71,7 +71,7 @@ class HandlerTest extends WP_Mock\Tools\TestCase
 		$container = new Container();
 		$container->set('test', 1);
 
-		$handler = new Handler($this->input, function(Input $input, $test) {
+		$handler = new Handler($this->request, function(Request $request, $test) {
 			$this->assertEquals($test, 1);
 		});
 
@@ -87,7 +87,7 @@ class HandlerTest extends WP_Mock\Tools\TestCase
 	 */
 	public function testCanPassCallable(): void
 	{
-		$handler = new Handler($this->input, function(Input $input, $test) {
+		$handler = new Handler($this->request, function(Request $request, $test) {
 			$this->assertEquals($test, 123);
 		});
 
@@ -108,7 +108,7 @@ class HandlerTest extends WP_Mock\Tools\TestCase
 
 		$factory->expects()->get('mock')->andReturn($mock);
 
-		$handler = new Handler($this->input, function(Input $input, $mock) {
+		$handler = new Handler($this->request, function(Request $request, $mock) {
 			$this->assertInstanceOf(\JayWolfeLib\Models\ModelInterface::class, $mock);
 		});
 

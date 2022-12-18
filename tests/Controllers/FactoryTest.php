@@ -8,7 +8,6 @@ use JayWolfeLib\Controllers\ControllerInterface;
 use JayWolfeLib\Models\Factory as ModelFactory;
 use JayWolfeLib\Config\Config;
 use JayWolfeLib\Views\View;
-use JayWolfeLib\Input;
 use JayWolfeLib\Exception\InvalidController;
 use WP_Mock;
 use Mockery;

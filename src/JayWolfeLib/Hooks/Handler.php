@@ -2,21 +2,17 @@
 
 namespace JayWolfeLib\Hooks;
 
-use JayWolfeLib\Input;
 use JayWolfeLib\Container;
 use JayWolfeLib\Factory\BaseFactoryInterface;
+use JayWolfeLib\Traits\RequestTrait;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Handler class
  */
 class Handler
 {
-	/**
-	 * The input object.
-	 *
-	 * @var Input
-	 */
-	private $input;
+	use RequestTrait;
 
 	/**
 	 * The callback that the handler will call when the action is invoked.
@@ -32,9 +28,9 @@ class Handler
 	 */
 	private $dependencies = [];
 
-	public function __construct(Input $input, callable $callback)
+	public function __construct(Request $request, callable $callback)
 	{
-		$this->input = $input;
+		$this->set_request($request);
 		$this->callback = $callback;
 	}
 
@@ -57,7 +53,7 @@ class Handler
 			$this->dependencies[$k] = $dependency;
 		}
 
-		call_user_func($this->callback, $this->input, ...$this->dependencies);
+		call_user_func($this->callback, $this->request, ...$this->dependencies);
 	}
 
 	/**

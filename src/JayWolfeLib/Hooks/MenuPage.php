@@ -2,8 +2,6 @@
 
 namespace JayWolfeLib\Hooks;
 
-use JayWolfeLib\Input;
-
 use function JayWolfeLib\container;
 
 class MenuPage
@@ -32,7 +30,7 @@ class MenuPage
 		if ($callback instanceof Handler) {
 			$handler = $callback;
 		} else {
-			$handler = new Handler( container()->get('input'), $callback );
+			$handler = new Handler( container()->get('request'), $callback );
 		}
 
 		add_menu_page(
@@ -72,7 +70,7 @@ class MenuPage
 		if ($callback instanceof Handler) {
 			$handler = $callback;
 		} else {
-			$handler = new Handler( container()->get('input'), $callback );
+			$handler = new Handler( container()->get('request'), $callback );
 		}
 
 		add_submenu_page(

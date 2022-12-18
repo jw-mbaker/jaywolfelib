@@ -4,6 +4,9 @@ namespace JayWolfeLib;
 
 use JayWolfeLib\Exception\InvalidClass;
 
+/**
+ * @deprecated
+ */
 class Input
 {
 	/**

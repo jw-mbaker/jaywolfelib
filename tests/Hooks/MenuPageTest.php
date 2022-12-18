@@ -2,9 +2,10 @@
 
 namespace JayWolfeLib\Tests\Hooks;
 
-use JayWolfeLib\Input;
 use JayWolfeLib\Hooks\MenuPage;
 use JayWolfeLib\Hooks\Handler;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\InputBag;
 use WP_Mock;
 use Mockery;
 
@@ -17,7 +18,7 @@ class MenuPageTest extends WP_Mock\Tools\TestCase
 		WP_Mock::setUp();
 		WP_Mock::userFunction('add_menu_page', ['return' => '']);
 		WP_Mock::userFunction('add_submenu_page', ['return' => '']);
-		container(false)->set('input', Mockery::mock(Input::class));
+		container(false)->set('request', fn() => Request::createFromGlobals());
 	}
 
 	public function tearDown(): void
@@ -46,12 +47,10 @@ class MenuPageTest extends WP_Mock\Tools\TestCase
 	{
 		$_GET['test'] = 1;
 
-		$input = container(false)->get('input');
+		$request = container(false)->get('request');
 
-		$input->expects()->get('test')->andReturn($_GET['test']);
-
-		$callback = function (Input $input, $foo, $bar) {
-			$this->assertEquals($input->get('test'), 1);
+		$callback = function (Request $request, $foo, $bar) {
+			$this->assertEquals($request->query->get('test'), 1);
 			$this->assertEquals($foo, 'foo');
 			$this->assertEquals($bar, 'bar');
 		};
