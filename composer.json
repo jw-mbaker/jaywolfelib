@@ -1,7 +1,6 @@
 {
     "name": "jw-mbaker/jaywolfelib",
     "type": "mu-plugin",
-    "version": "2.0.1",
     "minimum-stability": "dev",
     "require-dev": {
         "10up/wp_mock": "^0.5.0"
