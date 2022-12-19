@@ -7,6 +7,9 @@ use JayWolfeLib\Factory\ConfigFactoryInterface;
 use JayWolfeLib\Includes\Dependencies;
 use JayWolfeLib\Exception\InvalidConfig;
 
+/**
+ * @deprecated 3.0.0
+ */
 class Factory implements ConfigFactoryInterface
 {
 	/**

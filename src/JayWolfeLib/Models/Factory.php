@@ -2,36 +2,36 @@
 
 namespace JayWolfeLib\Models;
 
-use JayWolfeLib\Container;
 use JayWolfeLib\Factory\ModelFactoryInterface;
 use JayWolfeLib\Exception\InvalidModel;
+use DI\Container;
 
 class Factory implements ModelFactoryInterface
 {
 	/**
-	 * The model container.
+	 * The model collection.
 	 *
-	 * @var Container
+	 * @var ModelCollection
 	 */
-	protected $modelContainer;
+	protected $models;
 
 	/**
 	 * The main container.
 	 *
 	 * @var Container
 	 */
-	protected $mainContainer;
+	protected $container;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param Container $modelContainer
-	 * @param Container $mainContainer
+	 * @param ModelCollection $models
+	 * @param Container $container
 	 */
-	public function __construct(Container $modelContainer, Container $mainContainer)
+	public function __construct(ModelCollection $models, Container $container)
 	{
-		$this->modelContainer = $modelContainer;
-		$this->mainContainer = $mainContainer;
+		$this->models = $models;
+		$this->container = $container;
 	}
 
 	public function get(string $model): ModelInterface
@@ -40,18 +40,16 @@ class Factory implements ModelFactoryInterface
 			throw new InvalidModel($model . ' not found.');
 		}
 
-		$key = sanitize_key($model);
-
-		if (!isset($this->modelContainer[$key])) {
+		if (null === $this->models->get($model)) {
 			$class = new \ReflectionClass($model);
 			if (!$class->implementsInterface(ModelInterface::class)) {
-				$this->modelContainer[$key] = $this->create($model);
+				$this->models->add($model, $this->create($model));
 			} else {
-				$this->modelContainer[$key] = new $model($this->mainContainer->get('wpdb'), $this);
+				$this->models->add($model, new $model($this->container->get(\WPDB::class), $this));
 			}
 		}
 
-		return $this->modelContainer[$key];
+		return $this->models->get($model);
 	}
 
 	protected function create(string $class): ModelInterface
@@ -60,12 +58,12 @@ class Factory implements ModelFactoryInterface
 	}
 
 	/**
-	 * Get the model container.
+	 * Get the model collection.
 	 *
-	 * @return Container
+	 * @return ModelCollection
 	 */
-	public function get_container(): Container
+	public function get_models(): ModelCollection
 	{
-		return $this->modelContainer;
+		return $this->models;
 	}
 }

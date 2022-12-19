@@ -4,6 +4,9 @@ namespace JayWolfeLib\Factory;
 
 use JayWolfeLib\Config\ConfigInterface;
 
+/**
+ * @deprecated 3.0.0
+ */
 interface ConfigFactoryInterface extends BaseFactoryInterface
 {
 	/**

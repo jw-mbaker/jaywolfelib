@@ -2,7 +2,9 @@
 
 namespace JayWolfeLib\Includes;
 
-class Dependencies
+use JayWolfeLib\Parameter\ParameterInterface;
+
+class Dependencies implements ParemeterInterface
 {
 	/**
 	 * The dependencies.
@@ -23,6 +25,25 @@ class Dependencies
 		$this->dependencies = $dependencies;
 	}
 
+	public function add(array $dependencies)
+	{
+		foreach ($dependencies as $key => $value) {
+			$this->set($key, $value);
+		}
+	}
+
+	public function set(string $name, $value)
+	{
+		$key = sanitize_key($name);
+
+		$this->dependencies[$key] = $value;
+	}
+
+	public function has(string $name)
+	{
+		return array_key_exists($name, $this->dependencies);
+	}
+
 	public function requirements_met(): bool
 	{
 		$requirements_met = true;
@@ -40,6 +61,20 @@ class Dependencies
 		}
 
 		return $requirements_met;
+	}
+
+	public function remove(string $name)
+	{
+		$key = sanitize_key($name);
+
+		if (isset($this->dependencies[$key])) {
+			unset($this->dependencies[$key]);
+		}
+	}
+
+	public function clear()
+	{
+		$this->dependencies = [];
 	}
 
 	/**

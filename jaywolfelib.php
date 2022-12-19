@@ -13,6 +13,11 @@
 
 namespace JayWolfeLib;
 
-if (file_exists(__DIR__ . '/jaywolfelib/vendor/autoload.php')) {
-	define(__NAMESPACE__ . "\\VENDOR_PATH", __DIR__ . '/jaywolfelib/vendor');
-}
+/**
+ * Whether in production or development environment.
+ * 
+ * @var bool
+ */
+const PRODUCTION = true;
+
+require_once __DIR__ . '/jaywolfelib/vendor/autoload.php';

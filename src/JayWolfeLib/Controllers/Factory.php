@@ -11,29 +11,20 @@ use JayWolfeLib\Container;
 class Factory implements ControllerFactoryInterface
 {
 	/**
-	 * The controller container.
+	 * The controller collection.
 	 *
-	 * @var Container
+	 * @var ControllerCollection
 	 */
-	protected $controllerContainer;
-
-	/**
-	 * The main container.
-	 *
-	 * @var Container
-	 */
-	protected $mainContainer;
+	protected $controllers;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param Container $controllerContainer
-	 * @param Container $mainContainer
+	 * @param ControllerCollection $controllers
 	 */
-	public function __construct(Container $controllerContainer, Container $mainContainer)
+	public function __construct(ControllerCollection $controllers)
 	{
-		$this->controllerContainer = $controllerContainer;
-		$this->mainContainer = $mainContainer;
+		$this->controllers = $controllers;
 	}
 
 	/**
@@ -51,9 +42,7 @@ class Factory implements ControllerFactoryInterface
 			$this->throw_controller_not_found($controller);
 		}
 
-		$key = sanitize_key($controller);
-
-		if (!isset($this->controllerContainer[$key])) {
+		if (null === $this->controllers->get($controller)) {
 			$class = new \ReflectionClass($controller);
 			if (!$class->implementsInterface(ControllerInterface::class)) {
 				$this->throw_controller_not_implement_interface($controller);
@@ -62,7 +51,7 @@ class Factory implements ControllerFactoryInterface
 			return $this->create($controller, $view, ...$dependencies);
 		}
 
-		return $this->controllerContainer[$key];
+		return $this->controllers->get($controller);
 	}
 
 	/**
@@ -80,9 +69,7 @@ class Factory implements ControllerFactoryInterface
 			$this->throw_controller_not_found($controller);
 		}
 
-		$key = sanitize_key($controller);
-
-		if (isset($this->controllerContainer[$key])) {
+		if (null !== $this->controllers->get($controller)) {
 			return $this->get($controller);
 		}
 
@@ -91,24 +78,19 @@ class Factory implements ControllerFactoryInterface
 			$this->throw_controller_not_implement_interface($controller);
 		}
 
-		$this->controllerContainer->init(
-			$key,
-			$controller,
-			$view,
-			...$dependencies
-		);
+		$this->controllers->add($controller, new $controller($view, ...$dependencies));
 
-		return $this->controllerContainer[$key];
+		return $this->controllers->get($controller);
 	}
 
 	/**
-	 * Get the controller container.
+	 * Get the controller collection.
 	 *
-	 * @return Container
+	 * @return ControllerCollection
 	 */
-	public function get_container(): Container
+	public function get_controllers(): ControllerCollection
 	{
-		return $this->controllerContainer;
+		return $this->controllers;
 	}
 
 	protected function throw_controller_not_found(string $controller)
