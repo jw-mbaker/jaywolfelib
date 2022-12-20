@@ -4,16 +4,21 @@ namespace JayWolfeLib\Route;
 
 use JayWolfeLib\Collection\AbstractCollection;
 
-class RouteCollection extends AbstractCollection
+class RouteCollection extends AbstractCollection implements RouteCollectionInterface
 {
 	/**
 	 * @var array<string, Route>
 	 */
 	private $routes = [];
 
-	public function add(string $name, Route $route)
+	public function add(string $name, RouteInterface $route)
 	{
 		$this->routes[$name] = $route;
+	}
+
+	public function addRoute(RouteInterface $route)
+	{
+		$this->add($route->id(), $route);
 	}
 
 	public function all(): array
@@ -21,7 +26,7 @@ class RouteCollection extends AbstractCollection
 		return $this->routes;
 	}
 
-	public function get(string $name): ?Route
+	public function get(string $name): ?RouteInterface
 	{
 		return $this->routes[$name] ?? null;
 	}

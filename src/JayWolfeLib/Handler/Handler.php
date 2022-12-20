@@ -1,6 +1,6 @@
 <?php
 
-namespace JayWolfeLib;
+namespace JayWolfeLib\Handler;
 
 use JayWolfeLib\Factory\ModelFactoryInterface;
 use JayWolfeLib\Models\ModelInterface;
@@ -30,12 +30,29 @@ class Handler
 			$this->dependencies[$k] = $dependency;
 		}
 
-		$this->container->call($this->callback, $this->dependencies);
+		return $this->container->call($this->callback, $this->dependencies);
 	}
 
 	public function add($dependency): self
 	{
 		$this->dependencies[] = $dependency;
 		return $this;
+	}
+
+	public static function create($handler, array $dependencies = []): ?self
+	{
+		$container = apply_filters('jwlib_get_container', null);
+
+		if (is_array($handler)) {
+			if ($container->has($handler[0])) {
+				$handler = [$container->get($handler[0]), $handler[1]];
+			} else {
+				throw new \Exception((string) $handler . ' not found in container.');
+			}
+
+			return new static($handler, $container, $dependencies);
+		}
+
+		return null;
 	}
 }

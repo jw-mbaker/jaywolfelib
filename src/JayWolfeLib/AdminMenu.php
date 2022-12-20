@@ -2,8 +2,12 @@
 
 namespace JayWolfeLib;
 
+use JayWolfeLib\Handler\HandlerTrait;
+
 class AdminMenu
 {
+	use HandlerTrait;
+
 	private $container;
 
 	public function __construct(Container $container)
@@ -30,7 +34,7 @@ class AdminMenu
 	) {
 		$options = $this->sanitize_options($options);
 
-		$handler = $this->possibly_create_handler($options['handler'], $options['dependencies'] ?? []);
+		$handler = $this->build_handler($options['handler'], $options['dependencies'] ?? []);
 
 		add_menu_page($page_title, $menu_title, $capability, $slug, $handler, $options['icon_url'], $options['position']);
 
@@ -58,7 +62,7 @@ class AdminMenu
 	) {
 		$options = $this->sanitize_options($options);
 
-		$handler = $this->possibly_create_handler($options['handler'], $options['dependencies'] ?? []);
+		$handler = $this->build_handler($options['handler'], $options['dependencies'] ?? []);
 
 		add_submenu_page($parent_slug, $page_title, $menu_title, $capability, $handler, $options['position']);
 
@@ -72,23 +76,5 @@ class AdminMenu
 		$options['position'] ??= null;
 
 		return $options;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	private function possibly_create_handler($handler, array $dependencies)
-	{
-		if (is_array($handler)) {
-			if ($this->container->has($handler[0])) {
-				$handler = [$this->container->get($handler[0]), $handler[1]];
-			} else {
-				throw new \Exception((string) $handler . ' not found in container.');
-			}
-
-			$handler = new Handler($handler, $this->container, $dependencies);
-		}
-
-		return $handler;
 	}
 }

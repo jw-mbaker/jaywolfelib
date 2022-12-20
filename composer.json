@@ -18,7 +18,10 @@
         "psr-4": {
             "JayWolfeLib\\": "src/JayWolfeLib"
         },
-        "files": ["src/JayWolfeLib/functions.php"]
+        "files": [
+            "src/JayWolfeLib/functions.php",
+            "src/JayWolfeLib/bootstrap.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

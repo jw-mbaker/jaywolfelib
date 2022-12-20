@@ -11,8 +11,17 @@ use JayWolfeLib\Models\ModelCollection;
 use JayWolfeLib\Models\Factory as ModelFactory;
 use JayWolfeLib\Controllers\ControllerCollection;
 use JayWolfeLib\Controllers\Factory as ControllerFactory;
-use JayWolfeLib\Route\RouteCollection;
-use JayWolfeLib\Route\Dispatcher;
+use JayWolfeLib\Hooks\AdminMenu;
+use JayWolfeLib\Routing\RouteCollectionInterface;
+use JayWolfeLib\Routing\RouteCollection;
+use JayWolfeLib\Routing\RouterInterface;
+use JayWolfeLib\Routing\Router;
+use JayWolfeLib\Routing\AjaxRouter;
+use JayWolfeLib\Routing\ApiRouter;
+use JayWolfeLib\Handler\ResultHandler;
+use JayWolfeLib\Handler\ApiHandler;
+use JayWolfeLib\Handler\AjaxHandler;
+use GuzzleHttp\Psr7\Uri;
 use DI\ContainerBuilder;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -46,14 +55,8 @@ class Init
 				global $wpdb;
 				return $wpdb;
 			},
-			ModelCollection::class => \DI\create(),
-			ModelFactoryInterface::class => function(Container $c) {
-				return new ModelFactory($c->get(ModelCollection::class), $c);
-			},
-			ControllerCollection::class => \DI\create(),
-			ControllerFactoryInterface::class => \DI\create(ControllerFactory::class)
-				->constructor(\DI\get(ControllerCollection::class)),
-			RouteCollection::class => \DI\create()
+			ModelFactoryInterface::class => \DI\create(ModelFactory::class),
+			RouteCollectionInterface::class => \DI\create(RouteCollection::class)
 		]);
 
 		do_action('jwlib_container_definitions', $this->containerBuilder);
@@ -65,11 +68,81 @@ class Init
 
 	public function register_routes()
 	{
-		do_action('jwlib_routes', $this->container->get(RouteCollection::class));
+		do_action('jwlib_routes', $this->container->get(RouteCollectionInterface::class));
+
+		$request = $this->container->get(Request::class);
+
+		switch (true) {
+			case (is_admin()):
+				$router = $this->container->get(AjaxRouter::class);
+				break;
+			case (str_starts_with($request->getPathInfo(), '/api')):
+				$router = $this->container->get(ApiRouter::class);
+				break;
+			default:
+				$router = $this->container->get(Router::class);
+		}
+
+		$this->handle_request($router, $request);
 	}
 
 	public function admin_menu()
 	{
 		do_action('jwlib_admin_menu', new AdminMenu($this->container));
+	}
+
+	private function handle_request(RouterInterface $router, Request $request)
+	{
+		if ($router instanceof AjaxRouter) {
+			$this->handle_admin($router, $request);
+			return;
+		}
+
+		if ($router instanceof ApiRouter) {
+			$this->handle_api($router, $request);
+			return;
+		}
+
+		if ($router instanceof Router) {
+			add_filter('do_parse_request', function(bool $do, \WP $wp) use ($router, $request) {
+				return $this->parse_request($router, $request, $do, $wp);
+			}, 999, 2);
+		}
+	}
+
+	private function parse_request(RouterInterface $router, Request $request, bool $do, \WP $wp): bool
+	{
+		$do = $this->container->call(
+			[ResultHandler::class, 'handle'],
+			[$router->match(new Uri($request->getUri()), $request->getMethod())],
+			$do
+		);
+		
+		if (!$do) {
+			global $wp_version;
+
+			if ($wp_version && version_compare($wp_version, '6', '>=')) {
+				$wp->query_posts();
+				$wp->register_globals();
+			}
+		}
+
+		return $do;
+	}
+
+	private function handle_ajax(RouterInterface $router, Request $request)
+	{
+		$this->container->call(
+			[AjaxHandler::class, 'handle'],
+			[$router->match($request->getMethod())]
+		);
+	}
+
+	private function handle_api(RouterInterface $router, Request $request)
+	{
+		$this->container->call(
+			[ApiHandler::class, 'handle'],
+			[$router->match(new Uri($request->getUri())), $request->getMethod()]
+		);
 	}
 }
