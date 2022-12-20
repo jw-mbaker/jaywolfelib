@@ -64,6 +64,11 @@ class Config implements ConfigInterface
 		return $this->settings[$key];
 	}
 
+	public function all(): array
+	{
+		return $this->settings;
+	}
+
 	public function has(string $name): bool
 	{
 		return array_key_exists($name, $this->settings);
@@ -127,16 +132,6 @@ class Config implements ConfigInterface
 	public function clear_dependencies()
 	{
 		$this->dependencies->clear();
-	}
-
-	/**
-	 * Get the settings array.
-	 *
-	 * @return array
-	 */
-	public function get_settings(): array
-	{
-		return $this->settings;
 	}
 
 	public function get_dependencies(): Dependencies

@@ -2,7 +2,6 @@
 
 namespace JayWolfeLib\Controllers;
 
-use JayWolfeLib\Container;
 use JayWolfeLib\Views\ViewInterface;
 use JayWolfeLib\Traits\JayWolfeTrait;
 use JayWolfeLib\Traits\ResponseTrait;
