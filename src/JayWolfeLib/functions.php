@@ -60,19 +60,15 @@ function validate_bool($var): ?bool
 /**
  * Retrieve the container.
  *
+ * @param Container|null $c
+ * 
  * @return Container
  */
-function container(bool $bootstrap = true): Container
+function container(?Container $c = null): Container
 {
 	static $container;
 
-	if (!$container) {
-		$container = new Container();
-	}
-
-	if ($bootstrap) {
-		Container::bootstrap($container);
-	}
+	$container ??= $c;
 
 	return $container;
 }

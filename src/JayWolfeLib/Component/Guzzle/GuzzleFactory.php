@@ -1,15 +1,14 @@
 <?php
 
-namespace JayWolfeLib\Guzzle;
+namespace JayWolfeLib\Component\Guzzle;
 
-use JayWolfeLib\Factory\GuzzleFactoryInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Stream;
 use GuzzleHttp\Psr7\Uri;
 
-class Factory implements GuzzleFactoryInterface
+class GuzzleFactory implements GuzzleFactoryInterface
 {
 	/**
 	 * Create a new instance based on the given key.

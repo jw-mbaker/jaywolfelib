@@ -19,8 +19,7 @@
             "JayWolfeLib\\": "src/JayWolfeLib"
         },
         "files": [
-            "src/JayWolfeLib/functions.php",
-            "src/JayWolfeLib/bootstrap.php"
+            "src/JayWolfeLib/functions.php"
         ]
     },
     "autoload-dev": {

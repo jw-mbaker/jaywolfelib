@@ -24,14 +24,6 @@ jobs:
           
       - name: Install Composer Dependencies
         run: composer install -o -q --no-dev
-
-      - name: Move source files into jaywolfelib folder
-        run: |
-          mkdir jaywolfelib
-          mv ./src ./jaywolfelib
-          mv ./vendor ./jaywolfelib
-          mv ./composer.json jaywolfelib
-          mv ./README.md jaywolfelib
         
       - name: Zip Folder
         run: zip -r ${{ github.event.repository.name }}.zip . -x ".git/*" ".github/*" "phpcs.xml" "composer.lock" ".gitignore" ".gitattributes" "tests/*" "phpunit.xml"

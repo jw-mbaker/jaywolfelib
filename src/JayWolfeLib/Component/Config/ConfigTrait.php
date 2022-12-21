@@ -1,6 +1,6 @@
 <?php
 
-namespace JayWolfeLib\Config;
+namespace JayWolfeLib\Component\Config;
 
 trait ConfigTrait
 {

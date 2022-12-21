@@ -25,8 +25,10 @@ use GuzzleHttp\Psr7\Uri;
 use DI\ContainerBuilder;
 use Symfony\Component\HttpFoundation\Request;
 
-class Init
+class JayWolfeLib
 {
+	private static $loaded = false;
+
 	private $containerBuilder;
 	private $container;
 
@@ -34,6 +36,57 @@ class Init
 	{
 		$this->containerBuilder = $containerBuilder;
 	}
+
+	public static function load(Request $request = null): bool
+	{
+		try {
+			if (self::$loaded) {
+				return false;
+			}
+
+			if (did_action('init')) {
+				throw new \BadMethodCallException(
+					sprintf('%s must be called before "init"', __METHOD__)
+				);
+			}
+
+			self::$loaded = add_action('init', function() use ($request) {
+				try {
+					$instance = new static( new ContainerBuilder(Container::class) );
+
+					// Initialize the global container.
+					container( $instance->add_definitions() );
+
+					$instance->register_routes();
+					
+
+					unset($instance);
+
+					do_action('jwlib_loaded');
+				} catch (\Exception $e) {
+					if (defined('WP_DEBUG') && WP_DEBUG) {
+						throw $e;
+					}
+
+					do_action('jwlib_fail', $e);
+					return;
+				}
+			}, 100, 1);
+		} catch (\Exception $e) {
+			if (defined('WP_DEBUG') && WP_DEBUG) {
+				throw $e;
+			}
+
+			do_action('jwlib_fail', $e);
+		}
+
+		return true;
+	}
+
+
+
+
+
 
 	public function run()
 	{
@@ -45,7 +98,7 @@ class Init
 		}
 	}
 
-	public function add_definitions()
+	public function add_definitions(): Container
 	{
 		$this->containerBuilder->addDefinitions([
 			Request::class => \DI\factory([Request::class, 'createFromGlobals']),
@@ -62,8 +115,7 @@ class Init
 		do_action('jwlib_container_definitions', $this->containerBuilder);
 
 		$this->container = $this->containerBuilder->build();
-
-		add_filter('jwlib_get_container', fn() => $this->container);
+		return $this->container;
 	}
 
 	public function register_routes()

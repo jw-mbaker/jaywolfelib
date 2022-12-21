@@ -8,6 +8,9 @@ use JayWolfeLib\Views\View;
 use JayWolfeLib\Exception\InvalidController;
 use JayWolfeLib\Container;
 
+/**
+ * @deprecated 3.0.0
+ */
 class Factory implements ControllerFactoryInterface
 {
 	/**

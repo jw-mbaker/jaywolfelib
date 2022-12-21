@@ -1,6 +1,6 @@
 <?php
 
-namespace JayWolfeLib\Config;
+namespace JayWolfeLib\Component\Config;
 
 class Config implements ConfigInterface
 {
@@ -18,10 +18,16 @@ class Config implements ConfigInterface
 	 */
 	protected $dependencies;
 
-	public function __construct(array $settings, array $dependencies)
+	/**
+	 * Constructor.
+	 *
+	 * @param array $settings
+	 * @param Dependencies|null $dependencies
+	 */
+	public function __construct(array $settings, Dependencies $dependencies = null)
 	{
 		$this->settings = $settings;
-		$this->dependencies = new Dependencies($dependencies);
+		$this->dependencies ??= new Dependencies([]);
 	}
 
 	public function add(array $settings)

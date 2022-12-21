@@ -5,6 +5,9 @@ namespace JayWolfeLib\Factory;
 use JayWolfeLib\Controllers\ControllerInterface;
 use JayWolfeLib\Views\ViewInterface;
 
+/**
+ * @deprecated 3.0.0
+ */
 interface ControllerFactoryInterface extends BaseFactoryInterface
 {
 	/**

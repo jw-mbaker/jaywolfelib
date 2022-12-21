@@ -1,6 +1,6 @@
 <?php
 
-namespace JayWolfeLib\Includes;
+namespace JayWolfeLib\Component\Config;
 
 use JayWolfeLib\Parameter\ParameterInterface;
 

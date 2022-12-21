@@ -2,6 +2,8 @@
 
 namespace JayWolfeLib\Factory;
 
+use JayWolfeLib\Factory\BaseFactoryInterface;
+
 interface GuzzleFactoryInterface extends BaseFactoryInterface
 {
 	public function get(string $key, array $opts = []);
