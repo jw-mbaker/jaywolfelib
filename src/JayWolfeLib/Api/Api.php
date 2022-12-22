@@ -11,6 +11,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 use function JayWolfeLib\container;
 
+/**
+ * @deprecated 3.0.0
+ */
 class Api
 {
 	use RequestTrait, ResponseTrait;

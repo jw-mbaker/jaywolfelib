@@ -3,16 +3,15 @@
     "type": "mu-plugin",
     "minimum-stability": "dev",
     "require-dev": {
-        "10up/wp_mock": "^0.5.0"
+        "10up/wp_mock": "^0.5.0",
+        "doctrine/annotations": "^2.0"
     },
     "require": {
         "php": ">=7.4",
         "symfony/polyfill-php80": "^1.26",
-        "guzzlehttp/guzzle": "~6.0 || ~7.0",
         "symfony/http-foundation": "^5.4",
         "php-di/php-di": "^6.4.0",
-        "ocramius/proxy-manager": "^2.11.2",
-        "nikic/fast-route": "^v1.3.0"
+        "ocramius/proxy-manager": "^2.11.2"
     },
     "autoload": {
         "psr-4": {

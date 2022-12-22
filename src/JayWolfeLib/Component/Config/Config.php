@@ -2,14 +2,12 @@
 
 namespace JayWolfeLib\Component\Config;
 
+use JayWolfeLib\Traits\SettingsTrait;
+use JayWolfeLib\Exception\InvalidConfig;
+
 class Config implements ConfigInterface
 {
-	/**
-	 * An associative array of configuation settings.
-	 *
-	 * @var array
-	 */
-	protected $settings = [];
+	use SettingsTrait;
 
 	/**
 	 * The Dependencies object.
@@ -27,52 +25,7 @@ class Config implements ConfigInterface
 	public function __construct(array $settings, Dependencies $dependencies = null)
 	{
 		$this->settings = $settings;
-		$this->dependencies ??= new Dependencies([]);
-	}
-
-	public function add(array $settings)
-	{
-		foreach ($settings as $key => $setting) {
-			$this->set($key, $setting);
-		}
-	}
-
-	/**
-	 * Set a config setting.
-	 *
-	 * @param string $name
-	 * @param mixed $value
-	 * @return $val
-	 */
-	public function set(string $name, $value)
-	{
-		$key = sanitize_key($name);
-
-		$this->settings[$key] = $value;
-
-		return $this->settings[$key];
-	}
-
-	/**
-	 * Get a config setting.
-	 *
-	 * @param string $name
-	 * @return mixed
-	 */
-	public function get(string $name)
-	{
-		$key = sanitize_key($name);
-
-		if (!isset($this->settings[$key])) {
-			return $this->set($key, null);
-		}
-
-		return $this->settings[$key];
-	}
-
-	public function all(): array
-	{
-		return $this->settings;
+		$this->dependencies ??= new Dependencies($settings['dependencies'] ?? []);
 	}
 
 	public function has(string $name): bool
@@ -100,26 +53,6 @@ class Config implements ConfigInterface
 		return $this->dependencies->get_errors();
 	}
 
-	/**
-	 * Delete a config setting.
-	 *
-	 * @param string $key
-	 * @return void
-	 */
-	public function remove(string $name)
-	{
-		$key = sanitize_key($name);
-
-		if (isset($this->settings[$key])) {
-			unset($this->settings[$key]);
-		}
-	}
-
-	public function clear()
-	{
-		$this->settings = [];
-	}
-
 	public function add_dependencies(array $dependencies)
 	{
 		$this->dependencies->add($dependencies);
@@ -143,5 +76,24 @@ class Config implements ConfigInterface
 	public function get_dependencies(): Dependencies
 	{
 		return $this->dependencies;
+	}
+
+	/**
+	 * Factory method for creating a new Config instance.
+	 *
+	 * @param string $file The config file location.
+	 * @return self
+	 */
+	public static function create(string $file): self
+	{
+		if (!is_readable($file)) {
+			throw new InvalidConfig(
+				sprintf('%s not found.', $file)
+			);
+		}
+
+		$settings = include $file;
+
+		return new static($settings);
 	}
 }

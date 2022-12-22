@@ -2,7 +2,7 @@
 
 namespace JayWolfeLib\Component\Config;
 
-use JayWolfeLib\Parameter\ParameterInterface;
+use JayWolfeLib\Component\ParameterInterface;
 
 interface ConfigInterface extends ParameterInterface
 {

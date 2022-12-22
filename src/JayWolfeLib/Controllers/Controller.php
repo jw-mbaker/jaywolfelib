@@ -12,16 +12,8 @@ abstract class Controller implements ControllerInterface
 {
 	use JayWolfeTrait;
 
-	/** @var ViewInterface */
-	protected $view;
-
-	/**
-	 * Constructor.
-	 *
-	 * @param ViewInterface $view
-	 */
-	public function __construct(ViewInterface $view)
+	public function __construct()
 	{
-		$this->view = $view;
+		
 	}
 }

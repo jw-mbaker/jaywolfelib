@@ -1,26 +1,26 @@
 <?php
 
-namespace JayWolfeLib\Routing;
+namespace JayWolfeLib\Traits;
 
-trait RouteTrait
+trait SettingsTrait
 {
-	private $settings = [];
+	protected $settings = [];
 
 	public function add(array $settings)
 	{
 		foreach ($settings as $key => $setting) {
-			$this->set($key, $setting);
+			$this->settings[$key] = $setting;
 		}
-	}
-
-	public function all(): array
-	{
-		return $this->settings;
 	}
 
 	public function get(string $key)
 	{
-		return $this->setting[$key] ?? null;
+		return $this->settings[$key] ?? null;
+	}
+
+	public function set(string $key, $option)
+	{
+		$this->settings[$key] = $option;
 	}
 
 	public function remove(string $key)
@@ -28,9 +28,9 @@ trait RouteTrait
 		unset($this->settings[$key]);
 	}
 
-	public function set(string $key, $value)
+	public function all(): array
 	{
-		$this->settings[$key] = $value;
+		return $this->settings;
 	}
 
 	public function has(string $key): bool

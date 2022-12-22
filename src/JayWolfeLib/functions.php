@@ -2,9 +2,147 @@
 
 namespace JayWolfeLib;
 
-use JayWolfeLib\Hooks\Hooks;
+use JayWolfeLib\Config\ConfigInterface;
+use JayWolfeLib\Config\Config;
 use JayWolfeLib\Exception\InvalidConfig;
 
+/**
+ * Helper function for installing plugins.
+ *
+ * @param ConfigInterface|string $config
+ * @return void
+ */
+function install($config)
+{
+	global $wpdb;
+
+	if (is_string($config)) {
+		$config = Config::create($config);
+	}
+
+	if (!$config instanceof ConfigInterface) {
+		throw new \InvalidArgumentException(
+			sprintf('$config argument must be a config file or implement %s.', ConfigInterface::class)
+		);
+	}
+
+	if (null === $config->get('db')) {
+		throw new InvalidConfig(
+			sprintf('"db" option not set for %s.', plugin_basename($config->get('plugin_file')))
+		);
+	}
+
+	$db = fetch_array('tables', $config);
+	$db_version = $db['version'];
+
+	$charset_collate = $wpdb->get_charset_collate();
+	require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+
+	$key = sanitize_key($config->get('db'));
+
+	add_option("{$key}_db_version", '1', '', 'no');
+
+	$installed_version = get_option( "{$key}_db_version" );
+
+	if ($installed_version !== $db_version) {
+		create_table($db, $charset_collate);
+		update_option("{$key}_db_version", $db_version);
+	}
+}
+
+/**
+ * Check the database for updates.
+ *
+ * @param ConfigInterface|string $config
+ * @return void
+ */
+function update_db_check($config): void
+{
+	if (is_string($config)) {
+		$config = Config::create($config);
+	}
+
+	if (!$config instanceof ConfigInterface) {
+		throw new \InvalidArgumentException(
+			sprintf('$config argument must be a config file or implement %s.', ConfigInterface::class)
+		);
+	}
+
+	if (null === $config->get('db')) {
+		throw new InvalidConfig(
+			sprintf('"db" option not set for %s.', plugin_basename($config->get('plugin_file')))
+		);
+	}
+
+	$db = fetch_array('tables', $config);
+
+	$key = sanitize_key($config->get('db'));
+
+	$db_version = $db['version'];
+
+	if (get_option( "{$key}_db_version" ) !== $db_version) {
+		install($config);
+	}
+}
+
+function create_table(array $db, string $charset_collate): void
+{
+	global $wpdb;
+
+	if (!is_array($db['tables'])) return;
+
+	foreach ($db['tables'] as $table => $fields) {
+		if (!is_array($fields)) continue;
+
+		$sql = "CREATE TABLE {$wpdb->prefix}$table";
+		$fld = [];
+		$fld[] = "id bigint(20) NOT NULL AUTO_INCREMENT";
+		foreach ($fields as $field => $structure) {
+			$fld[] = "$field {$structure['type']}" .
+				(isset($structure['length']) ? "({$structure['length']})" : "") .
+				(isset($structure['default']) ? " DEFAULT {$structure['default']}" : "");
+		}
+		$fld[] = "PRIMARY KEY id (id)";
+		$table_fields = implode(", \n", $fld);
+		$sql .= " ($table_fields) $charset_collate;";
+
+		dbDelta($sql);
+	}
+}
+
+function fetch_array(string $file, ?ConfigInterface $config = null): bool
+{
+	$pathinfo = pathinfo($file);
+
+	if (!isset($pathinfo['extension']) || $pathinfo['extension'] !== '.php') {
+		$file .= '.php';
+	}
+
+	if (null === $config) {
+		$dir = trailingslashit( dirname($file) );
+	} else {
+		if (null === $config->get('paths')['arrays']) {
+			throw new InvalidConfig(
+				sprintf('Array path not set for %s.', plugin_basename($config->get('plugin_file')))
+			);
+		}
+
+		$dir = trailingslashit( $config->get('paths')['arrays'] );
+	}
+
+	$arr = [];
+	if (is_readable($dir . $file)) {
+		$arr = include $dir . $file;
+	}
+
+	if (@!is_array($arr)) {
+		throw new \InvalidArgumentException(
+			sprintf('%s did not return an array.', $file)
+		);
+	}
+
+	return $arr;
+}
 
 /**
  * Store data in cache for quick retrieval.
