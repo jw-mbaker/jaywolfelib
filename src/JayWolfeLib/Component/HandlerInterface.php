@@ -1,6 +1,6 @@
 <?php
 
-namespace JayWolfeLib\Component\WordPress;
+namespace JayWolfeLib\Component;
 
 use Invoker\InvokerInterface;
 
