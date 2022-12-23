@@ -2,9 +2,9 @@
 
 namespace JayWolfeLib\Component\WordPress\AdminMenu;
 
-class SubMenuPage implements MenuPageInterface
+class SubMenuPage extends AbstractMenuPage
 {
-	use MenuPageTrait;
+	public const MENU_TYPE = 'submenu_page';
 
 	public const DEFAULTS = [
 		'page_title' => '',
@@ -13,17 +13,12 @@ class SubMenuPage implements MenuPageInterface
 		'position' => ''
 	];
 
-	protected $parent_slug = '';
+	protected $parent_slug;
 
 	public function __construct(string $slug, string $parent_slug, $callable, array $settings = [])
 	{
-		$this->slug = $slug;
 		$this->parent_slug = $parent_slug;
-		$this->callable = $callable;
-
-		$this->settings = array_merge(self::DEFAULTS, $settings);
-
-		$this->id = 'submenu_page_' . spl_object_hash($this);
+		parent::__construct($slug, $callable, $settings);
 	}
 
 	public function parent_slug(): string

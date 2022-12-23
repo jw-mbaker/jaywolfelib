@@ -19,7 +19,7 @@ class FilterCollection extends AbstractInvokerCollection
 	public function add_filter(HookInterface $hook): bool
 	{
 		$this->add($hook->id(), $hook);
-		return add_filter($hook->hook(), [$this, $hook->id()]);
+		return add_filter($hook->hook(), [$this, $hook->id()], $hook->get('priority'), $hook->get('num_args'));
 	}
 
 	public function add_action(HookInterface $hook): bool
@@ -51,6 +51,6 @@ class FilterCollection extends AbstractInvokerCollection
 
 	public function __call(string $name, array $arguments)
 	{
-		return $this->invoker->call($name, $arguments);
+		return $this->invoker->call($this->get($name), $arguments);
 	}
 }

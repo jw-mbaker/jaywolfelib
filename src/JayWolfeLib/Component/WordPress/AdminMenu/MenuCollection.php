@@ -81,6 +81,6 @@ class MenuCollection extends AbstractInvokerCollection
 
 	public function __call(string $name, array $arguments)
 	{
-		$this->invoker->call($name, $arguments);
+		$this->invoker->call($this->get($name), $arguments);
 	}
 }

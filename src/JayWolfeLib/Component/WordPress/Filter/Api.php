@@ -11,6 +11,7 @@ class Api extends Action
 {
 	use ResponseTrait;
 
+	public const HOOK_TYPE = 'api';
 	public const ACTION_NOT_RECOGNIZED = ['error' => 'Action not recognized.'];
 	public const INVALID_METHOD = ['error' => 'Invalid server request method.'];
 

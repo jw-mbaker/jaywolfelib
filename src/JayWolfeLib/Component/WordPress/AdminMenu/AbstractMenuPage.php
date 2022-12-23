@@ -2,21 +2,26 @@
 
 namespace JayWolfeLib\Component\WordPress\AdminMenu;
 
+use JayWolfeLib\Component\ObjectHash\AbstractObjectHash;
 use JayWolfeLib\Traits\SettingsTrait;
 use Symfony\Component\HttpFoundation\Response;
 use Invoker\InvokerInterface;
 
-trait MenuPageTrait
+abstract class AbstractMenuPage extends AbstractObjectHash implements MenuPageInterface
 {
 	use SettingsTrait;
 
-	protected $id = '';
 	protected $slug = '';
 	protected $callable;
 
-	public function id(): string
+	public function __construct(string $slug, $callable, array $settings = [])
 	{
-		return $this->id;
+		$this->slug = $slug;
+		$this->callable = $callable;
+
+		$this->settings = array_merge(static::DEFAULTS, $settings);
+
+		$this->id ??= $this->set_id_from_type(static::MENU_TYPE);
 	}
 
 	public function slug(): string
