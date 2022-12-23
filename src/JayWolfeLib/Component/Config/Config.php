@@ -26,12 +26,7 @@ class Config implements ConfigInterface
 	{
 		$this->settings = $settings;
 		$this->dependencies ??= new Dependencies($settings['dependencies'] ?? []);
-	}
-
-	public function has(string $name): bool
-	{
-		return array_key_exists($name, $this->settings);
-	}
+	}		
 
 	/**
 	 * Check if plugin requirements are met.
