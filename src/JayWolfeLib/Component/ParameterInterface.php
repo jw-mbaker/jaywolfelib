@@ -10,5 +10,5 @@ interface ParameterInterface
 	public function get(string $name);
 	public function remove(string $name);
 	public function set(string $name, $value);
-	public function has(string $name);
+	public function has(string $name): bool;
 }
