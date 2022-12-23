@@ -36,6 +36,18 @@ class MenuCollection extends AbstractInvokerCollection
 	public function remove($name)
 	{
 		foreach ((array) $name as $n) {
+			$menu_page = $this->menu_pages[$n];
+			$class = get_class($menu_page);
+
+			switch ($class::MENU_TYPE) {
+				case 'menu_page':
+					remove_menu_page($menu_page->slug());
+					break;
+				case 'submenu_page':
+					remove_submenu_page($menu_page->parent_slug(), $menu_page->slug());
+					break;
+			}
+			
 			unset($this->menu_pages[$n]);
 		}
 	}

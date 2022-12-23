@@ -45,6 +45,9 @@ class FilterCollection extends AbstractInvokerCollection
 	public function remove($name)
 	{
 		foreach ((array) $name as $n) {
+			$hook = $this->hooks[$n];
+
+			remove_filter($hook->hook(), [$this, [$hook->id()]]);
 			unset($this->hooks[$n]);
 		}
 	}
