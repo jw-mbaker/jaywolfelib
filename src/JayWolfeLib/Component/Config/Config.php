@@ -77,6 +77,7 @@ class Config implements ConfigInterface
 	 * Factory method for creating a new Config instance.
 	 *
 	 * @param string $file The config file location.
+	 * @throws InvalidConfig
 	 * @return self
 	 */
 	public static function create(string $file): self
