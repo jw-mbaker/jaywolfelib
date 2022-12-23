@@ -110,7 +110,7 @@ function create_table(array $db, string $charset_collate): void
 	}
 }
 
-function fetch_array(string $file, ?ConfigInterface $config = null): bool
+function fetch_array(string $file, ?ConfigInterface $config = null): array
 {
 	$pathinfo = pathinfo($file);
 
