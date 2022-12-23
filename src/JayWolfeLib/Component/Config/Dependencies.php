@@ -4,7 +4,7 @@ namespace JayWolfeLib\Component\Config;
 
 use JayWolfeLib\Component\ParameterInterface;
 
-class Dependencies implements ParemeterInterface
+class Dependencies implements ParameterInterface
 {
 	/**
 	 * The dependencies.
