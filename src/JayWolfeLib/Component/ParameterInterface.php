@@ -1,6 +1,6 @@
 <?php
 
-namespace JayWolfeLib\Parameter;
+namespace JayWolfeLib\Component;
 
 interface ParameterInterface
 {
