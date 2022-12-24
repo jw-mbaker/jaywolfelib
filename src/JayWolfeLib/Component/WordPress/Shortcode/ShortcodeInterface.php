@@ -1,15 +1,15 @@
 <?php
 
-namespace JayWolfeLib\Component\WordPress\Filter;
+namespace JayWolfeLib\Component\WordPress\Shortcode;
 
 use JayWolfeLib\Component\HandlerInterface;
 use JayWolfeLib\Component\ParameterInterface;
 use JayWolfeLib\Component\ObjectHash\ObjectHashInterface;
 
-interface HookInterface extends
+interface ShortcodeInterface extends
 	HandlerInterface,
 	ParameterInterface,
 	ObjectHashInterface
 {
-	public function hook(): string;
+	public function tag(): string;
 }

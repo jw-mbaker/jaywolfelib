@@ -27,6 +27,28 @@ class FilterCollection extends AbstractInvokerCollection
 		return $this->add_filter($hook);
 	}
 
+	public function remove_filter(string $hook, $callable, int $priority = 10): bool
+	{
+		$hooks = array_filter($this->hooks, function($obj) use ($hook, $callable, $priority) {
+			return
+				$obj->hook() === $hook &&
+				$obj->get('callable') === $callable &&
+				$obj->get('priority') === $priority;
+		});
+
+		if (!empty($hooks)) {
+			$this->remove(array_keys($hooks));
+			return true;
+		}
+
+		return false;
+	}
+
+	public function remove_action(string $hook, $callable, int $priority = 10): bool
+	{
+		return $this->remove_filter($hook, $callable, $priority);
+	}
+
 	public function all(): array
 	{
 		return $this->hooks;

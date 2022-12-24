@@ -17,7 +17,7 @@ abstract class AbstractMenuPage extends AbstractObjectHash implements MenuPageIn
 	public function __construct(string $slug, $callable, array $settings = [])
 	{
 		$this->slug = $slug;
-		$this->callable = $callable;
+		$this->callable = $settings['callable'] = $callable;
 
 		$this->settings = array_merge(static::DEFAULTS, $settings);
 

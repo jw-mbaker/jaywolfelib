@@ -16,7 +16,7 @@ abstract class AbstractHook extends AbstractObjectHash implements HookInterface
 	public function __construct(string $hook, $callable, array $settings = [])
 	{
 		$this->hook = $hook;
-		$this->callable = $callable;
+		$this->callable = $settings['callable'] = $callable;
 
 		$settings['priority'] ??= 10;
 		$settings['num_args'] ??= 1;

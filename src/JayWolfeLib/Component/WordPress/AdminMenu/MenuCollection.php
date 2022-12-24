@@ -29,6 +29,29 @@ class MenuCollection extends AbstractInvokerCollection
 	}
 
 	/**
+	 * Removes a menu page by slug.
+	 *
+	 * @param string $slug
+	 */
+	public function remove_menu_page(string $slug)
+	{		
+		$menu_page = array_reduce($this->menu_pages, function($carry, $item) use ($slug) {
+			if (null !== $carry) return $carry;
+
+			return $item->slug() === $slug ? $item : null;
+		}, null);
+
+		if (null !== $menu_page) {
+			$this->remove($menu_page->id());
+		}
+	}
+
+	public function remove_submenu_page(string $slug)
+	{
+		$this->remove_menu_page($slug);
+	}
+
+	/**
 	 * Removes a menu page or an array of menu pages by name from the collection.
 	 *
 	 * @param string|string[] $name
@@ -37,9 +60,8 @@ class MenuCollection extends AbstractInvokerCollection
 	{
 		foreach ((array) $name as $n) {
 			$menu_page = $this->menu_pages[$n];
-			$class = get_class($menu_page);
 
-			switch ($class::MENU_TYPE) {
+			switch ($menu_page::MENU_TYPE) {
 				case 'menu_page':
 					remove_menu_page($menu_page->slug());
 					break;

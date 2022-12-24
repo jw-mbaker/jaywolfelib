@@ -16,7 +16,7 @@ abstract class AbstractInvokerCollection extends AbstractCollection implements C
 		$this->invoker = $invoker;
 	}
 
-	protected function get_invoker(): InvokerInterface
+	public function get_invoker(): InvokerInterface
 	{
 		return $this->invoker;
 	}
