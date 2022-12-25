@@ -45,7 +45,7 @@ class JayWolfeLib
 				return true;
 			}
 
-			self::$loaded = add_action('init', function() use ($request) {
+			self::$loaded = add_action('init', function() {
 				try {
 					$instance = new static( new ContainerBuilder() );
 
