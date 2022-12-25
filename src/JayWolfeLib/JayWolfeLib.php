@@ -25,7 +25,7 @@ class JayWolfeLib
 		$this->containerBuilder = $containerBuilder;
 	}
 
-	public static function load(?string $config_file = null): bool
+	public final static function load(?string $config_file = null): bool
 	{
 		try {
 			if (null !== $config_file) {
