@@ -14,11 +14,21 @@ class View implements ViewInterface
 	/**
 	 * Constructor.
 	 *
-	 * @param ConfigInterface $config
+	 * @param ConfigInterface|null $config
 	 */
-	public function __construct(ConfigInterface $config)
+	public function __construct(?ConfigInterface $config = null)
 	{
-		$this->set_config($config);
+		if (null !== $config) $this->set_config($config);
+	}
+
+	public static function make(
+		string $template,
+		array $args = [],
+		?string $template_path = null,
+		?ConfigInterface $config = null
+	): string {
+		$view = new static($config);
+		return $view->render($template, $args, $template_path);
 	}
 
 	/**
@@ -27,22 +37,22 @@ class View implements ViewInterface
 	 * @param string $_template
 	 * @param array $_args
 	 * @param string|null $_template_path
-	 * @return void
+	 * @return string
 	 */
-	public function render(string $_template, array $_args = [], ?string $_template_path = null)
+	public function render(string $_template, array $_args = [], ?string $_template_path = null): string
 	{
 		extract($_args);
 
 		$located = $this->locate_template($_template, $_template_path);
 
-		if (null === $located) return;
+		if (null === $located) return '';
 
 		ob_start();
-		Hooks::do_action('jwlib_before_template_render', $_template, $_template_path, $located, $_args);
+		do_action('jwlib_before_template_render', $_template, $_template_path, $located, $_args);
 		include $located;
-		Hooks::do_action('jwlib_after_template_render', $_template, $_template_path, $located, $_args);
+		do_action('jwlib_after_template_render', $_template, $_template_path, $located, $_args);
 
-		echo ob_get_clean();
+		return ob_get_clean();
 	}
 	
 	/**
@@ -55,11 +65,19 @@ class View implements ViewInterface
 	 */
 	protected function locate_template(string $template, ?string $template_path = null): ?string
 	{
-		if (null === $this->config->get('paths')['templates']) {
-			throw new InvalidTemplate('Template path not set for ' . $this->config->get('plugin_file') . '.');
+		if (null === $template_path && !$this->config instanceof ConfigInterface) {
+			throw new \InvalidArgumentException(
+				sprintf('$template_path must be specified if %s is not provided.', ConfigInterface::class)
+			);
 		}
 
-		$template_path ??= $this->config->get('paths')['templates'];
+		if ($this->config instanceof ConfigInterface) {
+			if (null === $this->config->get('paths')['templates']) {
+				throw new InvalidTemplate('Template path not set for ' . $this->config->get('plugin_file') . '.');
+			}
+	
+			$template_path ??= $this->config->get('paths')['templates'];
+		}
 
 		if (!preg_match('/\.php/', $template)) {
 			$template .= '.php';
