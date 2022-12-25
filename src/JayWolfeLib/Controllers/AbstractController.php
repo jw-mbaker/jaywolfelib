@@ -14,11 +14,6 @@ abstract class AbstractController implements ControllerInterface
 	use ConfigTrait;
 	use ContainerAwareTrait;
 
-	public function __construct()
-	{
-		
-	}
-
 	/**
 	 * Set the container.
 	 *
