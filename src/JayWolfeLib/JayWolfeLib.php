@@ -12,7 +12,7 @@ use DI\ContainerBuilder;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class JayWolfeLib
+final class JayWolfeLib
 {
 	use ContainerAwareTrait;
 
@@ -25,7 +25,7 @@ class JayWolfeLib
 		$this->containerBuilder = $containerBuilder;
 	}
 
-	public final static function load(?string $config_file = null): bool
+	public static function load(?string $config_file = null): bool
 	{
 		try {
 			if (null !== $config_file) {
@@ -47,7 +47,7 @@ class JayWolfeLib
 
 			self::$loaded = add_action('init', function() {
 				try {
-					$instance = new static( new ContainerBuilder() );
+					$instance = new self( new ContainerBuilder() );
 
 					// Initialize the global container.
 					$container = $instance->add_definitions();
