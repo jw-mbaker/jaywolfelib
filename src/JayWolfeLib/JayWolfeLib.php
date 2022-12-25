@@ -28,7 +28,7 @@ class JayWolfeLib
 	public static function load(?string $config_file = null): bool
 	{
 		try {
-			if (null !== $config) {
+			if (null !== $config_file) {
 				add_action('jwlib_config', function(ConfigCollection $configCollection) use ($config_file) {
 					$config = Config::create($config_file);
 					$configCollection->add( plugin_basename( $config->get('plugin_file') ), $config );
