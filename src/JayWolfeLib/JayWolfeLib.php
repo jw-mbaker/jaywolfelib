@@ -7,6 +7,7 @@ use JayWolfeLib\Component\Config\Config;
 use JayWolfeLib\Component\WordPress\Filter\FilterCollection;
 use JayWolfeLib\Component\WordPress\AdminMenu\MenuCollection;
 use JayWolfeLib\Component\WordPress\Shortcode\ShortcodeCollection;
+use JayWolfeLib\Component\WordPress\PostType\PostTypeCollection;
 use JayWolfeLib\Traits\ContainerAwareTrait;
 use DI\ContainerBuilder;
 use Psr\Container\ContainerInterface;
@@ -16,8 +17,10 @@ final class JayWolfeLib
 {
 	use ContainerAwareTrait;
 
+	/** @var bool */
 	private static $loaded = false;
 
+	/** @var ContainerBuilder */
 	private $containerBuilder;
 
 	public function __construct(ContainerBuilder $containerBuilder)
@@ -25,7 +28,7 @@ final class JayWolfeLib
 		$this->containerBuilder = $containerBuilder;
 	}
 
-	public static function load(?string $config_file = null): bool
+	public static function load(string $config_file = null): bool
 	{
 		try {
 			if (null !== $config_file) {
@@ -55,6 +58,7 @@ final class JayWolfeLib
 
 					do_action('jwlib_config', $container->get(ConfigCollection::class));
 					do_action('jwlib_hooks', $container->get(FilterCollection::class));
+					do_action('jwlib_post_types', $container->get(PostTypeCollection::class));
 					add_action('admin_menu', function() use ($container) {
 						do_action('jwlib_admin_menu', $container->get(MenuCollection::class));
 					});
