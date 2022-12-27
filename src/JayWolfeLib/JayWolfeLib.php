@@ -9,6 +9,7 @@ use JayWolfeLib\Component\WordPress\AdminMenu\MenuCollection;
 use JayWolfeLib\Component\WordPress\Shortcode\ShortcodeCollection;
 use JayWolfeLib\Component\WordPress\PostType\PostTypeCollection;
 use JayWolfeLib\Component\WordPress\Widget\WidgetCollection;
+use JayWolfeLib\Component\WordPress\MetaBox\MetaBoxCollection;
 use JayWolfeLib\Traits\ContainerAwareTrait;
 use DI\ContainerBuilder;
 use Psr\Container\ContainerInterface;
@@ -65,6 +66,9 @@ final class JayWolfeLib
 					});
 					add_action('widgets_init', function() use ($container) {
 						do_action('jwlib_register_widgets', $container->get(WidgetCollection::class));
+					});
+					add_action('add_meta_boxes', function() use ($container) {
+						do_action('jwlib_meta_boxes', $container->get(MetaBoxCollection::class));
 					});
 					do_action('jwlib_shortcodes', $container->get(ShortcodeCollection::class));
 
