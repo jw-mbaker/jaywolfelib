@@ -36,7 +36,7 @@ function install($config)
 	$db_version = $db['version'];
 
 	$charset_collate = $wpdb->get_charset_collate();
-	require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+	require_once ABSPATH . '/wp-admin/includes/upgrade.php';
 
 	$key = sanitize_key($config->get('db'));
 
@@ -114,14 +114,14 @@ function fetch_array(string $file, ConfigInterface $config = null): array
 {
 	$pathinfo = pathinfo($file);
 
-	if (!isset($pathinfo['extension']) || $pathinfo['extension'] !== '.php') {
+	if (!isset($pathinfo['extension']) || $pathinfo['extension'] !== 'php') {
 		$file .= '.php';
 	}
 
 	if (null === $config) {
 		$dir = trailingslashit( dirname($file) );
 	} else {
-		if (null === $config->get('paths')['arrays']) {
+		if (!isset($config->get('paths')['arrays'])) {
 			throw new InvalidConfig(
 				sprintf('Array path not set for %s.', plugin_basename($config->get('plugin_file')))
 			);
@@ -130,9 +130,11 @@ function fetch_array(string $file, ConfigInterface $config = null): array
 		$dir = trailingslashit( $config->get('paths')['arrays'] );
 	}
 
+	$base_file = basename($file);
+
 	$arr = [];
-	if (is_readable($dir . $file)) {
-		$arr = include $dir . $file;
+	if (is_readable($dir . $base_file)) {
+		$arr = include $dir . $base_file;
 	}
 
 	if (@!is_array($arr)) {
@@ -156,7 +158,7 @@ function fetch_array(string $file, ConfigInterface $config = null): array
  */
 function fragment_cache(string $key, int $ttl, callable $callback, array $args = [])
 {
-	$key = Hooks::apply_filters('fragment_cache_prefix', 'fragment_cache_') . $key;
+	$key = apply_filters('fragment_cache_prefix', 'fragment_cache_') . $key;
 	$output = get_transient($key);
 
 	$clear_fragments = false;
@@ -180,7 +182,7 @@ function fragment_cache(string $key, int $ttl, callable $callback, array $args =
  */
 function delete_fragment_cache(string $key)
 {
-	$key = Hooks::apply_filters('fragment_cache_prefix', 'fragment_cache_') . $key;
+	$key = apply_filters('fragment_cache_prefix', 'fragment_cache_') . $key;
 	delete_transient($key);
 }
 
