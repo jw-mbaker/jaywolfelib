@@ -52,7 +52,12 @@ class FunctionTest extends \WP_Mock\Tools\TestCase
 		$config = $this->createMockConfig();
 		$dir = $this->fetchArrayDir();
 
-		$config->expects()->get('db')->twice()->andReturn('dummy_db');
+		$config
+			->expects()
+			->get('db')
+			->twice()
+			->andReturn('dummy_db');
+
 		$config
 			->expects()
 			->get('paths')
