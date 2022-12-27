@@ -8,6 +8,7 @@ use JayWolfeLib\Component\WordPress\Filter\FilterCollection;
 use JayWolfeLib\Component\WordPress\AdminMenu\MenuCollection;
 use JayWolfeLib\Component\WordPress\Shortcode\ShortcodeCollection;
 use JayWolfeLib\Component\WordPress\PostType\PostTypeCollection;
+use JayWolfeLib\Component\WordPress\Widget\WidgetCollection;
 use JayWolfeLib\Traits\ContainerAwareTrait;
 use DI\ContainerBuilder;
 use Psr\Container\ContainerInterface;
@@ -62,6 +63,9 @@ final class JayWolfeLib
 					add_action('admin_menu', function() use ($container) {
 						do_action('jwlib_admin_menu', $container->get(MenuCollection::class));
 					});
+					add_action('widgets_init', function() use ($container) {
+						do_action('jwlib_register_widgets', $container->get(WidgetCollection::class));
+					});
 					do_action('jwlib_shortcodes', $container->get(ShortcodeCollection::class));
 
 					do_action('jwlib_loaded', $container);
@@ -74,7 +78,7 @@ final class JayWolfeLib
 					do_action('jwlib_fail', $e);
 					return;
 				}
-			}, 100, 1);
+			}, 0, 1);
 		} catch (\Exception $e) {
 			if (defined('WP_DEBUG') && WP_DEBUG) {
 				throw $e;
