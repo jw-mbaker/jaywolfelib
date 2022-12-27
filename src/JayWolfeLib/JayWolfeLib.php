@@ -3,6 +3,7 @@
 namespace JayWolfeLib;
 
 use JayWolfeLib\Component\Config\ConfigCollection;
+use JayWolfeLib\Component\Config\ConfigInterface;
 use JayWolfeLib\Component\Config\Config;
 use JayWolfeLib\Component\WordPress\Filter\FilterCollection;
 use JayWolfeLib\Component\WordPress\AdminMenu\MenuCollection;
@@ -58,7 +59,10 @@ final class JayWolfeLib
 					$container = $instance->add_definitions();
 					container( $container );
 
+					add_action('jwlib_check_config', [$instance, 'check_config'], 99, 1);
+
 					do_action('jwlib_config', $container->get(ConfigCollection::class));
+					do_action('jwlib_check_config', $container->get(ConfigCollection::class));
 					do_action('jwlib_hooks', $container->get(FilterCollection::class));
 					do_action('jwlib_post_types', $container->get(PostTypeCollection::class));
 					add_action('admin_menu', function() use ($container) {
@@ -108,5 +112,35 @@ final class JayWolfeLib
 
 		$this->set_container($this->containerBuilder->build());
 		return $this->container;
+	}
+
+	public function check_config(ConfigCollection $configs)
+	{
+		foreach ($configs as $config) {
+			$this->check_requirements($config);
+		}
+	}
+
+	private function check_requirements(ConfigInterface $config)
+	{
+		if (!$config->requirements_met()) {
+			ob_start();
+			$errors = $config->get_errors();
+			foreach ($errors as $error):
+			?>
+			<div><?=$error->error_message?> (<?=$error->info?>)</div>
+			<?php
+			endforeach;
+
+			$this->deactivate_die($config->get('plugin_file'), ob_get_clean());
+		}
+	}
+
+	private function deactivate_die(string $plugin_file, string $message)
+	{
+		require_once ABSPATH . '/wp-admin/includes/plugin.php';
+		deactivate_plugins( plugin_basename( $plugin_file ) );
+
+		wp_die( wp_kses_post($message) );
 	}
 }
