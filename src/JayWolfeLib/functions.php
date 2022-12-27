@@ -2,8 +2,8 @@
 
 namespace JayWolfeLib;
 
-use JayWolfeLib\Config\ConfigInterface;
-use JayWolfeLib\Config\Config;
+use JayWolfeLib\Component\Config\ConfigInterface;
+use JayWolfeLib\Component\Config\Config;
 use JayWolfeLib\Exception\InvalidConfig;
 
 /**
@@ -110,7 +110,7 @@ function create_table(array $db, string $charset_collate): void
 	}
 }
 
-function fetch_array(string $file, ?ConfigInterface $config = null): array
+function fetch_array(string $file, ConfigInterface $config = null): array
 {
 	$pathinfo = pathinfo($file);
 
@@ -202,7 +202,7 @@ function validate_bool($var): ?bool
  * 
  * @return Container
  */
-function container(?Container $c = null): Container
+function container(Container $c = null): Container
 {
 	static $container;
 

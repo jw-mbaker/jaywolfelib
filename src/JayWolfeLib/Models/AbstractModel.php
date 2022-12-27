@@ -3,22 +3,19 @@
 namespace JayWolfeLib\Models;
 
 use JayWolfeLib\Factory\ModelFactoryInterface;
+use JayWolfeLib\Traits\ContainerAwareTrait;
+use Psr\Container\ContainerInterface;
 
-abstract class Model implements ModelInterface
+abstract class AbstractModel implements ModelInterface
 {
+	use ContainerAwareTrait;
+
 	/**
 	 * The wpdb instance.
 	 *
 	 * @var \WPDB
 	 */
 	protected $wpdb;
-
-	/**
-	 * The model factory.
-	 *
-	 * @var ModelFactoryInterface
-	 */
-	protected $factory;
 
 	/**
 	 * The table.
@@ -31,13 +28,11 @@ abstract class Model implements ModelInterface
 	 * Constructor.
 	 *
 	 * @param \WPDB $wpdb
-	 * @param ModelFactoryInterface $factory
 	 * @param string $table
 	 */
-	public function __construct(\WPDB $wpdb, ModelFactoryInterface $factory, string $table)
+	public function __construct(\WPDB $wpdb, string $table)
 	{
 		$this->wpdb = $wpdb;
-		$this->factory = $factory;
 		$this->table = $wpdb->prefix . $table;
 	}
 
@@ -49,7 +44,7 @@ abstract class Model implements ModelInterface
 	 * 
 	 * @return int|bool
 	 */
-	protected function saveData(array $data, ?int $id = NULL)
+	public function saveData(array $data, int $id = NULL)
 	{	
 		$data['date_updated'] = current_time('mysql');
 
@@ -77,8 +72,19 @@ abstract class Model implements ModelInterface
 	 * @param array $args
 	 * @return void
 	 */
-	protected function deleteData(array $where = [], array $args = [])
+	public function deleteData(array $where = [], array $args = [])
 	{
 		$this->wpdb->delete($this->table, $where, $args);
+	}
+
+	/**
+	 * Get an object from the container.
+	 *
+	 * @param string $class
+	 * @return mixed
+	 */
+	protected function get(string $class)
+	{
+		return $this->container->get($class);
 	}
 }

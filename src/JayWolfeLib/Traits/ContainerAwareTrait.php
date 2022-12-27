@@ -9,6 +9,12 @@ trait ContainerAwareTrait
 	/** @var ContainerInterface */
 	protected $container;
 
+	/**
+	 * Set the container.
+	 *
+	 * @Inject
+	 * @param ContainerInterface $container
+	 */
 	public function set_container(ContainerInterface $container)
 	{
 		$this->container = $container;

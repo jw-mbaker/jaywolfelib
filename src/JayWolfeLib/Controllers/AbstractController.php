@@ -18,17 +18,6 @@ abstract class AbstractController implements ControllerInterface
 	use ConfigTrait;
 	use ContainerAwareTrait;
 
-	/**
-	 * Set the container.
-	 *
-	 * @Inject
-	 * @param ContainerInterface $container
-	 */
-	public function set_container(ContainerInterface $container)
-	{
-		$this->container = $container;
-	}
-
 	protected function json($data, int $status = 200, array $headers = [], array $context = []): JsonResponse
 	{
 		return new JsonResponse($data, $status, $headers);
