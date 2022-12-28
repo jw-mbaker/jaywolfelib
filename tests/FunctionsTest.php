@@ -3,6 +3,7 @@
 namespace JayWolfeLib\Tests;
 
 use JayWolfeLib\Component\Config\ConfigInterface;
+use JayWolfeLib\Tests\Traits\MockConfigTrait;
 use WP_Mock;
 use Mockery;
 
@@ -16,6 +17,8 @@ use function JayWolfeLib\delete_fragment_cache;
 
 class FunctionTest extends \WP_Mock\Tools\TestCase
 {
+	use MockConfigTrait;
+
 	public function setUp(): void
 	{
 		global $wpdb;
@@ -407,10 +410,5 @@ class FunctionTest extends \WP_Mock\Tools\TestCase
 	private function fetchArrayDir(): string
 	{
 		return MOCK_ARRAY_PATH;
-	}
-
-	private function createMockConfig(): ConfigInterface
-	{
-		return Mockery::mock(ConfigInterface::class);
 	}
 }

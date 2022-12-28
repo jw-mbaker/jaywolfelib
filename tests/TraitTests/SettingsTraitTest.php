@@ -1,6 +1,6 @@
 <?php
 
-namespace JayWolfeLib\Tests\Traits;
+namespace JayWolfeLib\Tests\TraitTests;
 
 use JayWolfeLib\Traits\SettingsTrait;
 use WP_Mock;

@@ -2,13 +2,8 @@
 
 namespace JayWolfeLib\Collection;
 
-abstract class AbstractCollection implements \IteratorAggregate, \Countable
+abstract class AbstractCollection implements CollectionInterface
 {
-	public abstract function add(string $name, $value);
-	public abstract function all(): array;
-	public abstract function get(string $name);
-	public abstract function remove($name);
-
 	public function getIterator(): \ArrayIterator
 	{
 		return new \ArrayIterator($this->all());
