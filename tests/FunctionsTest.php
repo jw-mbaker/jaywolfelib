@@ -7,6 +7,7 @@ use WP_Mock;
 use Mockery;
 
 use function JayWolfeLib\install;
+use function JayWolfeLib\update_db_check;
 use function JayWolfeLib\validate_bool;
 use function JayWolfeLib\rrmdir;
 use function JayWolfeLib\fetch_array;
@@ -23,19 +24,28 @@ class FunctionTest extends \WP_Mock\Tools\TestCase
 		WP_Mock::alias('trailingslashit', function($str) {
 			return rtrim($str, '\\/') . DIRECTORY_SEPARATOR;
 		});
+		WP_Mock::alias('plugin_basename', function($file) {
+			return basename($file);
+		});
 
 		$wpdb = Mockery::mock(\WPDB::class);
+		$wpdb->prefix = 'wp';
 	}
 
 	public function tearDown(): void
 	{
+		if (file_exists(trailingslashit( ABSPATH ) . 'mock-config-no-db.php')) {
+			unlink(trailingslashit( ABSPATH ) . 'mock-config-no-db.php');
+		}
+
 		WP_Mock::tearDown();
 		Mockery::close();
 	}
 
 	/**
 	 * @group fetch_array
-	 * @depends testFetchArrayWithConfig
+	 * @group config
+	 * @group install
 	 * @doesNotPerformAssertions
 	 */
 	public function testInstallVersionsMatch()
@@ -69,6 +79,121 @@ class FunctionTest extends \WP_Mock\Tools\TestCase
 		$wpdb->expects()->get_charset_collate()->andReturn('');
 
 		install($config);
+	}
+
+	/**
+	 * @group fetch_array
+	 * @group config
+	 * @group install
+	 * @doesNotPerformAssertions
+	 */
+	public function testInstallVersionsNotMatchShouldCallCreateTable()
+	{
+		global $wpdb;
+
+		WP_Mock::passthruFunction('sanitize_key');
+		WP_Mock::userFunction('add_option');
+		WP_Mock::userFunction('get_option', [
+			'args' => 'dummy_db_db_version',
+			'return' => '0.9.9'
+		]);
+		WP_Mock::userFunction('update_option', [
+			'args' => ['dummy_db_db_version', '1.0.0']
+		]);
+		WP_Mock::userFunction('dbDelta', ['times' => 1]);
+
+		$config = $this->createMockConfig();
+		$dir = $this->fetchArrayDir();
+
+		$config
+			->expects()
+			->get('db')
+			->twice()
+			->andReturn('dummy_db');
+
+		$config
+			->expects()
+			->get('paths')
+			->twice()
+			->andReturn([
+				'arrays' => $dir
+			]);
+
+		$wpdb->expects()->get_charset_collate()->andReturn('');
+
+		install($config);
+	}
+
+	/**
+	 * @group fetch_array
+	 * @group config
+	 * @group install
+	 */
+	public function testInstallThrowsInvalidConfigOnNonFile()
+	{
+		$file = 'xyz.file';
+		$this->expectException(\JayWolfeLib\Exception\InvalidConfig::class);
+		$this->expectExceptionMessage(
+			sprintf('%s not found.', $file)
+		);
+
+		install($file);
+	}
+
+	/**
+	 * @group config
+	 * @group install
+	 */
+	public function testInstallThrowsInvalidConfigOnNoDB()
+	{
+		$file = trailingslashit( ABSPATH ) . 'mock-config-no-db.php';
+
+		file_put_contents($file, "<?php return [
+			'plugin_file' => MOCK_PLUGIN_REL_PATH,
+		];");
+
+		$this->assertTrue(file_exists($file));
+
+		$this->expectException(\JayWolfeLib\Exception\InvalidConfig::class);
+		$this->expectExceptionMessage(
+			sprintf('"db" option not set for %s.', basename(MOCK_PLUGIN_REL_PATH))
+		);
+
+		install($file);
+	}
+
+	/**
+	 * @group config
+	 * @group install
+	 * @group fetch_array
+	 * @doesNotPerformAssertions
+	 */
+	public function testUpdateDBCheckVersionsMatch()
+	{
+		WP_Mock::passthruFunction('sanitize_key');
+		WP_Mock::userFunction('get_option', [
+			'args' => 'dummy_db_db_version',
+			'return' => '1.0.0'
+		]);
+
+		$config = $this->createMockConfig();
+		$dir = $this->fetchArrayDir();
+
+		$config
+			->expects()
+			->get('db')
+			->twice()
+			->andReturn('dummy_db');
+
+		$config
+			->expects()
+			->get('paths')
+			->twice()
+			->andReturn([
+				'arrays' => $dir
+			]);
+
+		update_db_check($config);
 	}
 
 	public function testValidateBool()
