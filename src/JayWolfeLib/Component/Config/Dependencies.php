@@ -39,7 +39,7 @@ class Dependencies implements ParameterInterface
 
 	public function set(string $name, $value)
 	{
-		$this->dependencies[$key] = $value;
+		$this->dependencies[$name] = $value;
 	}
 
 	public function get(string $name)
@@ -73,7 +73,7 @@ class Dependencies implements ParameterInterface
 
 	public function remove(string $name)
 	{
-		unset($this->dependencies[$key]);
+		unset($this->dependencies[$name]);
 	}
 
 	public function clear()
@@ -131,7 +131,7 @@ class Dependencies implements ParameterInterface
 
 	private function is_plugin_active(string $slug): bool
 	{
-		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		require_once ABSPATH . '/wp-admin/includes/plugin.php';
 
 		if (is_plugin_active($slug)) {
 			return true;

@@ -48,6 +48,20 @@ class ConfigTest extends \WP_Mock\Tools\TestCase
 	/**
 	 * @group config
 	 */
+	public function testCanRemoveValue()
+	{
+		$dependencies = $this->createMockDependencies();
+		$config = new Config(['test' => 'test123'], $dependencies);
+
+		$this->assertEquals($config->get('test'), 'test123');
+		$config->remove('test');
+		$this->assertNull($config->get('test'));
+	}
+
+	/**
+	 * @covers \JayWolfeLib\Component\Config\Config::create
+	 * @group config
+	 */
 	public function testCreateConfigStatically()
 	{
 		$dependencies = $this->createMockDependencies();
@@ -59,6 +73,7 @@ class ConfigTest extends \WP_Mock\Tools\TestCase
 	}
 
 	/**
+	 * @covers \JayWolfeLib\Component\Config\Config::create
 	 * @group config
 	 */
 	public function testCreateConfigStaticallyThrowsInvalidConfig()
