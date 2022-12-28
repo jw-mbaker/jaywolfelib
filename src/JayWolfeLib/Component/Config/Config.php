@@ -80,7 +80,7 @@ class Config implements ConfigInterface
 	 * @throws InvalidConfig
 	 * @return self
 	 */
-	public static function create(string $file): self
+	public static function create(string $file, Dependencies $dependencies = null): self
 	{
 		if (!is_readable($file)) {
 			throw new InvalidConfig(
@@ -90,6 +90,6 @@ class Config implements ConfigInterface
 
 		$settings = include $file;
 
-		return new static($settings);
+		return new static($settings, $dependencies);
 	}
 }

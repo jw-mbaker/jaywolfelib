@@ -92,7 +92,7 @@ class FunctionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testRrmdir()
 	{
-		$dir = trailingslashit( __DIR__ ) . 'mock-dir';
+		$dir = trailingslashit( ABSPATH ) . 'mock-dir';
 		$file = trailingslashit($dir) . 'mock-file.php';
 
 		if (is_dir($dir)) {
@@ -220,7 +220,7 @@ class FunctionTest extends \WP_Mock\Tools\TestCase
 		$dir = $this->fetchArrayDir();
 		$config = $this->createMockConfig();
 
-		$plugin_file = __FILE__;
+		$plugin_file = MOCK_PLUGIN_REL_PATH;
 		WP_Mock::userFunction('plugin_basename', [
 			'args' => $plugin_file,
 			'return' => basename($plugin_file)
@@ -281,7 +281,7 @@ class FunctionTest extends \WP_Mock\Tools\TestCase
 
 	private function fetchArrayDir(): string
 	{
-		return trailingslashit(__DIR__) . 'arrays';
+		return MOCK_ARRAY_PATH;
 	}
 
 	private function createMockConfig(): ConfigInterface

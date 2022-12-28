@@ -25,6 +25,11 @@ class Dependencies implements ParameterInterface
 		$this->dependencies = $dependencies;
 	}
 
+	public function all(): array
+	{
+		return $this->dependencies;
+	}
+
 	public function add(array $dependencies)
 	{
 		foreach ($dependencies as $key => $value) {
@@ -34,12 +39,15 @@ class Dependencies implements ParameterInterface
 
 	public function set(string $name, $value)
 	{
-		$key = sanitize_key($name);
-
 		$this->dependencies[$key] = $value;
 	}
 
-	public function has(string $name)
+	public function get(string $name)
+	{
+		return $this->dependencies[$name] ?? null;
+	}
+
+	public function has(string $name): bool
 	{
 		return array_key_exists($name, $this->dependencies);
 	}
@@ -65,11 +73,7 @@ class Dependencies implements ParameterInterface
 
 	public function remove(string $name)
 	{
-		$key = sanitize_key($name);
-
-		if (isset($this->dependencies[$key])) {
-			unset($this->dependencies[$key]);
-		}
+		unset($this->dependencies[$key]);
 	}
 
 	public function clear()
