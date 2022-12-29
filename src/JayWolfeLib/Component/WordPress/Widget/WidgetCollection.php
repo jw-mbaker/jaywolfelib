@@ -11,7 +11,7 @@ class WidgetCollection extends AbstractCollection
 	 */
 	private $widgets = [];
 
-	public function add(string $name, WidgetInterface $widget)
+	private function add(string $name, WidgetInterface $widget)
 	{
 		$this->widgets[$name] = $widget;
 	}

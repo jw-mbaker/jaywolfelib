@@ -11,7 +11,7 @@ class ShortcodeCollection extends AbstractInvokerCollection
 	 */
 	private $shortcodes = [];
 
-	public function add(string $name, ShortcodeInterface $shortcode)
+	private function add(string $name, ShortcodeInterface $shortcode)
 	{
 		$this->shortcodes[$name] = $shortcode;
 	}

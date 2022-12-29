@@ -11,7 +11,7 @@ class PostTypeCollection extends AbstractCollection
 	 */
 	private $post_types = [];
 
-	public function add(string $name, PostTypeInterface $post_type)
+	private function add(string $name, PostTypeInterface $post_type)
 	{
 		$this->post_types[$name] = $post_type;
 	}

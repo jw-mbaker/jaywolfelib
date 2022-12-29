@@ -13,7 +13,7 @@ class MenuCollection extends AbstractInvokerCollection
 	 */
 	private $menu_pages = [];
 
-	public function add(string $name, MenuPageInterface $menu_page)
+	private function add(string $name, MenuPageInterface $menu_page)
 	{
 		$this->menu_pages[$name] = $menu_page;
 	}

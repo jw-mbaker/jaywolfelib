@@ -11,7 +11,7 @@ class FilterCollection extends AbstractInvokerCollection
 	 */
 	private $hooks = [];
 
-	public function add(string $name, HookInterface $hook)
+	private function add(string $name, HookInterface $hook)
 	{
 		$this->hooks[$name] = $hook;
 	}

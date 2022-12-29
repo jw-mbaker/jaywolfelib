@@ -11,7 +11,7 @@ class MetaBoxCollection extends AbstractInvokerCollection
 	 */
 	private $meta_boxes = [];
 
-	public function add(string $name, MetaBoxInterface $meta_box)
+	private function add(string $name, MetaBoxInterface $meta_box)
 	{
 		$this->meta_boxes[$name] = $meta_box;
 	}
