@@ -1,6 +1,6 @@
 <?php
 
-namespace JayWolfeLib\Component;
+namespace JayWolfeLib\Component\ObjectHash;
 
 interface ObjectHashInterface
 {

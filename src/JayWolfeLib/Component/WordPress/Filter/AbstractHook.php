@@ -31,8 +31,8 @@ abstract class AbstractHook extends AbstractObjectHash implements HookInterface
 		return $this->hook;
 	}
 
-	public function __invoke(InvokerInterface $invoker, array $arguments)
+	public function __invoke(InvokerInterface $invoker, ...$args)
 	{
-		return $invoker->call($this->callable, $arguments);
+		return $invoker->call($this->callable, $args);
 	}
 }

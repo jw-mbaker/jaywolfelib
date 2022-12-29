@@ -6,5 +6,5 @@ use Invoker\InvokerInterface;
 
 interface HandlerInterface
 {
-	public function __invoke(InvokerInterface $invoker, array $arguments);
+	public function __invoke(InvokerInterface $invoker, array $args);
 }

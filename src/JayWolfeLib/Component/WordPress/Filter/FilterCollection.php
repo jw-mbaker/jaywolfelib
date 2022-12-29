@@ -76,6 +76,6 @@ class FilterCollection extends AbstractInvokerCollection
 
 	public function __call(string $name, array $arguments)
 	{
-		return $this->invoker->call($this->get($name), $arguments);
+		return $this->resolve($this->get($name), $arguments);
 	}
 }
