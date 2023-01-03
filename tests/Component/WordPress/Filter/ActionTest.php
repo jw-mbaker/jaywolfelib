@@ -119,8 +119,6 @@ class ActionTest extends \WP_Mock\Tools\TestCase
 			return $response;
 		});
 
-		$response->expects()->send();
-
 		WP_Mock::onAction($action->hook())
 			->with(null)
 			->perform(function() use ($action) {
@@ -145,8 +143,6 @@ class ActionTest extends \WP_Mock\Tools\TestCase
 			$this->assertInstanceOf(Request::class, $request);
 			return $response;
 		});
-
-		$response->expects()->send();
 
 		WP_Mock::onAction($action->hook())
 			->with(null)

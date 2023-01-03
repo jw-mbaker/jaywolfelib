@@ -6,6 +6,7 @@ use JayWolfeLib\Component\WordPress\Filter\FilterCollection;
 use JayWolfeLib\Component\WordPress\Filter\HookInterface;
 use JayWolfeLib\Component\WordPress\Filter\Filter;
 use JayWolfeLib\Component\WordPress\Filter\Action;
+use JayWolfeLib\Component\WordPress\Filter\Api;
 use JayWolfeLib\Tests\Component\MockTypeHint;
 use JayWolfeLib\Tests\Traits\DevContainerTrait;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,10 +19,13 @@ class FilterCollectionTest extends \WP_Mock\Tools\TestCase
 {
 	use DevContainerTrait;
 
+	private $request;
+
 	public function setUp(): void
 	{
 		$this->container = $this->createDevContainer();
 		$this->collection = new FilterCollection($this->container);
+		$this->request = Mockery::mock(Request::class);
 		WP_Mock::setUp();
 		WP_Mock::userFunction('remove_filter');
 		WP_Mock::userFunction('remove_action');
@@ -147,6 +151,34 @@ class FilterCollectionTest extends \WP_Mock\Tools\TestCase
 	 * @group hook
 	 * @group wordpress
 	 * @group collection
+	 * @group api
+	 * @group action
+	 */
+	public function testCanInvokeApi()
+	{
+		$api = new Api('test', function(Request $request) {
+			$this->assertTrue(true);
+		}, 'GET', $this->request);
+
+		$this->request->expects()->getMethod()->twice()->andReturn('GET');
+		$this->request->expects()->get('key')->twice()->andReturn(null);
+
+		WP_Mock::expectFilterAdded('test', [$this->collection, $api->id()]);
+		$this->collection->add_action($api);
+
+		WP_Mock::onAction('test')
+			->with(null)
+			->perform(function() use ($api) {
+				call_user_func([$this->collection, $api->id()]);
+			});
+
+		do_action('test');
+	}
+
+	/**
+	 * @group hook
+	 * @group wordpress
+	 * @group collection
 	 * @group filter
 	 */
 	public function testCanInvokeFilterWithTypeHint()
@@ -191,6 +223,37 @@ class FilterCollectionTest extends \WP_Mock\Tools\TestCase
 			->perform(function() use ($action) {
 				call_user_func([$this->collection, $action->id()]);
 			});
+
+		do_action('test');
+	}
+
+	/**
+	 * @group hook
+	 * @group wordpress
+	 * @group collection
+	 * @group api
+	 * @group action
+	 */
+	public function testCanInvokeApiWithTypeHint()
+	{
+		$api = new Api('test', function(Request $request, MockTypeHint $th) {
+			$this->assertInstanceOf(MockTypeHint::class, $th);
+		}, 'GET', $this->request);
+
+		$this->request->expects()->getMethod()->twice()->andReturn('GET');
+		$this->request->expects()->get('key')->twice()->andReturn(null);
+
+		$this->collection->add_action($api);
+
+		$this->assertSame($api, $this->collection->get($api->id()));
+
+		WP_Mock::onAction('test')
+			->with(null)
+			->perform(function() use ($api) {
+				call_user_func([$this->collection, $api->id()]);
+			});
+
+		do_action('test');
 	}
 
 	/**

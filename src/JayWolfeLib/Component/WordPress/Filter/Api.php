@@ -2,24 +2,31 @@
 
 namespace JayWolfeLib\Component\WordPress\Filter;
 
-use JayWolfeLib\Traits\ResponseTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Invoker\InvokerInterface;
 
 class Api extends Action
 {
-	use ResponseTrait;
-
 	public const ACTION_NOT_RECOGNIZED = ['error' => 'Action not recognized.'];
 	public const INVALID_METHOD = ['error' => 'Invalid server request method.'];
 
+	private $request;
 	private $method = 'GET';
 
-	public function __construct(string $hook, $callable, string $method = 'GET', array $settings = [])
-	{
+	public function __construct(
+		string $hook,
+		$callable,
+		string $method = 'GET',
+		Request $request = null,
+		array $settings = []
+	) {
 		$this->method = $method;
+
 		$settings['api_key'] ??= null;
+
+		$this->request = $request ??= Request::createFromGlobals();
 
 		parent::__construct($hook, $callable, $settings);
 	}
@@ -29,11 +36,11 @@ class Api extends Action
 		return $this->method;
 	}
 
-	public function __invoke(Request $request, InvokerInterface $invoker, ...$arguments)
+	public function __invoke(InvokerInterface $invoker, ...$arguments)
 	{
 		$headers = [];
 
-		if ($request->getMethod() == 'POST') {
+		if ($this->request->getMethod() == 'POST') {
 			$headers[] = "Access-Control-Allow-Origin: *";
 		}
 
@@ -45,17 +52,14 @@ class Api extends Action
 			}
 		}
 
-		if (null !== $request->get('key') && $request->get('key') !== $this->settings['api_key']) {
-			$this->send_json(self::ACTION_NOT_RECOGNIZED, 404);
-			return;
+		if (null !== $this->request->get('key') && $this->request->get('key') !== $this->settings['api_key']) {
+			return new JsonResponse(self::ACTION_NOT_RECOGNIZED, Response::HTTP_NOT_FOUND);
 		}
 
-		if ($request->getMethod() !== $this->method) {
-			$this->send_json(self::INVALID_METHOD, 404);
-			return;
+		if ($this->request->getMethod() !== $this->method) {
+			return new JsonResponse(self::INVALID_METHOD, Response::HTTP_NOT_FOUND);
 		}
 		
-		parent::__invoke($invoker, ...$arguments);
-		wp_die();
+		return parent::__invoke($invoker, ...$arguments);
 	}
 }

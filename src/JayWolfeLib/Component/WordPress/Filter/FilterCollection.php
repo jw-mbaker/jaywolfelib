@@ -3,6 +3,7 @@
 namespace JayWolfeLib\Component\WordPress\Filter;
 
 use JayWolfeLib\Collection\AbstractInvokerCollection;
+use Symfony\Component\HttpFoundation\Response;
 
 class FilterCollection extends AbstractInvokerCollection
 {
@@ -76,6 +77,12 @@ class FilterCollection extends AbstractInvokerCollection
 
 	public function __call(string $name, array $arguments)
 	{
-		return $this->resolve($this->get($name), $arguments);
+		$response = $this->resolve($this->get($name), $arguments);
+
+		if ($response instanceof Response) {
+			$response->send();
+		}
+
+		return $response;
 	}
 }
