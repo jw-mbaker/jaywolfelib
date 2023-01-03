@@ -21,7 +21,7 @@ abstract class AbstractMenuPage extends AbstractObjectHash implements MenuPageIn
 		$settings['map'] ??= [];
 		$this->settings = array_merge(static::DEFAULTS, $settings);
 
-		$this->id ??= $this->set_id_from_type(static::MENU_TYPE);
+		$this->set_id_from_type(static::MENU_TYPE);
 	}
 
 	public function slug(): string

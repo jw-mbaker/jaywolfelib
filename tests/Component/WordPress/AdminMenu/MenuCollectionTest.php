@@ -142,6 +142,11 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 		$this->assertSame($mp, $this->collection->get(spl_object_hash($mp)));
 	}
 
+	/**
+	 * @group admin_menu
+	 * @group wordpress
+	 * @group collection
+	 */
 	public function testCanGetSubMenuPage()
 	{
 		$smp = Mockery::mock(SubMenuPage::class);
@@ -155,5 +160,176 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 
 		$this->collection->sub_menu_page($smp);
 		$this->assertSame($smp, $this->collection->get(spl_object_hash($smp)));
+	}
+
+	/**
+	 * @group admin_menu
+	 * @group wordpress
+	 * @group collection
+	 */
+	public function testCanInvokeMenuPage()
+	{
+		$mp = new MenuPage(
+			'test',
+			function() {
+				$this->assertTrue(true);
+			},
+			[
+				'page_title' => 'test',
+				'menu_title' => 'test',
+				'capability' => 'administrator'
+			]
+		);
+
+		$this->collection->menu_page($mp);
+
+		$this->assertSame($mp, $this->collection->get($mp->id()));
+
+		call_user_func([$this->collection, $mp->id()]);
+	}
+
+	/**
+	 * @group admin_menu
+	 * @group wordpress
+	 * @group collection
+	 */
+	public function testCanInvokeSubMenuPage()
+	{
+		$smp = new SubMenuPage(
+			'test',
+			'parent-test',
+			function() {
+				$this->assertTrue(true);
+			},
+			[
+				'page_title' => 'test',
+				'menu_title' => 'test',
+				'capability' => 'administrator'
+			]
+		);
+
+		$this->collection->sub_menu_page($smp);
+
+		$this->assertSame($smp, $this->collection->get($smp->id()));
+
+		call_user_func([$this->collection, $smp->id()]);
+	}
+
+	/**
+	 * @group admin_menu
+	 * @group wordpress
+	 * @group collection
+	 */
+	public function testCanInvokeMenuPageWithTypeHint()
+	{
+		$mp = new MenuPage(
+			'test',
+			function(Request $request, MockTypeHint $th) {
+				$this->assertInstanceOf(Request::class, $request);
+				$this->assertInstanceOf(MockTypeHint::class, $th);
+			},
+			[
+				'page_title' => 'test',
+				'menu_title' => 'test',
+				'capability' => 'administrator'
+			]
+		);
+
+		$this->collection->menu_page($mp);
+
+		$this->assertSame($mp, $this->collection->get($mp->id()));
+
+		call_user_func([$this->collection, $mp->id()]);
+	}
+
+	/**
+	 * @group admin_menu
+	 * @group wordpress
+	 * @group collection
+	 */
+	public function testCanInvokeSubMenuPageWithTypeHint()
+	{
+		$smp = new SubMenuPage(
+			'test',
+			'parent-test',
+			function(Request $request, MockTypeHint $th) {
+				$this->assertInstanceOf(Request::class, $request);
+				$this->assertInstanceOf(MockTypeHint::class, $th);
+			},
+			[
+				'page_title' => 'test',
+				'menu_title' => 'test',
+				'capability' => 'administrator'
+			]
+		);
+
+		$this->collection->sub_menu_page($smp);
+
+		$this->assertSame($smp, $this->collection->get($smp->id()));
+
+		call_user_func([$this->collection, $smp->id()]);
+	}
+
+	/**
+	 * @group admin_menu
+	 * @group wordpress
+	 * @group collection
+	 */
+	public function testMenuPageCanTakeRequestObjectAndHandlResponseObject()
+	{
+		$response = Mockery::mock(Response::class);
+
+		$mp = new MenuPage(
+			'test',
+			function(Request $request) use ($response) {
+				$this->assertInstanceOf(Request::class, $request);
+				return $response;
+			},
+			[
+				'page_title' => 'test',
+				'menu_title' => 'test',
+				'capability' => 'administrator'
+			]
+		);
+
+		$this->collection->menu_page($mp);
+
+		$this->assertSame($mp, $this->collection->get($mp->id()));
+
+		$response->expects()->send();
+
+		call_user_func([$this->collection, $mp->id()]);
+	}
+
+	/**
+	 * @group admin_menu
+	 * @group wordpress
+	 * @group collection
+	 */
+	public function testSubMenuPageCanTakeRequestObjectAndHandleResponseObject()
+	{
+		$response = Mockery::mock(Response::class);
+
+		$smp = new SubMenuPage(
+			'test',
+			'parent-test',
+			function(Request $request) use ($response) {
+				$this->assertInstanceOf(Request::class, $request);
+				return $response;
+			},
+			[
+				'page_title' => 'test',
+				'menu_title' => 'test',
+				'capability' => 'administrator'
+			]
+		);
+
+		$this->collection->sub_menu_page($smp);
+
+		$this->assertSame($smp, $this->collection->get($smp->id()));
+
+		$response->expects()->send();
+
+		call_user_func([$this->collection, $smp->id()]);
 	}
 }
