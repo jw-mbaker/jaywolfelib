@@ -11,6 +11,7 @@ use JayWolfeLib\Tests\Component\MockTypeHint;
 use JayWolfeLib\Tests\Traits\DevContainerTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use WP_Mock;
 use WP_Mock\InvokedFilterValue;
 use Mockery;
@@ -309,6 +310,120 @@ class FilterCollectionTest extends \WP_Mock\Tools\TestCase
 			->with(null)
 			->perform(function() use ($action) {
 				call_user_func([$this->collection, $action->id()]);
+			});
+
+		do_action('test');
+	}
+
+	/**
+	 * @group hook
+	 * @group wordpress
+	 * @group collection
+	 * @group api
+	 * @group action
+	 */
+	public function testApiReturnsResponse()
+	{
+		$response = Mockery::mock(Response::class);
+
+		$api = new Api('test', function(Request $request) use ($response) {
+			return $response;
+		}, 'GET', $this->request);
+
+		$this->request->expects()->getMethod()->twice()->andReturn('GET');
+		$this->request->expects()->get('key')->twice()->andReturn(null);
+
+		$this->collection->add_action($api);
+
+		$this->assertSame($api, $this->collection->get($api->id()));
+
+		$response->expects()->send();
+
+		WP_Mock::onAction('test')
+			->with(null)
+			->perform(function() use ($api) {
+				call_user_func([$this->collection, $api->id()]);
+			});
+
+		do_action('test');
+	}
+
+	/**
+	 * @group hook
+	 * @group collection
+	 * @group wordpress
+	 * @group api
+	 * @group action
+	 *
+	 * @return void
+	 */
+	public function testApiReturnsJsonResponseOnInvalidApiKey()
+	{
+		$api = new Api(
+			'test',
+			function(Request $request) {
+			
+			},
+			'GET',
+			$this->request,
+			[
+				'api_key' => 'good_key'
+			]
+		);
+
+		$this->request->expects()->getMethod()->andReturn('GET');
+		$this->request->expects()->get('key')->twice()->andReturn('bad_key');
+
+		$this->collection->add_action($api);
+
+		$this->assertSame($api, $this->collection->get($api->id()));
+
+		WP_Mock::onAction('test')
+			->with(null)
+			->perform(function() use ($api) {
+				$response = call_user_func([$this->collection, $api->id()]);
+
+				$this->assertInstanceOf(JsonResponse::class, $response);
+				$this->assertEquals($response->getContent(), json_encode(Api::ACTION_NOT_RECOGNIZED));
+				$this->assertEquals($response->getStatusCode(), Response::HTTP_NOT_FOUND);
+			});
+
+		do_action('test');
+	}
+
+	/**
+	 * @group hook
+	 * @group collection
+	 * @group wordpress
+	 * @group api
+	 * @group action
+	 */
+	public function testApiReturnsJsonResponseOnInvalidMethod()
+	{
+		$api = new Api(
+			'test',
+			function(Request $request) {
+			
+			},
+			'GET',
+			$this->request
+		);
+
+		$this->request->expects()->getMethod()->twice()->andReturn('POST');
+		$this->request->expects()->get('key')->twice()->andReturn(null);
+
+		$this->collection->add_action($api);
+
+		$this->assertSame($api, $this->collection->get($api->id()));
+
+		WP_Mock::onAction('test')
+			->with(null)
+			->perform(function() use ($api) {
+				$response = call_user_func([$this->collection, $api->id()]);
+
+				$this->assertInstanceOf(JsonResponse::class, $response);
+				$this->assertEquals($response->getContent(), json_encode(Api::INVALID_METHOD));
+				$this->assertEquals($response->getStatusCode(), Response::HTTP_NOT_FOUND);
 			});
 
 		do_action('test');
