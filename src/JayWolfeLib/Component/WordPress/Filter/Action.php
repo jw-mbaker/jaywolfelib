@@ -9,9 +9,9 @@ class Action extends Filter
 {
 	public const HOOK_TYPE = 'action';
 
-	public function __invoke(InvokerInterface $invoker, array $arguments)
+	public function __invoke(InvokerInterface $invoker, ...$arguments)
 	{
-		$response = parent::__invoke($invoker, $arguments);
+		$response = parent::__invoke($invoker, ...$arguments);
 
 		if ($response instanceof Response) {
 			$response->send();

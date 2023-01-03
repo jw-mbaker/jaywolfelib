@@ -19,6 +19,7 @@ abstract class AbstractMenuPage extends AbstractObjectHash implements MenuPageIn
 		$this->slug = $slug;
 		$this->callable = $settings['callable'] = $callable;
 
+		$settings['map'] ??= [];
 		$this->settings = array_merge(static::DEFAULTS, $settings);
 
 		$this->id ??= $this->set_id_from_type(static::MENU_TYPE);
@@ -29,9 +30,9 @@ abstract class AbstractMenuPage extends AbstractObjectHash implements MenuPageIn
 		return $this->slug;
 	}
 
-	public function __invoke(InvokerInterface $invoker, array $arguments)
+	public function __invoke(InvokerInterface $invoker, ...$arguments)
 	{
-		$response = $invoker->call($this->callable, $arguments);
+		$response = $invoker->call($this->callable, ...$arguments);
 
 		if ($response instanceof Response) {
 			$response->send();

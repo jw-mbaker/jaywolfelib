@@ -25,6 +25,7 @@ class MetaBox extends AbstractObjectHash implements MetaBoxInterface
 		$settings['context'] ??= 'advanced';
 		$settings['priority'] ??= 'default';
 		$settings['callback_args'] ??= null;
+		$settings['map'] ??= [];
 
 		$this->settings = $settings;
 
@@ -41,7 +42,7 @@ class MetaBox extends AbstractObjectHash implements MetaBoxInterface
 		return $this->title;
 	}
 
-	public function __invoke(InvokerInterface $invoker, array $arguments)
+	public function __invoke(InvokerInterface $invoker, ...$arguments)
 	{
 		$invoker->call($this->callable, $arguments);
 	}

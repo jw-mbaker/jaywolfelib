@@ -29,7 +29,7 @@ class Api extends Action
 		return $this->method;
 	}
 
-	public function __invoke(Request $request, InvokerInterface $invoker, array $arguments)
+	public function __invoke(Request $request, InvokerInterface $invoker, ...$arguments)
 	{
 		$headers = [];
 
@@ -55,7 +55,7 @@ class Api extends Action
 			return;
 		}
 		
-		parent::__invoke($invoker, $arguments);
+		parent::__invoke($invoker, ...$arguments);
 		wp_die();
 	}
 }

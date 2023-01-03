@@ -18,12 +18,13 @@ abstract class AbstractHook extends AbstractObjectHash implements HookInterface
 		$this->hook = $hook;
 		$this->callable = $settings['callable'] = $callable;
 
+		$settings['map'] ??= [];
 		$settings['priority'] ??= 10;
 		$settings['num_args'] ??= 1;
 
 		$this->settings = $settings;
 
-		$this->id ??= $this->set_id_from_type(static::HOOK_TYPE);
+		$this->set_id_from_type(static::HOOK_TYPE);
 	}
 
 	public function hook(): string

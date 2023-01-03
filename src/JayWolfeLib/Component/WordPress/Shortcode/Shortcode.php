@@ -20,6 +20,7 @@ class Shortcode extends AbstractObjectHash implements ShortcodeInterface
 		$this->tag = $tag;
 		$this->callable = $settings['callable'] = $settings;
 
+		$settings['map'] ??= [];
 		$this->settings = $settings;
 
 		$this->id = $this->set_id_from_type(static::TYPE);
@@ -30,7 +31,7 @@ class Shortcode extends AbstractObjectHash implements ShortcodeInterface
 		return $this->tag;
 	}
 
-	public function __invoke(InvokerInterface $invoker, array $arguments)
+	public function __invoke(InvokerInterface $invoker, ...$arguments)
 	{
 		return $invoker->call($this->callable, $arguments);
 	}

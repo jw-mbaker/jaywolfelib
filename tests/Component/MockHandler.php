@@ -15,6 +15,7 @@ class MockHandler implements HandlerInterface
 	public function __construct($callable, array $settings = [])
 	{
 		$this->callable = $settings['callable'] = $callable;
+		$settings['map'] ??= [];
 		$this->settings = $settings;
 	}
 
@@ -23,10 +24,8 @@ class MockHandler implements HandlerInterface
 		return $this->callable;
 	}
 
-	public function __invoke(InvokerInterface $invoker, array $args)
+	public function __invoke(InvokerInterface $invoker, ...$args)
 	{
-		error_log('ARGS: ' . var_export($args, true) . PHP_EOL);
-
 		return $invoker->call($this->callable, $args);
 	}
 }

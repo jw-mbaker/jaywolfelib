@@ -63,8 +63,11 @@ class CallerInterfaceTest extends \WP_Mock\Tools\TestCase
 				$this->assertEquals($float, 1.2);
 				$this->assertEquals($int, 345);
 			}),
-			'test4' => new MockHandler(function ($test) {
+			'test4' => new MockHandler(function (MockTypeHint $th, $test) {
 				$this->assertEquals($test, 'test');
+			}, ['map' => [\DI\get(MockTypeHint::class)]]),
+			'test5' => new MockHandler(function (MockTypeHint $th) {
+				$this->assertInstanceOf(MockTypeHint::class, $th);
 			})
 		];
 
@@ -76,6 +79,7 @@ class CallerInterfaceTest extends \WP_Mock\Tools\TestCase
 		call_user_func([$this->caller, 'test2'], 'test', false);
 		call_user_func([$this->caller, 'test3'], 1.2, 345);
 		call_user_func([$this->caller, 'test4'], 'test');
+		call_user_func([$this->caller, 'test5']);
 	}
 
 	/**
@@ -102,7 +106,7 @@ class CallerInterfaceTest extends \WP_Mock\Tools\TestCase
 		$handler = new MockHandler(function (MockTypeHint $class, string $str) {
 			$this->assertInstanceOf(MockTypeHint::class, $class);
 			$this->assertEquals('test', $str);
-		});
+		}, ['map' => [\DI\get(MockTypeHint::class)]]);
 
 		$this->caller->addHandler('test', $handler);
 
