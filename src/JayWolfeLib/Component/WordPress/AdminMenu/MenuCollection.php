@@ -115,6 +115,12 @@ class MenuCollection extends AbstractInvokerCollection
 
 	public function __call(string $name, array $arguments)
 	{
-		$this->invoker->call($this->get($name), $arguments);
+		$response = $this->resolve($this->get($name), $arguments);
+
+		if ($response instanceof Response) {
+			$response->send();
+		}
+
+		return $response;
 	}
 }

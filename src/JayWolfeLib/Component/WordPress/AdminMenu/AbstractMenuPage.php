@@ -4,7 +4,6 @@ namespace JayWolfeLib\Component\WordPress\AdminMenu;
 
 use JayWolfeLib\Component\ObjectHash\AbstractObjectHash;
 use JayWolfeLib\Traits\SettingsTrait;
-use Symfony\Component\HttpFoundation\Response;
 use Invoker\InvokerInterface;
 
 abstract class AbstractMenuPage extends AbstractObjectHash implements MenuPageInterface
@@ -32,10 +31,6 @@ abstract class AbstractMenuPage extends AbstractObjectHash implements MenuPageIn
 
 	public function __invoke(InvokerInterface $invoker, ...$arguments)
 	{
-		$response = $invoker->call($this->callable, ...$arguments);
-
-		if ($response instanceof Response) {
-			$response->send();
-		}
+		return $invoker->call($this->callable, ...$arguments);
 	}
 }
