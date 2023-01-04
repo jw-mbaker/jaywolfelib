@@ -70,7 +70,7 @@ class FilterCollection extends AbstractInvokerCollection
 		foreach ((array) $name as $n) {
 			$hook = $this->hooks[$n];
 
-			remove_filter($hook->hook(), [$this, [$hook->id()]]);
+			remove_filter($hook->hook(), [$this, $hook->id()]);
 			unset($this->hooks[$n]);
 		}
 	}
