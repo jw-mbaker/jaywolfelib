@@ -3,6 +3,7 @@
 namespace JayWolfeLib\Tests\Component\WordPress\AdminMenu;
 
 use JayWolfeLib\Component\WordPress\AdminMenu\MenuCollection;
+use JayWolfeLib\Component\WordPress\AdminMenu\MenuPageInterface;
 use JayWolfeLib\Component\WordPress\AdminMenu\MenuPage;
 use JayWolfeLib\Component\WordPress\AdminMenu\SubMenuPage;
 use JayWolfeLib\Tests\Component\MockTypeHint;
@@ -80,6 +81,7 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 	 * @group admin_menu
 	 * @group wordpress
 	 * @group collection
+	 * @depends testCanGetBySlug
 	 */
 	public function testCanRemoveMenuPage()
 	{
@@ -103,6 +105,7 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 	 * @group admin_menu
 	 * @group wordpress
 	 * @group collection
+	 * @depends testCanGetBySlug
 	 */
 	public function testCanRemoveSubMenuPage()
 	{
@@ -129,9 +132,43 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testRemoveMenuPageReturnsFalseOnInvalidKey()
 	{
-		$this->assertArrayNotHasKey('test', $this->collection->all());
 		$bool = $this->collection->remove_menu_page('test');
 		$this->assertFalse($bool);
+	}
+
+	/**
+	 * @group admin_menu
+	 * @group wordpress
+	 * @group collection
+	 */
+	public function testCanGetBySlug()
+	{
+		$mp = Mockery::mock(MenuPage::class);
+		$mp->expects()->get('page_title')->andReturn('test');
+		$mp->expects()->get('menu_title')->andReturn('test');
+		$mp->expects()->get('capability')->andReturn('administrator');
+		$mp->expects()->slug()->twice()->andReturn('test');
+		$mp->expects()->id()->twice()->andReturn(spl_object_hash($mp));
+		$mp->expects()->get('icon_url')->andReturn('');
+		$mp->expects()->get('position')->andReturn(null);
+
+		$this->collection->menu_page($mp);
+		$this->assertContains($mp, $this->collection->all());
+
+		$obj = $this->collection->get_by_slug('test');
+		$this->assertInstanceOf(MenuPageInterface::class, $obj);
+		$this->assertSame($obj, $mp);
+	}
+
+	/**
+	 * @group admin_menu
+	 * @group wordpress
+	 * @group collection
+	 */
+	public function testGetBySlugReturnsNullIfNotFound()
+	{
+		$obj = $this->collection->get_by_slug('test');
+		$this->assertNull($obj);
 	}
 
 	/**
