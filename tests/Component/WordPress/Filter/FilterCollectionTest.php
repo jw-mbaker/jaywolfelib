@@ -60,6 +60,7 @@ class FilterCollectionTest extends \WP_Mock\Tools\TestCase
 	 * @group hook
 	 * @group wordpress
 	 * @group collection
+	 * @depends testCanGetByHook
 	 */
 	public function testCanRemoveHook()
 	{
@@ -85,12 +86,46 @@ class FilterCollectionTest extends \WP_Mock\Tools\TestCase
 	 * @group hook
 	 * @group wordpress
 	 * @group collection
+	 * @depends testCanGetByHook
 	 */
 	public function testRemoveFilterReturnsFalseOnInvalidKey()
 	{
-		$this->assertArrayNotHasKey('test', $this->collection->all());
 		$bool = $this->collection->remove_filter('test', function() {});
 		$this->assertFalse($bool);
+	}
+
+	/**
+	 * @group hook
+	 * @group wordpress
+	 * @group collection
+	 */
+	public function testCanGetByHook()
+	{
+		$callable = function() {};
+
+		$hook = Mockery::mock(HookInterface::class);
+		$hook->expects()->id()->twice()->andReturn(spl_object_hash($hook));
+		$hook->expects()->hook()->twice()->andReturn('test');
+		$hook->expects()->get('callable')->andReturn($callable);
+		$hook->expects()->get('priority')->twice()->andReturn(10);
+		$hook->expects()->get('num_args')->andReturn(1);
+		
+		$this->collection->add_filter($hook);
+		$this->assertContains($hook, $this->collection->all());
+
+		$objs = $this->collection->get_by_hook('test', $callable);
+		$this->assertContains($hook, $objs);
+	}
+
+	/**
+	 * @group hook
+	 * @group wordpress
+	 * @group collection
+	 */
+	public function testGetByHookReturnsEmptyArrayIfNotFound()
+	{
+		$hooks = $this->collection->get_by_hook('test', function() {});
+		$this->assertEmpty($hooks);
 	}
 
 	/**

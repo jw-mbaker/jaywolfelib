@@ -30,12 +30,7 @@ class FilterCollection extends AbstractInvokerCollection
 
 	public function remove_filter(string $hook, $callable, int $priority = 10): bool
 	{
-		$hooks = array_filter($this->hooks, function($obj) use ($hook, $callable, $priority) {
-			return
-				$obj->hook() === $hook &&
-				$obj->get('callable') === $callable &&
-				$obj->get('priority') === $priority;
-		});
+		$hooks = $this->get_by_hook($hook, $callable, $priority);
 
 		if (!empty($hooks)) {
 			$this->remove(array_keys($hooks));
@@ -58,6 +53,23 @@ class FilterCollection extends AbstractInvokerCollection
 	public function get(string $name): ?HookInterface
 	{
 		return $this->hooks[$name] ?? null;
+	}
+
+	/**
+	 * Get by hook.
+	 *
+	 * @return array<string, HookInterface>
+	 */
+	public function get_by_hook(string $hook, $callable, int $priority = 10): array
+	{
+		$hooks = array_filter($this->hooks, function($obj) use ($hook, $callable, $priority) {
+			return
+				$obj->hook() === $hook &&
+				$obj->get('callable') === $callable &&
+				$obj->get('priority') === $priority;
+		});
+
+		return $hooks;
 	}
 
 	/**
