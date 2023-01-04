@@ -21,7 +21,7 @@ final class JayWolfeLib
 	use ContainerAwareTrait;
 
 	/** @var bool */
-	private static $loaded = false;
+	public static $loaded = false;
 
 	/** @var ContainerBuilder */
 	private $containerBuilder;
@@ -31,7 +31,7 @@ final class JayWolfeLib
 		$this->containerBuilder = $containerBuilder;
 	}
 
-	public static function load(string $config_file = null): bool
+	public static function load(string $config_file = null, ContainerBuilder $containerBuilder = null): bool
 	{
 		try {
 			if (null !== $config_file) {
@@ -51,42 +51,11 @@ final class JayWolfeLib
 				return true;
 			}
 
-			self::$loaded = add_action('init', function() {
-				try {
-					$instance = new self( new ContainerBuilder() );
+			add_action('jwlib_container_definitions', function(ContainerBuilder $containerBuilder) {
+				$containerBuilder->useAnnotations(true);
+			}, -1, 1);
 
-					// Initialize the global container.
-					$container = $instance->add_definitions();
-					container( $container );
-
-					add_action('jwlib_check_config', [$instance, 'check_config'], 99, 1);
-
-					do_action('jwlib_config', $container->get(ConfigCollection::class));
-					do_action('jwlib_check_config', $container->get(ConfigCollection::class));
-					do_action('jwlib_hooks', $container->get(FilterCollection::class));
-					do_action('jwlib_post_types', $container->get(PostTypeCollection::class));
-					add_action('admin_menu', function() use ($container) {
-						do_action('jwlib_admin_menu', $container->get(MenuCollection::class));
-					});
-					add_action('widgets_init', function() use ($container) {
-						do_action('jwlib_register_widgets', $container->get(WidgetCollection::class));
-					});
-					add_action('add_meta_boxes', function() use ($container) {
-						do_action('jwlib_meta_boxes', $container->get(MetaBoxCollection::class));
-					});
-					do_action('jwlib_shortcodes', $container->get(ShortcodeCollection::class));
-
-					do_action('jwlib_loaded', $container);
-					unset($instance);
-				} catch (\Exception $e) {
-					if (defined('WP_DEBUG') && WP_DEBUG) {
-						throw $e;
-					}
-
-					do_action('jwlib_fail', $e);
-					return;
-				}
-			}, 0, 1);
+			add_action('init', [new self($containerBuilder ?? new ContainerBuilder()), 'init'], 0, 1);
 		} catch (\Exception $e) {
 			if (defined('WP_DEBUG') && WP_DEBUG) {
 				throw $e;
@@ -95,13 +64,56 @@ final class JayWolfeLib
 			do_action('jwlib_fail', $e);
 		}
 
-		return true;
+		return self::$loaded = true;
+	}
+
+	public function init()
+	{
+		try {
+			// Initialize the global container.
+			$container = $this->add_definitions();
+			//container( $container );
+
+			add_action('jwlib_check_config', [$this, 'check_config'], 99, 1);
+
+			do_action('jwlib_config', $container->get(ConfigCollection::class));
+			do_action('jwlib_check_config', $container->get(ConfigCollection::class));
+			do_action('jwlib_hooks', $container->get(FilterCollection::class));
+			do_action('jwlib_post_types', $container->get(PostTypeCollection::class));
+			add_action('admin_menu', function() use ($container) {
+				do_action('jwlib_admin_menu', $container->get(MenuCollection::class));
+			});
+			add_action('widgets_init', function() use ($container) {
+				do_action('jwlib_register_widgets', $container->get(WidgetCollection::class));
+			});
+			add_action('add_meta_boxes', function() use ($container) {
+				do_action('jwlib_meta_boxes', $container->get(MetaBoxCollection::class));
+			});
+			do_action('jwlib_shortcodes', $container->get(ShortcodeCollection::class));
+
+			do_action('jwlib_loaded', $container);
+		} catch (\Exception $e) {
+			if (defined('WP_DEBUG') && WP_DEBUG) {
+				throw $e;
+			}
+
+			do_action('jwlib_fail', $e);
+			return;
+		}
 	}
 
 	public function add_definitions(): ContainerInterface
 	{
+		$dev = apply_filters('jwlib_dev', defined('JAYWOLFE_LIB_DEV'));
+
+		if ($dev === false) {
+			$this->containerBuilder->enableCompilation(
+				JAYWOLFE_LIB_CACHE_DIR,
+				"JwLibCompiledContainer"
+			);
+		}
+
 		$this->containerBuilder->addDefinitions([
-			Request::class => \DI\factory([Request::class, 'createFromGlobals']),
 			\WPDB::class => function() {
 				global $wpdb;
 				return $wpdb;
