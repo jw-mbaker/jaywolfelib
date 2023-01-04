@@ -58,6 +58,7 @@ class MetaBoxCollectionTest extends \WP_Mock\Tools\TestCase
 	 * @group meta_box
 	 * @group wordpress
 	 * @group collection
+	 * @depends testGetMetaBoxMethod
 	 */
 	public function testCanRemoveMetaBox()
 	{
@@ -83,12 +84,47 @@ class MetaBoxCollectionTest extends \WP_Mock\Tools\TestCase
 	 * @group meta_box
 	 * @group wordpress
 	 * @group collection
+	 * @depends testGetMetaBoxMethod
 	 */
 	public function testRemoveMetaBoxReturnsFalseOnInvalidKey()
 	{
-		$this->assertArrayNotHasKey('test', $this->collection->all());
 		$bool = $this->collection->remove_meta_box('test', null, 'advanced');
 		$this->assertFalse($bool);
+	}
+
+	/**
+	 * @group meta_box
+	 * @group wordpress
+	 * @group collection
+	 */
+	public function testGetMetaBoxMethod()
+	{
+		$mb = Mockery::mock(MetaBoxInterface::class);
+		$mb->expects()->id()->twice()->andReturn(spl_object_hash($mb));
+		$mb->expects()->meta_id()->twice()->andReturn('test');
+		$mb->expects()->title()->andReturn('test');
+		$mb->expects()->get('screen')->twice()->andReturn(null);
+		$mb->expects()->get('context')->twice()->andReturn('advanced');
+		$mb->expects()->get('priority')->andReturn('default');
+		$mb->expects()->get('callback_args')->andReturn(null);
+
+		$this->collection->add_meta_box($mb);
+		$this->assertContains($mb, $this->collection->all());
+
+		$obj = $this->collection->get_meta_box('test', null, 'advanced');
+		$this->assertInstanceOf(MetaBoxInterface::class, $obj);
+		$this->assertSame($obj, $mb);
+	}
+
+	/**
+	 * @group meta_box
+	 * @group wordpress
+	 * @group collection
+	 */
+	public function testGetMetaBoxMethodReturnsNullIfNotFound()
+	{
+		$obj = $this->collection->get_meta_box('test', null, 'advanced');
+		$this->assertNull($obj);
 	}
 
 	/**

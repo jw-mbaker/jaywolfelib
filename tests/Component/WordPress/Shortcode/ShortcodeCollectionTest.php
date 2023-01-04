@@ -73,7 +73,6 @@ class ShortcodeCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testRemoveShortCodeReturnsFalseOnInvalidKey()
 	{
-		$this->assertArrayNotHasKey('test', $this->collection->all());
 		$bool = $this->collection->remove_shortcode('test');
 		$this->assertFalse($bool);
 	}

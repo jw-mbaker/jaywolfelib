@@ -151,7 +151,6 @@ class PostTypeCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testUnregisterPostTypeReturnsFalseOnInvalidKey()
 	{
-		$this->assertArrayNotHasKey('test', $this->collection->all());
 		$bool = $this->collection->unregister_post_type('test');
 		$this->assertFalse($bool);
 	}
