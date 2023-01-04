@@ -10,7 +10,6 @@
         "symfony/polyfill-php80": "^1.26",
         "symfony/http-foundation": "^5.4",
         "php-di/php-di": "^6.4.0",
-        "ocramius/proxy-manager": "^2.11",
         "doctrine/annotations": "^1.14"
     },
     "autoload": {
