@@ -32,8 +32,9 @@ class MenuCollection extends AbstractInvokerCollection
 	 * Removes a menu page by slug.
 	 *
 	 * @param string $slug
+	 * @return bool
 	 */
-	public function remove_menu_page(string $slug)
+	public function remove_menu_page(string $slug): bool
 	{		
 		$menu_page = array_reduce($this->menu_pages, function($carry, $item) use ($slug) {
 			if (null !== $carry) return $carry;
@@ -43,7 +44,10 @@ class MenuCollection extends AbstractInvokerCollection
 
 		if (null !== $menu_page) {
 			$this->remove($menu_page->id());
+			return true;
 		}
+
+		return false;
 	}
 
 	public function remove_submenu_page(string $slug)

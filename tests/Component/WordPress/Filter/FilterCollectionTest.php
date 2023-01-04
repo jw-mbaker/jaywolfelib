@@ -20,6 +20,7 @@ class FilterCollectionTest extends \WP_Mock\Tools\TestCase
 {
 	use DevContainerTrait;
 
+	private $collection;
 	private $request;
 
 	public function setUp(): void
@@ -78,6 +79,18 @@ class FilterCollectionTest extends \WP_Mock\Tools\TestCase
 		$this->assertTrue($bool);
 
 		$this->assertNotContains($hook, $this->collection->all());
+	}
+
+	/**
+	 * @group hook
+	 * @group wordpress
+	 * @group collection
+	 */
+	public function testRemoveFilterReturnsFalseOnInvalidKey()
+	{
+		$this->assertArrayNotHasKey('test', $this->collection->all());
+		$bool = $this->collection->remove_filter('test', function() {});
+		$this->assertFalse($bool);
 	}
 
 	/**

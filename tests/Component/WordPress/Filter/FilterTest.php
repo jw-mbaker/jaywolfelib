@@ -59,7 +59,7 @@ class FilterTest extends \WP_Mock\Tools\TestCase
 		WP_Mock::onFilter($filter->hook())
 			->with('test')
 			->reply(new InvokedFilterValue(function(string $test) use ($filter) {
-				return $this->container->call($filter, [$this->container, $filter->get('map')[0], $test]);
+				return $this->container->call($filter, [$this->container, ...$filter->get('map'), $test]);
 			}));
 		
 		apply_filters($filter->hook(), 'test');

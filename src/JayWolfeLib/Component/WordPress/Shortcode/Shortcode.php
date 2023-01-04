@@ -18,12 +18,12 @@ class Shortcode extends AbstractObjectHash implements ShortcodeInterface
 	public function __construct(string $tag, $callable, array $settings = [])
 	{
 		$this->tag = $tag;
-		$this->callable = $settings['callable'] = $settings;
+		$this->callable = $settings['callable'] = $callable;
 
 		$settings['map'] ??= [];
 		$this->settings = $settings;
 
-		$this->id = $this->set_id_from_type(static::TYPE);
+		$this->set_id_from_type(static::TYPE);
 	}
 
 	public function tag(): string

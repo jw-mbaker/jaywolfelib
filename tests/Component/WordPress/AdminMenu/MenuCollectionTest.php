@@ -127,6 +127,18 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 	 * @group wordpress
 	 * @group collection
 	 */
+	public function testRemoveMenuPageReturnsFalseOnInvalidKey()
+	{
+		$this->assertArrayNotHasKey('test', $this->collection->all());
+		$bool = $this->collection->remove_menu_page('test');
+		$this->assertFalse($bool);
+	}
+
+	/**
+	 * @group admin_menu
+	 * @group wordpress
+	 * @group collection
+	 */
 	public function testCanGetMenuPage()
 	{
 		$mp = Mockery::mock(MenuPage::class);

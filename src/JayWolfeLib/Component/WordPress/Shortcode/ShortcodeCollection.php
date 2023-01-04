@@ -31,8 +31,9 @@ class ShortcodeCollection extends AbstractInvokerCollection
 	 * Remove a shortcode.
 	 *
 	 * @param string $tag
+	 * @return bool
 	 */
-	public function remove_shortcode(string $tag)
+	public function remove_shortcode(string $tag): bool
 	{
 		$shortcode = array_reduce($this->shortcodes, function($carry, $item) use ($tag) {
 			if (null !== $carry) return $carry;
@@ -42,7 +43,10 @@ class ShortcodeCollection extends AbstractInvokerCollection
 
 		if (null !== $shortcode) {
 			$this->remove($shortcode->id());
+			return true;
 		}
+
+		return false;
 	}
 
 	public function all(): array
@@ -67,6 +71,6 @@ class ShortcodeCollection extends AbstractInvokerCollection
 
 	public function __call(string $name, array $arguments)
 	{
-		return $this->invoker->call($this->get($name), $arguments);
+		return $this->resolve($this->get($name), $arguments);
 	}
 }
