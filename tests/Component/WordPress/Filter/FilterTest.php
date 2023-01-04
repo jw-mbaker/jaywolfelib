@@ -84,6 +84,6 @@ class FilterTest extends \WP_Mock\Tools\TestCase
 	public function testCanGetHook()
 	{
 		$filter = new Filter('test', function() {});
-		$this->assertEquals($filter->hook(), 'test');
+		$this->assertEquals('test', $filter->hook());
 	}
 }

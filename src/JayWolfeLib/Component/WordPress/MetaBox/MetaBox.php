@@ -4,6 +4,7 @@ namespace JayWolfeLib\Component\WordPress\MetaBox;
 
 use JayWolfeLib\Component\ObjectHash\AbstractObjectHash;
 use JayWolfeLib\Traits\SettingsTrait;
+use Invoker\InvokerInterface;
 
 class MetaBox extends AbstractObjectHash implements MetaBoxInterface
 {
@@ -29,7 +30,7 @@ class MetaBox extends AbstractObjectHash implements MetaBoxInterface
 
 		$this->settings = $settings;
 
-		$this->id ??= $this->set_id_from_type(static::TYPE);
+		$this->set_id_from_type(static::TYPE);
 	}
 
 	public function meta_id(): string
@@ -44,6 +45,6 @@ class MetaBox extends AbstractObjectHash implements MetaBoxInterface
 
 	public function __invoke(InvokerInterface $invoker, ...$arguments)
 	{
-		$invoker->call($this->callable, $arguments);
+		return $invoker->call($this->callable, $arguments);
 	}
 }

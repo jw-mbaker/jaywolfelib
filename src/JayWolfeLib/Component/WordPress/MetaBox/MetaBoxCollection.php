@@ -3,6 +3,7 @@
 namespace JayWolfeLib\Component\WordPress\MetaBox;
 
 use JayWolfeLib\Collection\AbstractInvokerCollection;
+use Symfony\Component\HttpFoundation\Response;
 
 class MetaBoxCollection extends AbstractInvokerCollection
 {
@@ -30,7 +31,15 @@ class MetaBoxCollection extends AbstractInvokerCollection
 		);
 	}
 
-	public function remove_meta_box(string $id, $screen, string $context)
+	/**
+	 * Remove a meta box.
+	 *
+	 * @param string $id
+	 * @param string|array|\WP_Screen $screen
+	 * @param string $context
+	 * @return bool
+	 */
+	public function remove_meta_box(string $id, $screen, string $context): bool
 	{
 		$meta_box = array_reduce($this->meta_boxes, function($carry, $item) use ($id, $screen, $context) {
 			if (null !== $carry) return $carry;
@@ -48,7 +57,10 @@ class MetaBoxCollection extends AbstractInvokerCollection
 
 		if (null !== $meta_box) {
 			$this->remove($meta_box->id());
+			return true;
 		}
+
+		return false;
 	}
 
 	public function all(): array
@@ -73,6 +85,12 @@ class MetaBoxCollection extends AbstractInvokerCollection
 
 	public function __call(string $name, array $arguments)
 	{
-		$this->invoker->call($this->get($name), $arguments);
+		$response = $this->resolve($this->get($name), $arguments);
+
+		if ($response instanceof Response) {
+			$response->send();
+		}
+
+		return $response;
 	}
 }
