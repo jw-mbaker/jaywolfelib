@@ -28,6 +28,18 @@ class PostTypeCollection extends AbstractCollection
 		}
 	}
 
+	public function unregister_post_type(string $object_type): bool
+	{
+		$post_type = $this->get_by_object_type($object_type);
+
+		if (null !== $post_type) {
+			$this->remove($post_type->id());
+			return true;
+		}
+
+		return false;
+	}
+
 	/**
 	 * Register a taxonomy to the associated post type(s)
 	 *
@@ -35,10 +47,11 @@ class PostTypeCollection extends AbstractCollection
 	 * @param string|array $object_type
 	 * @param array $args
 	 */
-	public function register_taxonomy(string $taxonomy, $object_type, array $args)
+	public function register_taxonomy(string $taxonomy, $object_type, array $args = [])
 	{
 		foreach ((array) $object_type as $t) {
-			$post_type = $this->post_types[$t];
+			$post_type = $this->get_by_object_type($t);
+			if (null === $post_type) continue;
 
 			$post_type->register_taxonomy($taxonomy, $args);
 		}
@@ -54,13 +67,37 @@ class PostTypeCollection extends AbstractCollection
 		return $this->post_types[$name] ?? null;
 	}
 
-	public function remove($object_type)
+	public function remove($name)
 	{
-		foreach ((array) $object_type as $t) {
-			$post_type = $this->post_types[$t];
+		foreach ((array) $name as $n) {
+			$post_type = $this->post_types[$n];
 
-			unregister_post_type($post_type->post_type());
-			unset($this->post_types[$t]);
+			$thing = unregister_post_type($post_type->post_type());
+
+			if (is_wp_error($thing)) {
+				throw new \Exception(
+					sprintf('Error removing post type %s', $post_type->post_type())
+				);
+			}
+
+			unset($this->post_types[$n]);
 		}
+	}
+
+	/**
+	 * Get the post type by name.
+	 *
+	 * @param string $object_type
+	 * @return PostTypeInterface|null
+	 */
+	public function get_by_object_type(string $object_type): ?PostTypeInterface
+	{
+		$post_type = array_reduce($this->post_types, function($carry, $item) use ($object_type) {
+			if (null !== $carry) return $carry;
+
+			return $item->post_type() === $object_type ? $item : null;
+		}, null);
+
+		return $post_type;
 	}
 }
