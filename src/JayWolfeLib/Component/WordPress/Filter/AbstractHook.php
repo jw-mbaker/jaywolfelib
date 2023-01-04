@@ -2,13 +2,14 @@
 
 namespace JayWolfeLib\Component\WordPress\Filter;
 
-use JayWolfeLib\Component\ObjectHash\AbstractObjectHash;
+use JayWolfeLib\Component\ObjectHash\ObjectHashTrait;
 use JayWolfeLib\Traits\SettingsTrait;
 use Invoker\InvokerInterface;
 
-abstract class AbstractHook extends AbstractObjectHash implements HookInterface
+abstract class AbstractHook implements HookInterface
 {
 	use SettingsTrait;
+	use ObjectHashTrait;
 
 	protected $hook;
 	protected $callable;

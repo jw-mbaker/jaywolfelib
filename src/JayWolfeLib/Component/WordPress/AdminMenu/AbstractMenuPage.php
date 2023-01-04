@@ -2,13 +2,14 @@
 
 namespace JayWolfeLib\Component\WordPress\AdminMenu;
 
-use JayWolfeLib\Component\ObjectHash\AbstractObjectHash;
+use JayWolfeLib\Component\ObjectHash\ObjectHashTrait;
 use JayWolfeLib\Traits\SettingsTrait;
 use Invoker\InvokerInterface;
 
-abstract class AbstractMenuPage extends AbstractObjectHash implements MenuPageInterface
+abstract class AbstractMenuPage implements MenuPageInterface
 {
 	use SettingsTrait;
+	use ObjectHashTrait;
 
 	protected $slug = '';
 	protected $callable;

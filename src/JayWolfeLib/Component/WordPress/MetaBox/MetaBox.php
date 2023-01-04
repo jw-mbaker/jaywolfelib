@@ -2,13 +2,14 @@
 
 namespace JayWolfeLib\Component\WordPress\MetaBox;
 
-use JayWolfeLib\Component\ObjectHash\AbstractObjectHash;
+use JayWolfeLib\Component\ObjectHash\ObjectHashTrait;
 use JayWolfeLib\Traits\SettingsTrait;
 use Invoker\InvokerInterface;
 
-class MetaBox extends AbstractObjectHash implements MetaBoxInterface
+class MetaBox implements MetaBoxInterface
 {
 	use SettingsTrait;
+	use ObjectHashTrait;
 
 	public const TYPE = 'meta_box';
 

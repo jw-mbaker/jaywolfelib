@@ -2,13 +2,14 @@
 
 namespace JayWolfeLib\Component\WordPress\Shortcode;
 
-use JayWolfeLib\Component\ObjectHash\AbstractObjectHash;
+use JayWolfeLib\Component\ObjectHash\ObjectHashTrait;
 use JayWolfeLib\Traits\SettingsTrait;
 use Invoker\InvokerInterface;
 
-class Shortcode extends AbstractObjectHash implements ShortcodeInterface
+class Shortcode implements ShortcodeInterface
 {
 	use SettingsTrait;
+	use ObjectHashTrait;
 
 	public const TYPE = 'shortcode';
 

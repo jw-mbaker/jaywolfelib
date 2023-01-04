@@ -2,10 +2,12 @@
 
 namespace JayWolfeLib\Component\WordPress\PostType;
 
-use JayWolfeLib\Component\ObjectHash\AbstractObjectHash;
+use JayWolfeLib\Component\ObjectHash\ObjectHashTrait;
 
-class PostType extends AbstractObjectHash implements PostTypeInterface
+class PostType implements PostTypeInterface
 {
+	use ObjectHashTrait;
+
 	public const TYPE = 'post_type';
 
 	/** @var string */
@@ -25,7 +27,7 @@ class PostType extends AbstractObjectHash implements PostTypeInterface
 		$this->post_type = $post_type;
 		$this->args = $args;
 
-		$this->id ??= $this->set_id_from_type(static::TYPE);
+		$this->set_id_from_type(static::TYPE);
 	}
 
 	public function post_type(): string

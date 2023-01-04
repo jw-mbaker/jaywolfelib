@@ -2,11 +2,13 @@
 
 namespace JayWolfeLib\Component\WordPress\Widget;
 
-use JayWolfeLib\Component\ObjectHash\AbstractObjectHash;
+use JayWolfeLib\Component\ObjectHash\ObjectHashTrait;
 use WP_Widget;
 
-class Widget extends AbstractObjectHash implements WidgetInterface
+class Widget implements WidgetInterface
 {
+	use ObjectHashTrait;
+
 	public const TYPE = 'widget';
 
 	/**
@@ -24,7 +26,7 @@ class Widget extends AbstractObjectHash implements WidgetInterface
 	public function __construct($widget)
 	{
 		$this->widget = $widget;
-		$this->id ??= $this->set_id_from_type(static::TYPE);
+		$this->set_id_from_type(static::TYPE);
 	}
 	
 	/**

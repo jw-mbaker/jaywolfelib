@@ -2,7 +2,7 @@
 
 namespace JayWolfeLib\Component\ObjectHash;
 
-abstract class AbstractObjectHash implements ObjectHashInterface
+trait ObjectHashTrait
 {
 	protected $id;
 
