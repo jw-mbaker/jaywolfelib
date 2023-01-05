@@ -30,7 +30,8 @@
         ]
     },
     "scripts": {
-        "test": "./vendor/bin/phpunit"
+        "test": "./vendor/bin/phpunit",
+        "test:wordpress": "./vendor/bin/phpunit --group wordpress"
     },
     "extra": {
         "branch-alias": {
