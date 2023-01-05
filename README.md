@@ -4,39 +4,21 @@ This library is useful to help WordPress plugins follow the MVC design pattern.
 
 ## Installation
 
-To use this library as a must-use plugin, download the latest [release](https://github.com/jw-mbaker/jaywolfelib/releases/download/2.0.2/jaywolfelib.zip) and copy its contents to the mu-plugins folder of an existing WordPress installation.
-
-Then, make sure your main plugin file is loading the library's autoloader:
-```php
-require_once JayWolfeLib\VENDOR_PATH . '/autoload.php';
-```
-
-To use this library within your plugin folder, add this library as a repository in your [composer.json](https://getcomposer.org) file:
-
-```json
-{
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/jw-mbaker/jaywolfelib"
-        }
-    ]
-}
-```
+First, make sure you have [composer](https://getcomposer.org) installed.
 
 Then, add JayWolfeLib as a dependency:
 ```
 composer require jw-mbaker/jaywolfelib
 ```
 
-Make sure in your plugin is loading its autoloader:
+Make sure your plugin is loading its autoloader:
 ```php
 require_once 'vendor/autoload.php';
 ```
 
-## How to Use
+## How to use
 
-Create a `config.php` and a `routes.php` file in your main plugin folder. These are the files that will be used to bootstrap the library.
+Create a `config.php` file in your main plugin folder. This file will be used to bootstrap the library.
 
 ### The Configuration File
 
@@ -46,91 +28,35 @@ The `config.php` file should return an array of configuration settings unique to
 
 return [
     'plugin_file' => __DIR__ . '/index.php',
-    
+
     'version' => get_plugin_data(__DIR__ . '/index.php')['Version'],
-    
+
     'author' => 'Craig Misak',
-    
+
     'paths' => [
-        'base' => __DIR__,
-        'controllers' => __DIR__ . '/src/Plugin/Controllers',
-        'views' => __DIR__ . '/src/Plugin/Views',
         'templates' => __DIR__ . '/src/Plugin/templates',
-        'arrays' => __DIR__ . '/src/Plugin/arrays',
-        'log' => __DIR__ . '/logs'
+        'arrays' => __DIR__ . '/src/Plugin/arrays'
     ],
-    
+
     'dependencies' => [
         'plugins' => [
             'plugin/slug1',
             'plugin/slug2'
         ],
-        
+
         'min_php_version' => '7.4',
-        
+
         'min_wp_version' => '5.0'
     ]
 ];
 ```
 
-And then point to the config file when you bootstrap the plugin:
+And then point to the config file when you bootstrap the library:
 ```php
-use function JayWolfeLib\container;
+use JayWolfeLib\JayWolfeLib;
 
-$config = null;
-
-add_action('plugins_loaded', function() use (&$config) {
-    $factory = container()->get('config');
-
-    $config = $factory->set(__DIR__ . '/config.php');
-});
+JayWolfeLib::load(__DIR__ . '/config.php');
 ```
-
-### The Routes File
-
-Routes can be defined inside `routes.php`:
-
-```php
-use JayWolfeLib\Route\RouteType;
-
-use function JayWolfeLib\container;
-
-$router
-    ->register_route_of_type(RoutType::ADMIN_WITH_POSSIBLE_AJAX)
-    ->with_controller(\Plugin\Controllers\Controller::class)
-    ->with_model([container()->get('models'), \Plugin\Models\Model::class])
-    ->with_model([container()->get('models'), \Plugin\Models\Model2::class])
-    ->with_view(\Plugin\Views\View::class);
-    
-$router
-    ->register_route_of_type(RouteType::ADMIN_WITH_POSSIBLE_AJAX)
-    ->with_controller(\Plugin\Controllers\Controller2::class)
-    ->with_model([container()->get('models'), \Plugin\Models\Model::class])
-    ->with_dependency([container(), 'guzzle']);
-```
-
-And then initialized when you bootstrap the plugin:
-
-```php
-use JayWolfeLib\Route\Router;
-
-use function JayWolfeLib\container;
-
-function init_router(Router $router, string $routes)
-{
-    if (!file_exists($routes)) {
-        throw new \InvalidArgumentException("Routes file $routes not found.");
-    }
-    
-    include_once $routes;
-}
-
-add_action('plugins_loaded', function() use ($config) {
-    init_router(new Router(container()->get('controllers'), $config), __DIR__ . '/routes.php');
-});
-```
-
-Routes are used to initialize each controller based on the given route type.
 
 ### Writing a Controller
 
