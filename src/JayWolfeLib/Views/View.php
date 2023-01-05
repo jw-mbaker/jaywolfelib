@@ -2,8 +2,8 @@
 
 namespace JayWolfeLib\Views;
 
-use JayWolfeLib\Config\ConfigInterface;
-use JayWolfeLib\Config\ConfigTrait;
+use JayWolfeLib\Component\Config\ConfigInterface;
+use JayWolfeLib\Component\Config\ConfigTrait;
 use JayWolfeLib\Hooks\Hooks;
 use JayWolfeLib\Exception\InvalidTemplate;
 
@@ -11,26 +11,13 @@ class View implements ViewInterface
 {
 	use ConfigTrait;
 
-	/**
-	 * Constructor.
-	 *
-	 * @param ConfigInterface|null $config
-	 */
-	public function __construct(?ConfigInterface $config = null)
+	public function __construct(ConfigInterface $config = null)
 	{
-		if (null !== $config) $this->set_config($config);
+		if (null !== $config) {
+			$this->set_config($config);
+		}
 	}
-
-	public static function make(
-		string $template,
-		array $args = [],
-		?string $template_path = null,
-		?ConfigInterface $config = null
-	): string {
-		$view = new static($config);
-		return $view->render($template, $args, $template_path);
-	}
-
+	
 	/**
 	 * Render the template.
 	 *
@@ -39,7 +26,7 @@ class View implements ViewInterface
 	 * @param string|null $_template_path
 	 * @return string
 	 */
-	public function render(string $_template, array $_args = [], ?string $_template_path = null): string
+	public function render(string $_template, array $_args = [], string $_template_path = null): string
 	{
 		extract($_args);
 
@@ -61,7 +48,7 @@ class View implements ViewInterface
 	 * @param string $template
 	 * @param string|null $template_path
 	 * @return string|null
-	 * @throws InvalidView
+	 * @throws InvalidTemplate
 	 */
 	protected function locate_template(string $template, ?string $template_path = null): ?string
 	{

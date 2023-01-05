@@ -2,7 +2,7 @@
 
 namespace JayWolfeLib\Controllers;
 
-use JayWolfeLib\Config\ConfigInterface;
+use JayWolfeLib\Component\Config\ConfigInterface;
 
 /**
  * The controller interface.
