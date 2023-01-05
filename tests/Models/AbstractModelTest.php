@@ -6,7 +6,7 @@ use JayWolfeLib\Tests\Traits\DevContainerTrait;
 use WP_Mock;
 use Mockery;
 
-class ModelTest extends \WP_Mock\Tools\TestCase
+class AbstractModelTest extends \WP_Mock\Tools\TestCase
 {
 	use DevContainerTrait;
 
@@ -19,7 +19,7 @@ class ModelTest extends \WP_Mock\Tools\TestCase
 		$this->wpdb->prefix = 'wp_';
 		$this->container = $this->createDevContainer();
 		$this->container->set(\WPDB::class, $this->wpdb);
-		$this->mockModel = $this->container->get(MockModel::class);
+		$this->mockModel = $this->createMockModel();
 		WP_Mock::setUp();
 	}
 
@@ -82,5 +82,10 @@ class ModelTest extends \WP_Mock\Tools\TestCase
 		);
 
 		$this->mockModel->deleteData($where, $args);
+	}
+
+	private function createMockModel(): MockModel
+	{
+		return $this->container->get(MockModel::class);
 	}
 }
