@@ -59,24 +59,24 @@ class ConfigTest extends \WP_Mock\Tools\TestCase
 	}
 
 	/**
-	 * @covers \JayWolfeLib\Component\Config\Config::create
+	 * @covers \JayWolfeLib\Component\Config\Config::from_file
 	 * @group config
 	 */
-	public function testCreateConfigStatically()
+	public function testCreateConfigFromFile()
 	{
 		$dependencies = $this->createMockDependencies();
 
-		$config = Config::create(MOCK_CONFIG_FILE, $dependencies);
+		$config = Config::from_file(MOCK_CONFIG_FILE, $dependencies);
 
 		$this->assertInstanceOf(ConfigInterface::class, $config);
 		$this->assertInstanceOf(Config::class, $config);
 	}
 
 	/**
-	 * @covers \JayWolfeLib\Component\Config\Config::create
+	 * @covers \JayWolfeLib\Component\Config\Config::from_File
 	 * @group config
 	 */
-	public function testCreateConfigStaticallyThrowsInvalidConfig()
+	public function testCreateConfigFromFileThrowsInvalidConfig()
 	{
 		$dependencies = $this->createMockDependencies();
 
@@ -85,7 +85,7 @@ class ConfigTest extends \WP_Mock\Tools\TestCase
 		$this->expectException(\JayWolfeLib\Exception\InvalidConfig::class);
 		$this->expectExceptionMessage(sprintf('%s not found.', $file));
 
-		$config = Config::create($file, $dependencies);
+		$config = Config::from_file($file, $dependencies);
 	}
 
 	private function createMockDependencies(): Dependencies

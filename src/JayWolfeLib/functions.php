@@ -17,7 +17,7 @@ function install($config)
 	global $wpdb;
 
 	if (is_string($config)) {
-		$config = Config::create($config);
+		$config = Config::from_file($config);
 	}
 
 	if (!$config instanceof ConfigInterface) {
@@ -59,7 +59,7 @@ function install($config)
 function update_db_check($config): void
 {
 	if (is_string($config)) {
-		$config = Config::create($config);
+		$config = Config::from_file($config);
 	}
 
 	if (!$config instanceof ConfigInterface) {

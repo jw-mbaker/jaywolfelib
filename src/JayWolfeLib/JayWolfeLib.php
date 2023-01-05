@@ -21,7 +21,7 @@ final class JayWolfeLib
 	use ContainerAwareTrait;
 
 	/** @var bool */
-	public static $loaded = false;
+	private static $loaded = false;
 
 	/** @var ContainerBuilder */
 	private $containerBuilder;
@@ -36,7 +36,7 @@ final class JayWolfeLib
 		try {
 			if (null !== $config_file) {
 				add_action('jwlib_config', function(ConfigCollection $configCollection) use ($config_file) {
-					$config = Config::create($config_file);
+					$config = Config::from_file($config_file);
 					$configCollection->add( plugin_basename( $config->get('plugin_file') ), $config );
 				});
 			}
@@ -64,7 +64,13 @@ final class JayWolfeLib
 			do_action('jwlib_fail', $e);
 		}
 
-		return self::$loaded = true;
+		$dev = apply_filters('jwlib_dev', defined('JAYWOLFE_LIB_DEV') && JAYWOLFE_LIB_DEV);
+
+		if ($dev === false) {
+			self::$loaded = true;
+		}
+
+		return true;
 	}
 
 	public function init()
@@ -104,7 +110,7 @@ final class JayWolfeLib
 
 	public function add_definitions(): ContainerInterface
 	{
-		$dev = apply_filters('jwlib_dev', defined('JAYWOLFE_LIB_DEV'));
+		$dev = apply_filters('jwlib_dev', defined('JAYWOLFE_LIB_DEV') && JAYWOLFE_LIB_DEV);
 
 		if ($dev === false) {
 			$this->containerBuilder->enableCompilation(

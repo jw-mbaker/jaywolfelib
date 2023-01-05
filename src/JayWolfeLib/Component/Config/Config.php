@@ -80,7 +80,7 @@ class Config implements ConfigInterface
 	 * @throws InvalidConfig
 	 * @return self
 	 */
-	public static function create(string $file, Dependencies $dependencies = null): self
+	public static function from_file(string $file, Dependencies $dependencies = null): self
 	{
 		if (!is_readable($file)) {
 			throw new InvalidConfig(
