@@ -8,7 +8,7 @@ class ViewFactory
 {
 	public function make(
 		string $template,
-		array $args,
+		array $args = [],
 		string $template_path = null,
 		ConfigInterface $config = null
 	): string {

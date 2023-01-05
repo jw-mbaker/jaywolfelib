@@ -59,7 +59,7 @@ class View implements ViewInterface
 		}
 
 		if ($this->config instanceof ConfigInterface) {
-			if (null === $this->config->get('paths')['templates']) {
+			if (empty($this->config->get('paths')['templates'])) {
 				throw new InvalidTemplate('Template path not set for ' . $this->config->get('plugin_file') . '.');
 			}
 	

@@ -2,15 +2,14 @@
 
 namespace JayWolfeLib\Tests\Views;
 
-use JayWolfeLib\Views\ViewFactory;
-use JayWolfeLib\Views\ViewInterface;
+use JayWolfeLib\Views\View;
 use JayWolfeLib\Component\Config\ConfigInterface;
 use JayWolfeLib\Component\Config\Config;
 use JayWolfeLib\Exception\InvalidTemplate;
 use WP_Mock;
 use Mockery;
 
-class ViewFactoryTest extends \WP_Mock\Tools\TestCase
+class ViewTest extends \WP_Mock\Tools\TestCase
 {
 	public function setUp(): void
 	{
@@ -24,73 +23,73 @@ class ViewFactoryTest extends \WP_Mock\Tools\TestCase
 		Mockery::close();
 	}
 
-	public function testMakeFromAbsolutePath()
+	public function testRenderFromAbsolutePath()
 	{
-		$factory = new ViewFactory();
+		$view = new View();
+		$str = $view->render('mock-template.php', [], MOCK_TEMPLATE_PATH);
 
-		$str = $factory->make('mock-template.php', [], MOCK_TEMPLATE_PATH);
 		$this->assertEquals('Hello World!', $str);
 	}
 
-	public function testMakeFromAbsolutePathWithoutExtension()
+	public function testRenderFromAbsolutePathWithoutExtension()
 	{
-		$factory = new ViewFactory();
+		$view = new View();
+		$str = $view->render('mock-template', [], MOCK_TEMPLATE_PATH);
 
-		$str = $factory->make('mock-template', [], MOCK_TEMPLATE_PATH);
 		$this->assertEquals('Hello World!', $str);
 	}
 
-	public function testMakeFromAbsolutePathWithArgs()
+	public function testRenderFromAbsolutePathWithArgs()
 	{
-		$factory = new ViewFactory();
+		$view = new View();
+		$str = $view->render('mock-template', ['foo' => 'bar'], MOCK_TEMPLATE_PATH);
 
-		$str = $factory->make('mock-template', ['foo' => 'bar'], MOCK_TEMPLATE_PATH);
 		$this->assertEquals('bar', $str);
 	}
 
 	public function testThrowsInvalidArgumentExceptionWithoutConfig()
 	{
-		$factory = new ViewFactory();
+		$view = new View();
 
 		$this->expectException(\InvalidArgumentException::class);
 		$this->expectExceptionMessage(
 			sprintf('$template_path must be specified if %s is not provided.', ConfigInterface::class)
 		);
 
-		$factory->make('mock-template');
+		$view->render('mock-template');
 	}
 
-	public function testMakeFromConfig()
+	public function testRenderFromConfig()
 	{
-		$factory = new ViewFactory();
-		$config = Config::from_file(MOCK_CONFIG_FILE);
+		$config = $this->createConfig();
+		$view = new View($config);
 
-		$str = $factory->make('mock-template.php', [], null, $config);
+		$str = $view->render('mock-template.php');
 		$this->assertEquals('Hello World!', $str);
 	}
 
-	public function testMakeFromConfigWithoutExtension()
+	public function testRenderFromConfigWithoutExtension()
 	{
-		$factory = new ViewFactory();
-		$config = Config::from_file(MOCK_CONFIG_FILE);
+		$config = $this->createConfig();
+		$view = new View($config);
 
-		$str = $factory->make('mock-template', [], null, $config);
+		$str = $view->render('mock-template');
 		$this->assertEquals('Hello World!', $str);
 	}
 
-	public function testMakeFromConfigWithArgs()
+	public function testRenderFromConfigWithArgs()
 	{
-		$factory = new ViewFactory();
-		$config = Config::from_file(MOCK_CONFIG_FILE);
+		$config = $this->createConfig();
+		$view = new View($config);
 
-		$str = $factory->make('mock-template', ['foo' => 'bar'], null, $config);
+		$str = $view->render('mock-template', ['foo' => 'bar']);
 		$this->assertEquals('bar', $str);
 	}
 
 	public function testThrowsInvalidTemplateIfTemplatePathNotSet()
 	{
 		$config = Mockery::mock(ConfigInterface::class);
-		$factory = new ViewFactory();
+		$view = new View($config);
 
 		$config->expects()->get('paths')->andReturn([]);
 		$config->expects()->get('plugin_file')->andReturn(MOCK_PLUGIN_REL_PATH);
@@ -100,6 +99,11 @@ class ViewFactoryTest extends \WP_Mock\Tools\TestCase
 			sprintf('Template path not set for %s.', MOCK_PLUGIN_REL_PATH)
 		);
 
-		$factory->make('mock-template', [], null, $config);
+		$view->render('mock-template');
+	}
+
+	private function createConfig(): ConfigInterface
+	{
+		return Config::from_file(MOCK_CONFIG_FILE);
 	}
 }
