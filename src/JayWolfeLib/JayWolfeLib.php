@@ -64,7 +64,7 @@ final class JayWolfeLib
 			do_action('jwlib_fail', $e);
 		}
 
-		$dev = apply_filters('jwlib_dev', defined('JAYWOLFE_LIB_DEV') && JAYWOLFE_LIB_DEV);
+		$dev = apply_filters('jwlib_dev', !defined(__NAMESPACE__ . '\\PRODUCTION') || !PRODUCTION);
 
 		if ($dev === false) {
 			self::$loaded = true;
@@ -110,11 +110,11 @@ final class JayWolfeLib
 
 	public function add_definitions(): ContainerInterface
 	{
-		$dev = apply_filters('jwlib_dev', defined('JAYWOLFE_LIB_DEV') && JAYWOLFE_LIB_DEV);
+		$dev = apply_filters('jwlib_dev', !defined(__NAMESPACE__ . '\\PRODUCTION') || !PRODUCTION);
 
 		if ($dev === false) {
 			$this->containerBuilder->enableCompilation(
-				JAYWOLFE_LIB_CACHE_DIR,
+				CACHE_DIR,
 				"JwLibCompiledContainer"
 			);
 		}

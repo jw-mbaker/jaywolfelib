@@ -27,6 +27,9 @@ use WP_Mock\InvokedFilterValue;
 use WP_Mock\Matcher\AnyInstance;
 use Mockery;
 
+use const JayWolfeLib\PRODUCTION;
+use const JayWolfeLib\CACHE_DIR;
+
 class JayWolfeLibTest extends \WP_Mock\Tools\TestCase
 {
 	use DevContainerTrait;
@@ -48,7 +51,7 @@ class JayWolfeLibTest extends \WP_Mock\Tools\TestCase
 	public function testEnableCompilation()
 	{
 		WP_Mock::onFilter('jwlib_dev')
-			->with(JAYWOLFE_LIB_DEV)
+			->with(true)
 			->reply(false);
 
 		$jwlib = new JayWolfeLib($this->containerBuilder);
@@ -56,9 +59,9 @@ class JayWolfeLibTest extends \WP_Mock\Tools\TestCase
 
 		$this->assertInstanceOf(ContainerInterface::class, $container);
 		$this->assertTrue(class_exists(\JwLibCompiledContainer::class));
-		$this->assertFileExists(JAYWOLFE_LIB_CACHE_DIR . '/JwLibCompiledContainer.php');
+		$this->assertFileExists(CACHE_DIR . '/JwLibCompiledContainer.php');
 
-		unlink(JAYWOLFE_LIB_CACHE_DIR . '/JwLibCompiledContainer.php');
+		unlink(CACHE_DIR . '/JwLibCompiledContainer.php');
 	}
 
 	public function testCanAddDefinitions()
