@@ -80,10 +80,9 @@ final class JayWolfeLib
 			$container = $this->add_definitions();
 			//container( $container );
 
-			add_action('jwlib_check_config', [$this, 'check_config'], 99, 1);
+			add_action('jwlib_config', [$this, 'check_and_set_configs'], 99, 1);
 
 			do_action('jwlib_config', $container->get(ConfigCollection::class));
-			do_action('jwlib_check_config', $container->get(ConfigCollection::class));
 			do_action('jwlib_hooks', $container->get(FilterCollection::class));
 			do_action('jwlib_post_types', $container->get(PostTypeCollection::class));
 			add_action('admin_menu', function() use ($container) {
@@ -132,14 +131,16 @@ final class JayWolfeLib
 		return $this->container;
 	}
 
-	public function check_config(ConfigCollection $configs)
+	public function check_and_set_configs(ConfigCollection $configs)
 	{
 		foreach ($configs as $config) {
-			$this->check_requirements($config);
+			if ($this->check_requirements($config)) {
+				$this->container->set(sprintf('config.%s', plugin_basename($config->get('plugin_file'))), $config);
+			}
 		}
 	}
 
-	private function check_requirements(ConfigInterface $config)
+	private function check_requirements(ConfigInterface $config): bool
 	{
 		if (!$config->requirements_met()) {
 			ob_start();
@@ -151,7 +152,11 @@ final class JayWolfeLib
 			endforeach;
 
 			$this->deactivate_die($config->get('plugin_file'), ob_get_clean());
+
+			return false;
 		}
+
+		return true;
 	}
 
 	private function deactivate_die(string $plugin_file, string $message)

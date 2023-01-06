@@ -114,10 +114,7 @@ class JayWolfeLibTest extends \WP_Mock\Tools\TestCase
 		$this->assertInstanceOf(ConfigInterface::class, $collection->get('test'));
 	}
 
-	/**
-	 * @doesNotPerformAssertions
-	 */
-	public function testCanCheckConfigs()
+	public function testCheckAndSetConfigs()
 	{
 		$collection = $this->container->get(ConfigCollection::class);
 
@@ -132,8 +129,10 @@ class JayWolfeLibTest extends \WP_Mock\Tools\TestCase
 		}
 
 		$configs['test1']->expects()->requirements_met()->andReturn(true);
+		$configs['test1']->expects()->get('plugin_file')->andReturn('test1.php');
 		$configs['test2']->expects()->requirements_met()->andReturn(false);
 		$configs['test3']->expects()->requirements_met()->andReturn(true);
+		$configs['test3']->expects()->get('plugin_file')->andReturn('test3.php');
 
 		$configs['test2']->expects()->get_errors()->andReturn([
 			(object) [
@@ -142,15 +141,20 @@ class JayWolfeLibTest extends \WP_Mock\Tools\TestCase
 			]
 		]);
 
-		$configs['test2']->expects()->get('plugin_file')->andReturn('mock/plugin.php');
+		$configs['test2']->expects()->get('plugin_file')->andReturn('test2.php');
 
 		WP_Mock::userFunction('deactivate_plugins', ['times' => 1]);
-		WP_Mock::userFunction('plugin_basename', ['times' => 1]);
+		WP_Mock::passthruFunction('plugin_basename');
 		WP_Mock::userFunction('wp_die', ['times' => 1]);
 		WP_Mock::userFunction('wp_kses_post', ['times' => 1]);
 
 		$jwlib = new JayWolfeLib($this->containerBuilder);
-		$jwlib->check_config($collection);
+		$jwlib->set_container($this->container);
+		$jwlib->check_and_set_configs($collection);
+
+		$this->assertTrue($this->container->has('config.test1.php'));
+		$this->assertTrue($this->container->has('config.test3.php'));
+		$this->assertFalse($this->container->has('config.test2.php'));
 	}
 
 	/**
