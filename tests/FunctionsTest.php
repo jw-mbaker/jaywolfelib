@@ -15,6 +15,9 @@ use function JayWolfeLib\fetch_array;
 use function JayWolfeLib\fragment_cache;
 use function JayWolfeLib\delete_fragment_cache;
 
+use const JayWolfeLib\MOCK_PLUGIN_REL_PATH;
+use const JayWolfeLib\MOCK_ARRAY_PATH;
+
 class FunctionTest extends \WP_Mock\Tools\TestCase
 {
 	use MockConfigTrait;
@@ -152,7 +155,7 @@ class FunctionTest extends \WP_Mock\Tools\TestCase
 		$file = trailingslashit( ABSPATH ) . 'mock-config-no-db.php';
 
 		file_put_contents($file, "<?php return [
-			'plugin_file' => MOCK_PLUGIN_REL_PATH,
+			'plugin_file' => JayWolfeLib\\MOCK_PLUGIN_REL_PATH,
 		];");
 
 		$this->assertTrue(file_exists($file));

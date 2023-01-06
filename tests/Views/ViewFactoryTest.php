@@ -10,6 +10,10 @@ use JayWolfeLib\Exception\InvalidTemplate;
 use WP_Mock;
 use Mockery;
 
+use const JayWolfeLib\MOCK_PLUGIN_REL_PATH;
+use const JayWolfeLib\MOCK_TEMPLATE_PATH;
+use const JayWolfeLib\MOCK_CONFIG_FILE;
+
 class ViewFactoryTest extends \WP_Mock\Tools\TestCase
 {
 	public function setUp(): void

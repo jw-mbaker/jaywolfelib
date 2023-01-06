@@ -8,6 +8,8 @@ use JayWolfeLib\Component\Config\Dependencies;
 use WP_Mock;
 use Mockery;
 
+use const JayWolfeLib\MOCK_CONFIG_FILE;
+
 class ConfigTest extends \WP_Mock\Tools\TestCase
 {
 	public function setUp(): void

@@ -29,6 +29,7 @@ use Mockery;
 
 use const JayWolfeLib\PRODUCTION;
 use const JayWolfeLib\CACHE_DIR;
+use const JayWolfeLib\MOCK_CONFIG_FILE;
 
 class JayWolfeLibTest extends \WP_Mock\Tools\TestCase
 {
