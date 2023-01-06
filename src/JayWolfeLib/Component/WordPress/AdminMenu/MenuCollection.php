@@ -13,9 +13,9 @@ class MenuCollection extends AbstractInvokerCollection
 	 */
 	private $menu_pages = [];
 
-	private function add(string $name, MenuPageInterface $menu_page)
+	private function add(MenuPageInterface $menu_page)
 	{
-		$this->menu_pages[$name] = $menu_page;
+		$this->menu_pages[(string) $menu_page->id()] = $menu_page;
 	}
 
 	public function all(): array
@@ -23,23 +23,16 @@ class MenuCollection extends AbstractInvokerCollection
 		return $this->menu_pages;
 	}
 
-	public function get(string $name): ?MenuPageInterface
-	{
-		return $this->menu_pages[$name] ?? null;
-	}
-
-	/**
-	 * Get the menu page by slug.
-	 *
-	 * @param string $slug
-	 * @return MenuPageInterface|null
-	 */
-	public function get_by_slug(string $slug): ?MenuPageInterface
+	public function get(Slug $slug): ?MenuPageInterface
 	{
 		$menu_page = array_reduce($this->menu_pages, function($carry, $item) use ($slug) {
 			if (null !== $carry) return $carry;
 
-			return $item->slug() === $slug ? $item : null;
+			if ((string) $slug === (string) $item->slug()) {
+				return $item;
+			}
+
+			return null;
 		}, null);
 
 		return $menu_page;
@@ -51,43 +44,41 @@ class MenuCollection extends AbstractInvokerCollection
 	 * @param string $slug
 	 * @return bool
 	 */
-	public function remove_menu_page(string $slug): bool
+	public function remove_menu_page(Slug $slug): bool
 	{		
-		$menu_page = $this->get_by_slug($slug);
+		$menu_page = $this->get($slug);
 
 		if (null !== $menu_page) {
-			$this->remove($menu_page->id());
+			$this->remove($menu_page);
 			return true;
 		}
 
 		return false;
 	}
 
-	public function remove_submenu_page(string $slug)
+	public function remove_submenu_page(Slug $slug): bool
 	{
-		$this->remove_menu_page($slug);
+		return $this->remove_menu_page($slug);
 	}
 
 	/**
-	 * Removes a menu page or an array of menu pages by name from the collection.
+	 * Removes a menu page or an array of menu pages from the collection.
 	 *
-	 * @param string|string[] $name
+	 * @param MenuPageInterface|MenuPageInterface[] $menu_page
 	 */
-	public function remove($name)
+	private function remove($menu_page)
 	{
-		foreach ((array) $name as $n) {
-			$menu_page = $this->menu_pages[$n];
-
+		foreach ((array) $menu_page as $mp) {
 			switch ($menu_page::MENU_TYPE) {
 				case 'menu_page':
-					remove_menu_page($menu_page->slug());
+					remove_menu_page((string) $menu_page->slug());
 					break;
 				case 'submenu_page':
-					remove_submenu_page($menu_page->parent_slug(), $menu_page->slug());
+					remove_submenu_page((string) $menu_page->parent_slug(), (string) $menu_page->slug());
 					break;
 			}
 			
-			unset($this->menu_pages[$n]);
+			unset($this->menu_pages[(string) $menu_page->id()]);
 		}
 	}
 
@@ -98,13 +89,13 @@ class MenuCollection extends AbstractInvokerCollection
 	 */
 	public function menu_page(MenuPage $menu_page): string
 	{
-		$this->add($menu_page->id(), $menu_page);
+		$this->add($menu_page);
 		return add_menu_page(
 			$menu_page->get('page_title'),
 			$menu_page->get('menu_title'),
 			$menu_page->get('capability'),
-			$menu_page->slug(),
-			[$this, $menu_page->id()],
+			(string) $menu_page->slug(),
+			[$this, (string) $menu_page->id()],
 			$menu_page->get('icon_url'),
 			$menu_page->get('position')
 		);
@@ -118,21 +109,21 @@ class MenuCollection extends AbstractInvokerCollection
 	 */
 	public function sub_menu_page(SubMenuPage $sub_menu_page)
 	{
-		$this->add($sub_menu_page->id(), $sub_menu_page);
+		$this->add($sub_menu_page);
 		return add_submenu_page(
-			$sub_menu_page->parent_slug(),
+			(string) $sub_menu_page->parent_slug(),
 			$sub_menu_page->get('page_title'),
 			$sub_menu_page->get('menu_title'),
 			$sub_menu_page->get('capability'),
-			$sub_menu_page->slug(),
-			[$this, $sub_menu_page->id()],
+			(string) $sub_menu_page->slug(),
+			[$this, (string) $sub_menu_page->id()],
 			$sub_menu_page->get('position')
 		);
 	}
 
 	public function __call(string $name, array $arguments)
 	{
-		$response = $this->resolve($this->get($name), $arguments);
+		$response = $this->resolve($this->menu_pages[$name], $arguments);
 
 		if ($response instanceof Response) {
 			$response->send();

@@ -15,14 +15,24 @@ class SubMenuPage extends AbstractMenuPage
 
 	protected $parent_slug;
 
-	public function __construct(string $slug, string $parent_slug, $callable, array $settings = [])
+	public function __construct(Slug $slug, Slug $parent_slug, $callable, array $settings = [])
 	{
 		$this->parent_slug = $parent_slug;
 		parent::__construct($slug, $callable, $settings);
 	}
 
-	public function parent_slug(): string
+	public function parent_slug(): Slug
 	{
 		return $this->parent_slug;
+	}
+
+	public static function create(array $args): self
+	{
+		return new self(
+			Slug::fromString($args['slug']),
+			Slug::fromString($args['parent_slug']),
+			$args['callable'],
+			$args['settings'] ?? []
+		);
 	}
 }

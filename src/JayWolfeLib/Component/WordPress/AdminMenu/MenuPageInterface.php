@@ -8,5 +8,6 @@ use JayWolfeLib\Component\ObjectHash\ObjectHashInterface;
 
 interface MenuPageInterface extends HandlerInterface, ParameterInterface, ObjectHashInterface
 {
-	public function slug(): string;
+	public function slug(): Slug;
+	public static function create(array $args): MenuPageInterface;
 }

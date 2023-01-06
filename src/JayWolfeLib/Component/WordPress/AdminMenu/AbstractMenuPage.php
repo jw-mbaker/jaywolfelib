@@ -11,21 +11,24 @@ abstract class AbstractMenuPage implements MenuPageInterface
 	use SettingsTrait;
 	use ObjectHashTrait;
 
-	protected $slug = '';
+	protected $slug;
 	protected $callable;
 
-	public function __construct(string $slug, $callable, array $settings = [])
+	public function __construct(Slug $slug, $callable, array $settings = [])
 	{
 		$this->slug = $slug;
 		$this->callable = $settings['callable'] = $callable;
 
 		$settings['map'] ??= [];
 		$this->settings = array_merge(static::DEFAULTS, $settings);
-
-		$this->set_id_from_type(static::MENU_TYPE);
 	}
 
-	public function slug(): string
+	public function id(): MenuId
+	{
+		return $this->id ??= MenuId::fromMenuPage($this);
+	}
+
+	public function slug(): Slug
 	{
 		return $this->slug;
 	}

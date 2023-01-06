@@ -3,6 +3,8 @@
 namespace JayWolfeLib\Tests\Component\WordPress\AdminMenu;
 
 use JayWolfeLib\Component\WordPress\AdminMenu\MenuPage;
+use JayWolfeLib\Component\WordPress\AdminMenu\Slug;
+use JayWolfeLib\Component\WordPress\AdminMenu\MenuId;
 use JayWolfeLib\Tests\Component\MockTypeHint;
 use JayWolfeLib\Tests\Traits\DevContainerTrait;
 use Symfony\Component\HttpFoundation\Request;
@@ -33,9 +35,12 @@ class MenuPageTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testCanInvokeMenuPage()
 	{
-		$mp = new MenuPage('test', function() {
-			$this->assertTrue(true);
-		});
+		$mp = MenuPage::create([
+			'slug' => 'test',
+			'callable' => function() {
+				$this->assertTrue(true);
+			}
+		]);
 
 		$this->container->call($mp);
 	}
@@ -46,10 +51,13 @@ class MenuPageTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testCanInvokeMenuPageWithTypeHint()
 	{
-		$mp = new MenuPage('test', function(Request $request, MockTypeHint $th) {
-			$this->assertInstanceOf(Request::class, $request);
-			$this->assertInstanceOf(MockTypeHint::class, $th);
-		});
+		$mp = MenuPage::create([
+			'slug' => 'test',
+			'callable' => function(Request $request, MockTypeHint $th) {
+				$this->assertInstanceOf(Request::class, $request);
+				$this->assertInstanceOf(MockTypeHint::class, $th);
+			}
+		]);
 
 		$this->container->call($mp);
 	}
@@ -62,10 +70,13 @@ class MenuPageTest extends \WP_Mock\Tools\TestCase
 	{
 		$response = Mockery::mock(Response::class);
 
-		$mp = new MenuPage('test', function() use ($response) {
-			$this->assertTrue(true);
-			return $response;
-		});
+		$mp = MenuPage::create([
+			'slug' => 'test',
+			'callable' => function() use ($response) {
+				$this->assertTrue(true);
+				return $response;
+			}
+		]);
 
 		$this->container->call($mp);
 	}
@@ -78,11 +89,30 @@ class MenuPageTest extends \WP_Mock\Tools\TestCase
 	{
 		$response = Mockery::mock(Response::class);
 
-		$mp = new MenuPage('test', function(Request $request) use ($response) {
-			$this->assertInstanceOf(Request::class, $request);
-			return $response;
-		});
+		$mp = MenuPage::create([
+			'slug' => 'test',
+			'callable' => function(Request $request) use ($response) {
+				$this->assertInstanceOf(Request::class, $request);
+				return $response;
+			}
+		]);
 
 		$this->container->call($mp);
+	}
+
+	/**
+	 * @group admin_menu
+	 * @group wordpress
+	 */
+	public function testMenuPageIdMethodShouldReturnMenuId()
+	{
+		$mp = MenuPage::create([
+			'slug' => 'test',
+			'callable' => function() {}
+		]);
+
+		$id = $mp->id();
+		$this->assertInstanceOf(MenuId::class, $id);
+		$this->assertSame((string) $id, spl_object_hash($mp));
 	}
 }

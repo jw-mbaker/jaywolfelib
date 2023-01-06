@@ -6,6 +6,8 @@ use JayWolfeLib\Component\WordPress\AdminMenu\MenuCollection;
 use JayWolfeLib\Component\WordPress\AdminMenu\MenuPageInterface;
 use JayWolfeLib\Component\WordPress\AdminMenu\MenuPage;
 use JayWolfeLib\Component\WordPress\AdminMenu\SubMenuPage;
+use JayWolfeLib\Component\WordPress\AdminMenu\Slug;
+use JayWolfeLib\Component\WordPress\AdminMenu\MenuId;
 use JayWolfeLib\Tests\Component\MockTypeHint;
 use JayWolfeLib\Tests\Traits\DevContainerTrait;
 use Symfony\Component\HttpFoundation\Request;
@@ -44,14 +46,7 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testCanAddMenuPage()
 	{
-		$mp = Mockery::mock(MenuPage::class);
-		$mp->expects()->get('page_title')->andReturn('test');
-		$mp->expects()->get('menu_title')->andReturn('test');
-		$mp->expects()->get('capability')->andReturn('administrator');
-		$mp->expects()->slug()->andReturn('test');
-		$mp->expects()->id()->twice()->andReturn(spl_object_hash($mp));
-		$mp->expects()->get('icon_url')->andReturn('');
-		$mp->expects()->get('position')->andReturn(null);
+		$mp = $this->createMenuPage();
 
 		$this->collection->menu_page($mp);
 		$this->assertContains($mp, $this->collection->all());
@@ -64,14 +59,7 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testCanAddSubMenuPage()
 	{
-		$smp = Mockery::mock(SubMenuPage::class);
-		$smp->expects()->parent_slug()->andReturn('parent-test');
-		$smp->expects()->get('page_title')->andReturn('test');
-		$smp->expects()->get('menu_title')->andReturn('test');
-		$smp->expects()->get('capability')->andReturn('administrator');
-		$smp->expects()->slug()->andReturn('test');
-		$smp->expects()->id()->twice()->andReturn(spl_object_hash($smp));
-		$smp->expects()->get('position')->andReturn(null);
+		$smp = $this->createSubMenuPage();
 
 		$this->collection->sub_menu_page($smp);
 		$this->assertContains($smp, $this->collection->all());
@@ -85,19 +73,12 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testCanRemoveMenuPage()
 	{
-		$mp = Mockery::mock(MenuPage::class);
-		$mp->expects()->get('page_title')->andReturn('test');
-		$mp->expects()->get('menu_title')->andReturn('test');
-		$mp->expects()->get('capability')->andReturn('administrator');
-		$mp->expects()->slug()->times(3)->andReturn('test');
-		$mp->expects()->id()->times(3)->andReturn(spl_object_hash($mp));
-		$mp->expects()->get('icon_url')->andReturn('');
-		$mp->expects()->get('position')->andReturn(null);
+		$mp = $this->createMenuPage();
 
 		$this->collection->menu_page($mp);
 		$this->assertContains($mp, $this->collection->all());
 
-		$this->collection->remove_menu_page('test');
+		$this->collection->remove_menu_page(Slug::fromString('test'));
 		$this->assertNotContains($mp, $this->collection->all());
 	}
 
@@ -105,23 +86,16 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 	 * @group admin_menu
 	 * @group wordpress
 	 * @group collection
-	 * @depends testCanGetBySlug
+	 * @depends testCanGetSubMenuPageBySlug
 	 */
 	public function testCanRemoveSubMenuPage()
 	{
-		$smp = Mockery::mock(SubMenuPage::class);
-		$smp->expects()->parent_slug()->twice()->andReturn('parent-test');
-		$smp->expects()->get('page_title')->andReturn('test');
-		$smp->expects()->get('menu_title')->andReturn('test');
-		$smp->expects()->get('capability')->andReturn('administrator');
-		$smp->expects()->slug()->times(3)->andReturn('test');
-		$smp->expects()->id()->times(3)->andReturn(spl_object_hash($smp));
-		$smp->expects()->get('position')->andReturn(null);
+		$smp = $this->createSubMenuPage();
 
 		$this->collection->sub_menu_page($smp);
 		$this->assertContains($smp, $this->collection->all());
 
-		$this->collection->remove_submenu_page('test');
+		$this->collection->remove_submenu_page(Slug::fromString('test'));
 		$this->assertNotContains($smp, $this->collection->all());
 	}
 
@@ -130,9 +104,9 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 	 * @group wordpress
 	 * @group collection
 	 */
-	public function testRemoveMenuPageReturnsFalseOnInvalidKey()
+	public function testRemoveMenuPageReturnsFalseOnInvalidSlug()
 	{
-		$bool = $this->collection->remove_menu_page('test');
+		$bool = $this->collection->remove_menu_page(Slug::fromString('test'));
 		$this->assertFalse($bool);
 	}
 
@@ -143,19 +117,12 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testCanGetBySlug()
 	{
-		$mp = Mockery::mock(MenuPage::class);
-		$mp->expects()->get('page_title')->andReturn('test');
-		$mp->expects()->get('menu_title')->andReturn('test');
-		$mp->expects()->get('capability')->andReturn('administrator');
-		$mp->expects()->slug()->twice()->andReturn('test');
-		$mp->expects()->id()->twice()->andReturn(spl_object_hash($mp));
-		$mp->expects()->get('icon_url')->andReturn('');
-		$mp->expects()->get('position')->andReturn(null);
+		$mp = $this->createMenuPage();
 
 		$this->collection->menu_page($mp);
 		$this->assertContains($mp, $this->collection->all());
 
-		$obj = $this->collection->get_by_slug('test');
+		$obj = $this->collection->get(Slug::fromString('test'));
 		$this->assertInstanceOf(MenuPageInterface::class, $obj);
 		$this->assertSame($obj, $mp);
 	}
@@ -165,50 +132,27 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 	 * @group wordpress
 	 * @group collection
 	 */
-	public function testGetBySlugReturnsNullIfNotFound()
+	public function testCanGetSubMenuPageBySlug()
 	{
-		$obj = $this->collection->get_by_slug('test');
-		$this->assertNull($obj);
-	}
-
-	/**
-	 * @group admin_menu
-	 * @group wordpress
-	 * @group collection
-	 */
-	public function testCanGetMenuPage()
-	{
-		$mp = Mockery::mock(MenuPage::class);
-		$mp->expects()->get('page_title')->andReturn('test');
-		$mp->expects()->get('menu_title')->andReturn('test');
-		$mp->expects()->get('capability')->andReturn('administrator');
-		$mp->expects()->slug()->andReturn('test');
-		$mp->expects()->id()->twice()->andReturn(spl_object_hash($mp));
-		$mp->expects()->get('icon_url')->andReturn('');
-		$mp->expects()->get('position')->andReturn(null);
-
-		$this->collection->menu_page($mp);
-		$this->assertSame($mp, $this->collection->get(spl_object_hash($mp)));
-	}
-
-	/**
-	 * @group admin_menu
-	 * @group wordpress
-	 * @group collection
-	 */
-	public function testCanGetSubMenuPage()
-	{
-		$smp = Mockery::mock(SubMenuPage::class);
-		$smp->expects()->parent_slug()->andReturn('parent-test');
-		$smp->expects()->get('page_title')->andReturn('test');
-		$smp->expects()->get('menu_title')->andReturn('test');
-		$smp->expects()->get('capability')->andReturn('administrator');
-		$smp->expects()->slug()->andReturn('test');
-		$smp->expects()->id()->twice()->andReturn(spl_object_hash($smp));
-		$smp->expects()->get('position')->andReturn(null);
+		$smp = $this->createSubMenuPage();
 
 		$this->collection->sub_menu_page($smp);
-		$this->assertSame($smp, $this->collection->get(spl_object_hash($smp)));
+		$this->assertContains($smp, $this->collection->all());
+
+		$obj = $this->collection->get(Slug::fromString('test'));
+		$this->assertInstanceOf(SubMenuPage::class, $obj);
+		$this->assertSame($obj, $smp);
+	}
+
+	/**
+	 * @group admin_menu
+	 * @group wordpress
+	 * @group collection
+	 */
+	public function testGetBySlugReturnsNullIfNotFound()
+	{
+		$obj = $this->collection->get(Slug::fromString('test'));
+		$this->assertNull($obj);
 	}
 
 	/**
@@ -218,23 +162,23 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testCanInvokeMenuPage()
 	{
-		$mp = new MenuPage(
-			'test',
-			function() {
+		$mp = MenuPage::create([
+			'slug' => 'test',
+			'callable' => function() {
 				$this->assertTrue(true);
 			},
-			[
+			'settings' => [
 				'page_title' => 'test',
 				'menu_title' => 'test',
 				'capability' => 'administrator'
 			]
-		);
+		]);
 
 		$this->collection->menu_page($mp);
 
-		$this->assertSame($mp, $this->collection->get($mp->id()));
+		$this->assertSame($mp, $this->collection->get(Slug::fromString('test')));
 
-		call_user_func([$this->collection, $mp->id()]);
+		call_user_func([$this->collection, (string) $mp->id()]);
 	}
 
 	/**
@@ -380,5 +324,22 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 		$response->expects()->send();
 
 		call_user_func([$this->collection, $smp->id()]);
+	}
+
+	private function createMenuPage(): MenuPage
+	{
+		return MenuPage::create([
+			'slug' => 'test',
+			'callable' => function() {}
+		]);
+	}
+
+	private function createSubMenuPage(): SubMenuPage
+	{
+		return SubMenuPage::create([
+			'slug' => 'test',
+			'parent_slug' => 'parent-test',
+			'callable' => function() {}
+		]);
 	}
 }

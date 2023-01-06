@@ -13,4 +13,13 @@ class MenuPage extends AbstractMenuPage
 		'icon_url' => '',
 		'position' => null
 	];
+
+	public static function create(array $args): self
+	{
+		return new self(
+			Slug::fromString($args['slug']),
+			$args['callable'],
+			$args['settings'] ?? []
+		);
+	}
 }
