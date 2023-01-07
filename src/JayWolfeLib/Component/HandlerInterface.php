@@ -7,4 +7,5 @@ use Invoker\InvokerInterface;
 interface HandlerInterface
 {
 	public function __invoke(InvokerInterface $invoker, ...$args);
+	public function map(): array;
 }

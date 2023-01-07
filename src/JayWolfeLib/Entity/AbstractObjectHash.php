@@ -1,6 +1,6 @@
 <?php
 
-namespace JayWolfeLib\Component\ObjectHash;
+namespace JayWolfeLib\Entity;
 
 abstract class AbstractObjectHash
 {
@@ -9,5 +9,10 @@ abstract class AbstractObjectHash
 	public function __construct(object $obj)
 	{
 		$this->id = spl_object_hash($obj);
+	}
+
+	public function __toString()
+	{
+		return $this->id;
 	}
 }
