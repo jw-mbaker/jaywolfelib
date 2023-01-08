@@ -2,17 +2,12 @@
 
 namespace JayWolfeLib\Component\WordPress\AdminMenu;
 
+use JayWolfeLib\Invoker\CallableTrait;
 use Invoker\InvokerInterface;
 
 abstract class AbstractMenuPage implements MenuPageInterface
 {
-	public const SLUG = 'slug';
-	public const CALLABLE = 'callable';
-	public const PAGE_TITLE = 'page_title';
-	public const MENU_TITLE = 'menu_title';
-	public const CAPABILITY = 'capability';
-	public const POSITION = 'position';
-	public const MAP = 'map';
+	use CallableTrait;
 
 	public const DEFAULTS = [
 		self::PAGE_TITLE => '',
@@ -22,10 +17,13 @@ abstract class AbstractMenuPage implements MenuPageInterface
 		self::MAP => []
 	];
 
-	protected $slug;
-	protected $callable;
-	protected $id;
-	protected $map;
+	protected string $slug;
+	protected string $page_title;
+	protected string $menu_title;
+	protected string $capability;
+	protected MenuId $id;
+	protected $position;
+	protected array $map;
 
 	public function __construct(
 		string $slug,
@@ -33,7 +31,7 @@ abstract class AbstractMenuPage implements MenuPageInterface
 		string $page_title = self::DEFAULTS[self::PAGE_TITLE],
 		string $menu_title = self::DEFAULTS[self::MENU_TITLE],
 		string $capability = self::DEFAULTS[self::CAPABILITY],
-		string $position = self::DEFAULTS[self::POSITION],
+		$position = self::DEFAULTS[self::POSITION],
 		array $map = self::DEFAULTS[self::MAP]
 	) {
 		if (null !== $position && !is_numeric($position)) {
@@ -42,6 +40,8 @@ abstract class AbstractMenuPage implements MenuPageInterface
 
 		$this->slug = $slug;
 		$this->callable = $callable;
+		$this->page_title = $page_title;
+		$this->menu_title = $menu_title;
 		$this->capability = $capability;
 		$this->position = $position;
 		$this->map = $map;
@@ -57,6 +57,16 @@ abstract class AbstractMenuPage implements MenuPageInterface
 		return $this->slug;
 	}
 
+	public function page_title(): string
+	{
+		return $this->page_title;
+	}
+
+	public function menu_title(): string
+	{
+		return $this->menu_title;
+	}
+
 	public function capability(): string
 	{
 		return $this->capability;
@@ -65,11 +75,6 @@ abstract class AbstractMenuPage implements MenuPageInterface
 	public function position()
 	{
 		return $this->position;
-	}
-
-	public function map(): array
-	{
-		return $this->map;
 	}
 
 	public function __invoke(InvokerInterface $invoker, ...$arguments)

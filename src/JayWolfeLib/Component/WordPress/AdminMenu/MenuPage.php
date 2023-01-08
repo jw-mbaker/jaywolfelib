@@ -24,7 +24,6 @@ class MenuPage extends AbstractMenuPage
 		array $map = parent::DEFAULTS[self::MAP]
 	) {
 		parent::__construct($slug, $callable, $page_title, $menu_title, $capability, $position, $map);
-
 		$this->icon_url = $icon_url;
 	}
 

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JayWolfeLib\Component\WordPress\AdminMenu;
 
@@ -11,7 +11,7 @@ class MenuCollection extends AbstractInvokerCollection
 	/**
 	 * @var array<string, MenuPageInterface>
 	 */
-	private $menu_pages = [];
+	private array $menu_pages = [];
 
 	private function add(MenuPageInterface $menu_page)
 	{
@@ -23,12 +23,12 @@ class MenuCollection extends AbstractInvokerCollection
 		return $this->menu_pages;
 	}
 
-	public function get(Slug $slug): ?MenuPageInterface
+	public function get(string $slug): ?MenuPageInterface
 	{
 		$menu_page = array_reduce($this->menu_pages, function($carry, $item) use ($slug) {
 			if (null !== $carry) return $carry;
 
-			if ((string) $slug === (string) $item->slug()) {
+			if ($slug === $item->slug()) {
 				return $item;
 			}
 
@@ -44,7 +44,7 @@ class MenuCollection extends AbstractInvokerCollection
 	 * @param string $slug
 	 * @return bool
 	 */
-	public function remove_menu_page(Slug $slug): bool
+	public function remove_menu_page(string $slug): bool
 	{		
 		$menu_page = $this->get($slug);
 
@@ -56,30 +56,28 @@ class MenuCollection extends AbstractInvokerCollection
 		return false;
 	}
 
-	public function remove_submenu_page(Slug $slug): bool
+	public function remove_submenu_page(string $slug): bool
 	{
 		return $this->remove_menu_page($slug);
 	}
 
 	/**
-	 * Removes a menu page or an array of menu pages from the collection.
+	 * Removes a menu page from the collection.
 	 *
-	 * @param MenuPageInterface|MenuPageInterface[] $menu_page
+	 * @param MenuPageInterface $menu_page
 	 */
-	private function remove($menu_page)
+	private function remove(MenuPageInterface $menu_page)
 	{
-		foreach ((array) $menu_page as $mp) {
-			switch ($menu_page::MENU_TYPE) {
-				case 'menu_page':
-					remove_menu_page((string) $menu_page->slug());
-					break;
-				case 'submenu_page':
-					remove_submenu_page((string) $menu_page->parent_slug(), (string) $menu_page->slug());
-					break;
-			}
-			
-			unset($this->menu_pages[(string) $menu_page->id()]);
+		switch ($menu_page::MENU_TYPE) {
+			case 'menu_page':
+				remove_menu_page($menu_page->slug());
+				break;
+			case 'submenu_page':
+				remove_submenu_page($menu_page->parent_slug(), $menu_page->slug());
+				break;
 		}
+		
+		unset($this->menu_pages[(string) $menu_page->id()]);
 	}
 
 	/**
@@ -91,13 +89,13 @@ class MenuCollection extends AbstractInvokerCollection
 	{
 		$this->add($menu_page);
 		return add_menu_page(
-			$menu_page->get('page_title'),
-			$menu_page->get('menu_title'),
-			$menu_page->get('capability'),
-			(string) $menu_page->slug(),
+			$menu_page->page_title(),
+			$menu_page->menu_title(),
+			$menu_page->capability(),
+			$menu_page->slug(),
 			[$this, (string) $menu_page->id()],
-			$menu_page->get('icon_url'),
-			$menu_page->get('position')
+			$menu_page->icon_url(),
+			$menu_page->position()
 		);
 	}
 
@@ -111,13 +109,13 @@ class MenuCollection extends AbstractInvokerCollection
 	{
 		$this->add($sub_menu_page);
 		return add_submenu_page(
-			(string) $sub_menu_page->parent_slug(),
-			$sub_menu_page->get('page_title'),
-			$sub_menu_page->get('menu_title'),
-			$sub_menu_page->get('capability'),
-			(string) $sub_menu_page->slug(),
+			$sub_menu_page->parent_slug(),
+			$sub_menu_page->page_title(),
+			$sub_menu_page->menu_title(),
+			$sub_menu_page->capability(),
+			$sub_menu_page->slug(),
 			[$this, (string) $sub_menu_page->id()],
-			$sub_menu_page->get('position')
+			$sub_menu_page->position()
 		);
 	}
 

@@ -1,11 +1,17 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JayWolfeLib\Component\WordPress\AdminMenu;
 
-use JayWolfeLib\Component\HandlerInterface;
+use JayWolfeLib\Invoker\HandlerInterface;
 
 interface MenuPageInterface extends HandlerInterface
 {
-	public function slug(): Slug;
+	public const SLUG = 'slug';
+	public const PAGE_TITLE = 'page_title';
+	public const MENU_TITLE = 'menu_title';
+	public const CAPABILITY = 'capability';
+	public const POSITION = 'position';
+
+	public function slug(): string;
 	public static function create(array $args): MenuPageInterface;
 }

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JayWolfeLib\Tests\Component\WordPress\AdminMenu;
 
@@ -6,9 +6,8 @@ use JayWolfeLib\Component\WordPress\AdminMenu\MenuCollection;
 use JayWolfeLib\Component\WordPress\AdminMenu\MenuPageInterface;
 use JayWolfeLib\Component\WordPress\AdminMenu\MenuPage;
 use JayWolfeLib\Component\WordPress\AdminMenu\SubMenuPage;
-use JayWolfeLib\Component\WordPress\AdminMenu\Slug;
 use JayWolfeLib\Component\WordPress\AdminMenu\MenuId;
-use JayWolfeLib\Tests\Component\MockTypeHint;
+use JayWolfeLib\Tests\Invoker\MockTypeHint;
 use JayWolfeLib\Tests\Traits\DevContainerTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,7 +18,8 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 {
 	use DevContainerTrait;
 
-	private $request;
+	private MenuCollection $collection;
+	private Request $request;
 
 	public function setUp(): void
 	{
@@ -78,7 +78,7 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 		$this->collection->menu_page($mp);
 		$this->assertContains($mp, $this->collection->all());
 
-		$this->collection->remove_menu_page(Slug::fromString('test'));
+		$this->collection->remove_menu_page('test');
 		$this->assertNotContains($mp, $this->collection->all());
 	}
 
@@ -95,7 +95,7 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 		$this->collection->sub_menu_page($smp);
 		$this->assertContains($smp, $this->collection->all());
 
-		$this->collection->remove_submenu_page(Slug::fromString('test'));
+		$this->collection->remove_submenu_page('test');
 		$this->assertNotContains($smp, $this->collection->all());
 	}
 
@@ -106,7 +106,7 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testRemoveMenuPageReturnsFalseOnInvalidSlug()
 	{
-		$bool = $this->collection->remove_menu_page(Slug::fromString('test'));
+		$bool = $this->collection->remove_menu_page('test');
 		$this->assertFalse($bool);
 	}
 
@@ -122,7 +122,7 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 		$this->collection->menu_page($mp);
 		$this->assertContains($mp, $this->collection->all());
 
-		$obj = $this->collection->get(Slug::fromString('test'));
+		$obj = $this->collection->get('test');
 		$this->assertInstanceOf(MenuPageInterface::class, $obj);
 		$this->assertSame($obj, $mp);
 	}
@@ -139,7 +139,7 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 		$this->collection->sub_menu_page($smp);
 		$this->assertContains($smp, $this->collection->all());
 
-		$obj = $this->collection->get(Slug::fromString('test'));
+		$obj = $this->collection->get('test');
 		$this->assertInstanceOf(SubMenuPage::class, $obj);
 		$this->assertSame($obj, $smp);
 	}
@@ -151,7 +151,7 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testGetBySlugReturnsNullIfNotFound()
 	{
-		$obj = $this->collection->get(Slug::fromString('test'));
+		$obj = $this->collection->get('test');
 		$this->assertNull($obj);
 	}
 
@@ -163,20 +163,18 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 	public function testCanInvokeMenuPage()
 	{
 		$mp = MenuPage::create([
-			'slug' => 'test',
-			'callable' => function() {
+			MenuPage::SLUG => 'test',
+			MenuPage::CALLABLE => function() {
 				$this->assertTrue(true);
 			},
-			'settings' => [
-				'page_title' => 'test',
-				'menu_title' => 'test',
-				'capability' => 'administrator'
-			]
+			MenuPage::PAGE_TITLE => 'test',
+			MenuPage::MENU_TITLE => 'test',
+			MenuPage::CAPABILITY => 'administrator'
 		]);
 
 		$this->collection->menu_page($mp);
 
-		$this->assertSame($mp, $this->collection->get(Slug::fromString('test')));
+		$this->assertSame($mp, $this->collection->get('test'));
 
 		call_user_func([$this->collection, (string) $mp->id()]);
 	}
@@ -188,24 +186,22 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testCanInvokeSubMenuPage()
 	{
-		$smp = new SubMenuPage(
-			'test',
-			'parent-test',
-			function() {
+		$smp = SubMenuPage::create([
+			SubMenuPage::SLUG => 'test',
+			SubMenuPage::PARENT_SLUG => 'parent-test',
+			SubMenuPage::CALLABLE => function() {
 				$this->assertTrue(true);
 			},
-			[
-				'page_title' => 'test',
-				'menu_title' => 'test',
-				'capability' => 'administrator'
-			]
-		);
+			SubMenuPage::PAGE_TITLE => 'test',
+			SubMenuPage::MENU_TITLE => 'test',
+			SubMenuPage::CAPABILITY => 'administrator'
+		]);
 
 		$this->collection->sub_menu_page($smp);
 
-		$this->assertSame($smp, $this->collection->get($smp->id()));
+		$this->assertSame($smp, $this->collection->get($smp->slug()));
 
-		call_user_func([$this->collection, $smp->id()]);
+		call_user_func([$this->collection, (string) $smp->id()]);
 	}
 
 	/**
@@ -215,24 +211,22 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testCanInvokeMenuPageWithTypeHint()
 	{
-		$mp = new MenuPage(
-			'test',
-			function(Request $request, MockTypeHint $th) {
+		$mp = MenuPage::create([
+			MenuPage::SLUG => 'test',
+			MenuPage::CALLABLE => function(Request $request, MockTypeHint $th) {
 				$this->assertInstanceOf(Request::class, $request);
 				$this->assertInstanceOf(MockTypeHint::class, $th);
 			},
-			[
-				'page_title' => 'test',
-				'menu_title' => 'test',
-				'capability' => 'administrator'
-			]
-		);
+			MenuPage::PAGE_TITLE => 'test',
+			MenuPage::MENU_TITLE => 'test',
+			MenuPage::CAPABILITY => 'administrator'
+		]);
 
 		$this->collection->menu_page($mp);
 
-		$this->assertSame($mp, $this->collection->get($mp->id()));
+		$this->assertSame($mp, $this->collection->get($mp->slug()));
 
-		call_user_func([$this->collection, $mp->id()]);
+		call_user_func([$this->collection, (string) $mp->id()]);
 	}
 
 	/**
@@ -242,25 +236,23 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testCanInvokeSubMenuPageWithTypeHint()
 	{
-		$smp = new SubMenuPage(
-			'test',
-			'parent-test',
-			function(Request $request, MockTypeHint $th) {
+		$smp = SubMenuPage::create([
+			SubMenuPage::SLUG => 'test',
+			SubMenuPage::PARENT_SLUG => 'parent_test',
+			SubMenuPage::CALLABLE => function(Request $request, MockTypeHint $th) {
 				$this->assertInstanceOf(Request::class, $request);
 				$this->assertInstanceOf(MockTypeHint::class, $th);
 			},
-			[
-				'page_title' => 'test',
-				'menu_title' => 'test',
-				'capability' => 'administrator'
-			]
-		);
+			SubMenuPage::PAGE_TITLE => 'test',
+			SubMenuPage::MENU_TITLE => 'test',
+			SubMenuPage::CAPABILITY => 'administrator'
+		]);
 
 		$this->collection->sub_menu_page($smp);
 
-		$this->assertSame($smp, $this->collection->get($smp->id()));
+		$this->assertSame($smp, $this->collection->get($smp->slug()));
 
-		call_user_func([$this->collection, $smp->id()]);
+		call_user_func([$this->collection, (string) $smp->id()]);
 	}
 
 	/**
@@ -272,26 +264,24 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 	{
 		$response = Mockery::mock(Response::class);
 
-		$mp = new MenuPage(
-			'test',
-			function(Request $request) use ($response) {
+		$mp = MenuPage::create([
+			MenuPage::SLUG => 'test',
+			MenuPage::CALLABLE => function(Request $request)  use ($response) {
 				$this->assertInstanceOf(Request::class, $request);
 				return $response;
 			},
-			[
-				'page_title' => 'test',
-				'menu_title' => 'test',
-				'capability' => 'administrator'
-			]
-		);
+			MenuPage::PAGE_TITLE => 'test',
+			MenuPage::MENU_TITLE => 'test',
+			MenuPage::CAPABILITY => 'administrator'
+		]);
 
 		$this->collection->menu_page($mp);
 
-		$this->assertSame($mp, $this->collection->get($mp->id()));
+		$this->assertSame($mp, $this->collection->get($mp->slug()));
 
 		$response->expects()->send();
 
-		call_user_func([$this->collection, $mp->id()]);
+		call_user_func([$this->collection, (string) $mp->id()]);
 	}
 
 	/**
@@ -303,43 +293,41 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 	{
 		$response = Mockery::mock(Response::class);
 
-		$smp = new SubMenuPage(
-			'test',
-			'parent-test',
-			function(Request $request) use ($response) {
+		$smp = SubMenuPage::create([
+			SubMenuPage::SLUG => 'test',
+			SubMenuPage::PARENT_SLUG => 'parent-test',
+			SubMenuPage::CALLABLE => function(Request $request) use ($response) {
 				$this->assertInstanceOf(Request::class, $request);
 				return $response;
 			},
-			[
-				'page_title' => 'test',
-				'menu_title' => 'test',
-				'capability' => 'administrator'
-			]
-		);
+			SubMenuPage::PAGE_TITLE => 'test',
+			SubMenuPage::MENU_TITLE => 'test',
+			SubMenuPage::CAPABILITY => 'administrator'
+		]);
 
 		$this->collection->sub_menu_page($smp);
 
-		$this->assertSame($smp, $this->collection->get($smp->id()));
+		$this->assertSame($smp, $this->collection->get($smp->slug()));
 
 		$response->expects()->send();
 
-		call_user_func([$this->collection, $smp->id()]);
+		call_user_func([$this->collection, (string) $smp->id()]);
 	}
 
 	private function createMenuPage(): MenuPage
 	{
 		return MenuPage::create([
-			'slug' => 'test',
-			'callable' => function() {}
+			MenuPage::SLUG => 'test',
+			MenuPage::CALLABLE => function() {}
 		]);
 	}
 
 	private function createSubMenuPage(): SubMenuPage
 	{
 		return SubMenuPage::create([
-			'slug' => 'test',
-			'parent_slug' => 'parent-test',
-			'callable' => function() {}
+			SubMenuPage::SLUG => 'test',
+			SubMenuPage::PARENT_SLUG => 'parent-test',
+			SubMenuPage::CALLABLE => function() {}
 		]);
 	}
 }

@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace JayWolfeLib\Tests\Component;
+namespace JayWolfeLib\Tests\Invoker;
 
-use JayWolfeLib\Component\CallerInterface;
+use JayWolfeLib\Invoker\CallerInterface;
 use JayWolfeLib\Tests\Traits\DevContainerTrait;
 use Invoker\InvokerInterface;
 
@@ -10,7 +10,7 @@ class CallerInterfaceTest extends \WP_Mock\Tools\TestCase
 {
 	use DevContainerTrait;
 
-	private $caller;
+	private MockCaller $caller;
 
 	public function setUp(): void
 	{

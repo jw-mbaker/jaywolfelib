@@ -1,11 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JayWolfeLib\Tests\Component\WordPress\AdminMenu;
 
 use JayWolfeLib\Component\WordPress\AdminMenu\MenuPage;
-use JayWolfeLib\Component\WordPress\AdminMenu\Slug;
 use JayWolfeLib\Component\WordPress\AdminMenu\MenuId;
-use JayWolfeLib\Tests\Component\MockTypeHint;
+use JayWolfeLib\Tests\Invoker\MockTypeHint;
 use JayWolfeLib\Tests\Traits\DevContainerTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -36,8 +35,8 @@ class MenuPageTest extends \WP_Mock\Tools\TestCase
 	public function testCanInvokeMenuPage()
 	{
 		$mp = MenuPage::create([
-			'slug' => 'test',
-			'callable' => function() {
+			MenuPage::SLUG => 'test',
+			MenuPage::CALLABLE => function() {
 				$this->assertTrue(true);
 			}
 		]);
@@ -52,8 +51,8 @@ class MenuPageTest extends \WP_Mock\Tools\TestCase
 	public function testCanInvokeMenuPageWithTypeHint()
 	{
 		$mp = MenuPage::create([
-			'slug' => 'test',
-			'callable' => function(Request $request, MockTypeHint $th) {
+			MenuPage::SLUG => 'test',
+			MenuPage::CALLABLE => function(Request $request, MockTypeHint $th) {
 				$this->assertInstanceOf(Request::class, $request);
 				$this->assertInstanceOf(MockTypeHint::class, $th);
 			}
@@ -71,8 +70,8 @@ class MenuPageTest extends \WP_Mock\Tools\TestCase
 		$response = Mockery::mock(Response::class);
 
 		$mp = MenuPage::create([
-			'slug' => 'test',
-			'callable' => function() use ($response) {
+			MenuPage::SLUG => 'test',
+			MenuPage::CALLABLE => function() use ($response) {
 				$this->assertTrue(true);
 				return $response;
 			}
@@ -90,8 +89,8 @@ class MenuPageTest extends \WP_Mock\Tools\TestCase
 		$response = Mockery::mock(Response::class);
 
 		$mp = MenuPage::create([
-			'slug' => 'test',
-			'callable' => function(Request $request) use ($response) {
+			MenuPage::SLUG => 'test',
+			MenuPage::CALLABLE => function(Request $request) use ($response) {
 				$this->assertInstanceOf(Request::class, $request);
 				return $response;
 			}
@@ -107,8 +106,8 @@ class MenuPageTest extends \WP_Mock\Tools\TestCase
 	public function testMenuPageIdMethodShouldReturnMenuId()
 	{
 		$mp = MenuPage::create([
-			'slug' => 'test',
-			'callable' => function() {}
+			MenuPage::SLUG => 'test',
+			MenuPage::CALLABLE => function() {}
 		]);
 
 		$id = $mp->id();

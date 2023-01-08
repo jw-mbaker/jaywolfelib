@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JayWolfeLib\Component\WordPress\AdminMenu;
 
@@ -19,8 +19,8 @@ class SubMenuPage extends AbstractMenuPage
 		$position = self::DEFAULTS[self::POSITION],
 		array $map = self::DEFAULTS[self::MAP]
 	) {
-		$this->parent_slug = $parent_slug;
 		parent::__construct($slug, $callable, $page_title, $menu_title, $capability, $position, $map);
+		$this->parent_slug = $parent_slug;
 	}
 
 	public function parent_slug(): string

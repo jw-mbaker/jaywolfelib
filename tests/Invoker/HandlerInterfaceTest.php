@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace JayWolfeLib\Tests\Component;
+namespace JayWolfeLib\Tests\Invoker;
 
-use JayWolfeLib\Component\HandlerInterface;
+use JayWolfeLib\Invoker\HandlerInterface;
 use JayWolfeLib\Tests\Traits\DevContainerTrait;
 use Invoker\InvokerInterface;
 

@@ -1,18 +1,15 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace JayWolfeLib\Tests\Component;
+namespace JayWolfeLib\Tests\Invoker;
 
 use JayWolfeLib\Collection\AbstractInvokerCollection;
-use JayWolfeLib\Component\CallerInterface;
+use JayWolfeLib\Invoker\CallerInterface;
 use Invoker\InvokerInterface;
-use Invoker\Reflection\CallableReflection;
-use ReflectionMethod;
-use ReflectionFunction;
 
 class MockCaller extends AbstractInvokerCollection
 {
 	/** @var array<string, MockHandler> */
-	private $handlers = [];
+	private array $handlers = [];
 
 	public function all(): array
 	{
@@ -43,7 +40,6 @@ class MockCaller extends AbstractInvokerCollection
 
 	public function __call(string $name, array $arguments)
 	{
-		//return $this->invoker->call($this->handlers[$name]->callable(), $arguments);
 		return $this->resolve($this->handlers[$name], $arguments);
 	}
 }

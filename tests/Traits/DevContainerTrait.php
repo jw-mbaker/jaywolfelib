@@ -7,7 +7,7 @@ use Psr\Container\ContainerInterface;
 
 trait DevContainerTrait
 {
-	protected $container;
+	protected ContainerInterface $container;
 
 	public function createDevContainer(): ContainerInterface
 	{

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JayWolfeLib\Component\WordPress\Filter;
 
@@ -10,17 +10,22 @@ class FilterCollection extends AbstractInvokerCollection
 	/**
 	 * @var array<string, HookInterface>
 	 */
-	private $hooks = [];
+	private array $hooks = [];
 
-	private function add(string $name, HookInterface $hook)
+	private function add(HookInterface $hook)
 	{
-		$this->hooks[$name] = $hook;
+		$this->hooks[(string) $hook->id()] = $hook;
 	}
 
 	public function add_filter(HookInterface $hook)
 	{
-		$this->add($hook->id(), $hook);
-		return add_filter($hook->hook(), [$this, $hook->id()], $hook->get('priority'), $hook->get('num_args'));
+		$this->add($hook);
+		return add_filter(
+			$hook->hook(),
+			[$this, (string) $hook->id()],
+			$hook->priority(),
+			$hook->num_args()
+		);
 	}
 
 	public function add_action(HookInterface $hook)
@@ -30,10 +35,10 @@ class FilterCollection extends AbstractInvokerCollection
 
 	public function remove_filter(string $hook, $callable, int $priority = 10): bool
 	{
-		$hooks = $this->get_by_hook($hook, $callable, $priority);
+		$hooks = $this->get($hook, $callable, $priority);
 
 		if (!empty($hooks)) {
-			$this->remove(array_keys($hooks));
+			$this->remove(...array_values($hooks));
 			return true;
 		}
 
@@ -50,9 +55,9 @@ class FilterCollection extends AbstractInvokerCollection
 		return $this->hooks;
 	}
 
-	public function get(string $name): ?HookInterface
+	public function get_by_id(HookId $id): ?HookInterface
 	{
-		return $this->hooks[$name] ?? null;
+		return $this->hooks[(string) $id] ?? null;
 	}
 
 	/**
@@ -60,36 +65,34 @@ class FilterCollection extends AbstractInvokerCollection
 	 *
 	 * @return array<string, HookInterface>
 	 */
-	public function get_by_hook(string $hook, $callable, int $priority = 10): array
+	public function get(string $hook, $callable, int $priority = 10): array
 	{
 		$hooks = array_filter($this->hooks, function($obj) use ($hook, $callable, $priority) {
 			return
 				$obj->hook() === $hook &&
-				$obj->get('callable') === $callable &&
-				$obj->get('priority') === $priority;
+				$obj->callable() === $callable &&
+				$obj->priority() === $priority;
 		});
 
 		return $hooks;
 	}
 
 	/**
-	 * Removes a hook or an array of hooks by name from the collection.
+	 * Removes a hook from the collection.
 	 *
-	 * @param string|string[] $name
+	 * @param HookInterface ...$hook
 	 */
-	public function remove($name)
+	private function remove(HookInterface ...$hooks)
 	{
-		foreach ((array) $name as $n) {
-			$hook = $this->hooks[$n];
-
-			remove_filter($hook->hook(), [$this, $hook->id()]);
-			unset($this->hooks[$n]);
+		foreach ($hooks as $hook) {
+			remove_filter($hook->hook(), [$this, (string) $hook->id()]);
+			unset($this->hooks[(string) $hook->id()]);
 		}
 	}
 
 	public function __call(string $name, array $arguments)
 	{
-		$response = $this->resolve($this->get($name), $arguments);
+		$response = $this->resolve($this->hooks[$name], $arguments);
 
 		if ($response instanceof Response) {
 			$response->send();

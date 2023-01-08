@@ -1,11 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JayWolfeLib\Tests\Component\WordPress\AdminMenu;
 
 use JayWolfeLib\Component\WordPress\AdminMenu\SubMenuPage;
-use JayWolfeLib\Component\WordPress\AdminMenu\Slug;
 use JayWolfeLib\Component\WordPress\AdminMenu\MenuId;
-use JayWolfeLib\Tests\Component\MockTypeHint;
+use JayWolfeLib\Tests\Invoker\MockTypeHint;
 use JayWolfeLib\Tests\Traits\DevContainerTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -36,9 +35,9 @@ class SubMenuPageTest extends \WP_Mock\Tools\TestCase
 	public function testCanInvokeSubMenuPage()
 	{
 		$smp = SubMenuPage::create([
-			'slug' => 'test',
-			'parent_slug' => 'parent-test',
-			'callable' => function() {
+			SubMenuPage::SLUG => 'test',
+			SubMenuPage::PARENT_SLUG => 'parent-test',
+			SubMenuPage::CALLABLE => function() {
 				$this->assertTrue(true);
 			}
 		]);
@@ -53,9 +52,9 @@ class SubMenuPageTest extends \WP_Mock\Tools\TestCase
 	public function testCanInvokeSubMenuPageWithTypeHint()
 	{
 		$smp = SubMenuPage::create([
-			'slug' => 'test',
-			'parent_slug' => 'parent-test',
-			'callable' => function(Request $request, MockTypeHint $th) {
+			SubMenuPage::SLUG => 'test',
+			SubMenuPage::PARENT_SLUG => 'parent-test',
+			SubMenuPage::CALLABLE => function(Request $request, MockTypeHint $th) {
 				$this->assertInstanceOf(Request::class, $request);
 				$this->assertInstanceOf(MockTypeHint::class, $th);
 			}
@@ -73,9 +72,9 @@ class SubMenuPageTest extends \WP_Mock\Tools\TestCase
 		$response = Mockery::mock(Response::class);
 
 		$smp = SubMenuPage::create([
-			'slug' => 'test',
-			'parent_slug' => 'parent-test',
-			'callable' => function() use ($response) {
+			SubMenuPage::SLUG => 'test',
+			SubMenuPage::PARENT_SLUG => 'parent-test',
+			SubMenuPage::CALLABLE => function() use ($response) {
 				$this->assertTrue(true);
 				return $response;
 			}
@@ -93,9 +92,9 @@ class SubMenuPageTest extends \WP_Mock\Tools\TestCase
 		$response = Mockery::mock(Response::class);
 
 		$smp = SubMenuPage::create([
-			'slug' => 'test',
-			'parent_slug' => 'parent-test',
-			'callable' => function(Request $request) use ($response) {
+			SubMenuPage::SLUG => 'test',
+			SubMenuPage::PARENT_SLUG => 'parent-test',
+			SubMenuPage::CALLABLE => function(Request $request) use ($response) {
 				$this->assertInstanceOf(Request::class, $request);
 				return $response;
 			}
@@ -111,9 +110,9 @@ class SubMenuPageTest extends \WP_Mock\Tools\TestCase
 	public function testSubMenuPageIdMethodShouldReturnMenuId()
 	{
 		$smp = SubMenuPage::create([
-			'slug' => 'test',
-			'parent_slug' => 'parent-test',
-			'callable' => function() {}
+			SubMenuPage::SLUG => 'test',
+			SubMenuPage::PARENT_SLUG => 'parent-test',
+			SubMenuPage::CALLABLE => function() {}
 		]);
 
 		$id = $smp->id();

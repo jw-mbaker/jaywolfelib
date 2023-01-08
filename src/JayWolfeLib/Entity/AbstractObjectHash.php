@@ -1,18 +1,28 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JayWolfeLib\Entity;
 
-abstract class AbstractObjectHash
+abstract class AbstractObjectHash implements EntityInterface
 {
-	protected $id;
+	protected string $id;
 
 	public function __construct(object $obj)
 	{
-		$this->id = spl_object_hash($obj);
+		$this->set_id(spl_object_hash($obj));
+	}
+
+	public function set_id($id)
+	{
+		$this->id = $id;
+	}
+
+	public function get_id(): string
+	{
+		return $this->id;
 	}
 
 	public function __toString()
 	{
-		return $this->id;
+		return $this->get_id();
 	}
 }

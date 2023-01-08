@@ -1,6 +1,6 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace JayWolfeLib\Component;
+namespace JayWolfeLib\Invoker;
 
 interface CallerInterface
 {

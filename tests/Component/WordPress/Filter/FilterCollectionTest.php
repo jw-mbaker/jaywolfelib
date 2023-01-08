@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JayWolfeLib\Tests\Component\WordPress\Filter;
 
@@ -7,7 +7,8 @@ use JayWolfeLib\Component\WordPress\Filter\HookInterface;
 use JayWolfeLib\Component\WordPress\Filter\Filter;
 use JayWolfeLib\Component\WordPress\Filter\Action;
 use JayWolfeLib\Component\WordPress\Filter\Api;
-use JayWolfeLib\Tests\Component\MockTypeHint;
+use JayWolfeLib\Component\WordPress\Filter\HookId;
+use JayWolfeLib\Tests\Invoker\MockTypeHint;
 use JayWolfeLib\Tests\Traits\DevContainerTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,8 +21,8 @@ class FilterCollectionTest extends \WP_Mock\Tools\TestCase
 {
 	use DevContainerTrait;
 
-	private $collection;
-	private $request;
+	private FilterCollection $collection;
+	private Request $request;
 
 	public function setUp(): void
 	{
@@ -46,14 +47,16 @@ class FilterCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testCanAddHook()
 	{
-		$hook = Mockery::mock(HookInterface::class);
-		$hook->expects()->id()->twice()->andReturn(spl_object_hash($hook));
-		$hook->expects()->hook()->andReturn('test');
-		$hook->expects()->get('priority')->andReturn(10);
-		$hook->expects()->get('num_args')->andReturn(1);
+		$callable = function() {};
+
+		$filter = Filter::create([
+			Filter::HOOK => 'test',
+			Filter::CALLABLE => $callable
+		]);
 		
-		$this->collection->add_filter($hook);
-		$this->assertContains($hook, $this->collection->all());
+		$this->collection->add_filter($filter);
+		$this->assertContains($filter, $this->collection->all());
+		$this->assertSame($filter, $this->collection->get('test', $callable)[(string) $filter->id()]);
 	}
 
 	/**
@@ -66,20 +69,18 @@ class FilterCollectionTest extends \WP_Mock\Tools\TestCase
 	{
 		$callable = function() {};
 
-		$hook = Mockery::mock(HookInterface::class);
-		$hook->expects()->id()->times(3)->andReturn(spl_object_hash($hook));
-		$hook->expects()->hook()->times(3)->andReturn('test');
-		$hook->expects()->get('priority')->twice()->andReturn(10);
-		$hook->expects()->get('num_args')->andReturn(1);
-		$hook->expects()->get('callable')->andReturn($callable);
+		$filter = Filter::create([
+			Filter::HOOK => 'test',
+			Filter::CALLABLE => $callable
+		]);
 
-		$this->collection->add_filter($hook);
-		$this->assertContains($hook, $this->collection->all());
+		$this->collection->add_filter($filter);
+		$this->assertContains($filter, $this->collection->all());
 
 		$bool = $this->collection->remove_filter('test', $callable);
 		$this->assertTrue($bool);
 
-		$this->assertNotContains($hook, $this->collection->all());
+		$this->assertNotContains($filter, $this->collection->all());
 	}
 
 	/**
@@ -103,18 +104,17 @@ class FilterCollectionTest extends \WP_Mock\Tools\TestCase
 	{
 		$callable = function() {};
 
-		$hook = Mockery::mock(HookInterface::class);
-		$hook->expects()->id()->twice()->andReturn(spl_object_hash($hook));
-		$hook->expects()->hook()->twice()->andReturn('test');
-		$hook->expects()->get('callable')->andReturn($callable);
-		$hook->expects()->get('priority')->twice()->andReturn(10);
-		$hook->expects()->get('num_args')->andReturn(1);
+		$filter = Filter::create([
+			Filter::HOOK => 'test',
+			Filter::CALLABLE => $callable
+		]);
 		
-		$this->collection->add_filter($hook);
-		$this->assertContains($hook, $this->collection->all());
+		$this->collection->add_filter($filter);
+		$this->assertContains($filter, $this->collection->all());
 
-		$objs = $this->collection->get_by_hook('test', $callable);
-		$this->assertContains($hook, $objs);
+		$objs = $this->collection->get('test', $callable);
+		$this->assertContains($filter, $objs);
+		$this->assertSame($filter, $objs[(string) $filter->id()]);
 	}
 
 	/**
@@ -124,25 +124,8 @@ class FilterCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testGetByHookReturnsEmptyArrayIfNotFound()
 	{
-		$hooks = $this->collection->get_by_hook('test', function() {});
+		$hooks = $this->collection->get('test', function() {});
 		$this->assertEmpty($hooks);
-	}
-
-	/**
-	 * @group hook
-	 * @group wordpress
-	 * @group collection
-	 */
-	public function testCanGetHook()
-	{
-		$hook = Mockery::mock(HookInterface::class);
-		$hook->expects()->id()->twice()->andReturn(spl_object_hash($hook));
-		$hook->expects()->hook()->andReturn('test');
-		$hook->expects()->get('priority')->andReturn(10);
-		$hook->expects()->get('num_args')->andReturn(1);
-		
-		$this->collection->add_filter($hook);
-		$this->assertSame($hook, $this->collection->get(spl_object_hash($hook)));
 	}
 
 	/**
@@ -153,19 +136,22 @@ class FilterCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testCanInvokeFilter()
 	{
-		$filter = new Filter('test', function(string $test) {
-			return $test;
-		});
+		$filter = Filter::create([
+			Filter::HOOK => 'test',
+			Filter::CALLABLE => function(string $test) {
+				return $test;
+			}
+		]);
 
-		WP_Mock::expectFilterAdded('test', [$this->collection, $filter->id()]);
+		WP_Mock::expectFilterAdded('test', [$this->collection, (string) $filter->id()]);
 		$this->collection->add_filter($filter);
 
-		$this->assertSame($filter, $this->collection->get($filter->id()));
+		$this->assertSame($filter, $this->collection->get_by_id($filter->id()));
 
 		WP_Mock::onFilter('test')
 			->with('test')
 			->reply(new InvokedFilterValue(function() use ($filter) {
-				return call_user_func([$this->collection, $filter->id()], 'test');
+				return call_user_func([$this->collection, (string) $filter->id()], 'test');
 			}));
 
 		$val = apply_filters('test', 'test');
@@ -180,17 +166,20 @@ class FilterCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testCanInvokeAction()
 	{
-		$action = new Action('test', function() {
-			$this->assertTrue(true);
-		});
+		$action = Action::create([
+			Action::HOOK => 'test',
+			Action::CALLABLE => function() {
+				$this->assertTrue(true);
+			}
+		]);
 
-		WP_Mock::expectFilterAdded('test', [$this->collection, $action->id()]);
+		WP_Mock::expectFilterAdded('test', [$this->collection, (string) $action->id()]);
 		$this->collection->add_action($action);
 
 		WP_Mock::onAction('test')
 			->with(null)
 			->perform(function() use ($action) {
-				call_user_func([$this->collection, $action->id()]);
+				call_user_func([$this->collection, (string) $action->id()]);
 			});
 
 		do_action('test');
@@ -205,20 +194,24 @@ class FilterCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testCanInvokeApi()
 	{
-		$api = new Api('test', function(Request $request) {
-			$this->assertTrue(true);
-		}, 'GET', $this->request);
+		$api = Api::create([
+			Api::HOOK => 'test',
+			Api::CALLABLE => function(Request $request) {
+				$this->assertTrue(true);
+			},
+			Api::REQUEST => $this->request
+		]);
 
 		$this->request->expects()->getMethod()->twice()->andReturn('GET');
 		$this->request->expects()->get('key')->twice()->andReturn(null);
 
-		WP_Mock::expectFilterAdded('test', [$this->collection, $api->id()]);
+		WP_Mock::expectFilterAdded('test', [$this->collection, (string) $api->id()]);
 		$this->collection->add_action($api);
 
 		WP_Mock::onAction('test')
 			->with(null)
 			->perform(function() use ($api) {
-				call_user_func([$this->collection, $api->id()]);
+				call_user_func([$this->collection, (string) $api->id()]);
 			});
 
 		do_action('test');
@@ -232,19 +225,23 @@ class FilterCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testCanInvokeFilterWithTypeHint()
 	{
-		$filter = new Filter('test', function(MockTypeHint $th, string $test) {
-			$this->assertInstanceOf(MockTypeHint::class, $th);
-			return $test;
-		}, ['map' => [\DI\get(MockTypeHint::class)]]);
+		$filter = Filter::create([
+			Filter::HOOK => 'test',
+			Filter::CALLABLE => function(MockTypeHint $th, string $test) {
+				$this->assertInstanceOf(MockTypeHint::class, $th);
+				return $test;
+			},
+			Filter::MAP => [\DI\get(MockTypeHint::class)]
+		]);
 
 		$this->collection->add_filter($filter);
 
-		$this->assertSame($filter, $this->collection->get($filter->id()));
+		$this->assertSame($filter, $this->collection->get_by_id($filter->id()));
 
 		WP_Mock::onFilter('test')
 			->with('test')
 			->reply(new InvokedFilterValue(function() use ($filter) {
-				return call_user_func([$this->collection, $filter->id()], 'test');
+				return call_user_func([$this->collection, (string) $filter->id()], 'test');
 			}));
 
 		$val = apply_filters('test', 'test');
@@ -259,18 +256,21 @@ class FilterCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testCanInvokeActionWithTypeHint()
 	{
-		$action = new Action('test', function(MockTypeHint $th) {
-			$this->assertInstanceOf(MockTypeHint::class, $th);
-		});
+		$action =  Action::create([
+			Action::HOOK => 'test',
+			Action::CALLABLE => function(MockTypeHint $th) {
+				$this->assertInstanceOf(MockTypeHint::class, $th);
+			}
+		]);
 
 		$this->collection->add_action($action);
 
-		$this->assertSame($action, $this->collection->get($action->id()));
+		$this->assertSame($action, $this->collection->get_by_id($action->id()));
 
 		WP_Mock::onAction('test')
 			->with(null)
 			->perform(function() use ($action) {
-				call_user_func([$this->collection, $action->id()]);
+				call_user_func([$this->collection, (string) $action->id()]);
 			});
 
 		do_action('test');
@@ -285,21 +285,25 @@ class FilterCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testCanInvokeApiWithTypeHint()
 	{
-		$api = new Api('test', function(Request $request, MockTypeHint $th) {
-			$this->assertInstanceOf(MockTypeHint::class, $th);
-		}, 'GET', $this->request);
+		$api = Api::create([
+			Api::HOOK => 'test',
+			Api::CALLABLE => function(Request $request, MockTypeHint $th) {
+				$this->assertInstanceOf(MockTypeHint::class, $th);
+			},
+			Api::REQUEST => $this->request
+		]);
 
 		$this->request->expects()->getMethod()->twice()->andReturn('GET');
 		$this->request->expects()->get('key')->twice()->andReturn(null);
 
 		$this->collection->add_action($api);
 
-		$this->assertSame($api, $this->collection->get($api->id()));
+		$this->assertSame($api, $this->collection->get_by_id($api->id()));
 
 		WP_Mock::onAction('test')
 			->with(null)
 			->perform(function() use ($api) {
-				call_user_func([$this->collection, $api->id()]);
+				call_user_func([$this->collection, (string) $api->id()]);
 			});
 
 		do_action('test');
@@ -313,19 +317,24 @@ class FilterCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testCanInvokeActionWithTypeHintAndArguments()
 	{
-		$action = new Action('test', function(MockTypeHint $th, bool $bool, int $int) {
-			$this->assertTrue($bool);
-			$this->assertEquals(123, $int);
-		}, ['map' => [\DI\get(MockTypeHint::class)], 'num_args' => 2]);
+		$action = Action::create([
+			Action::HOOK => 'test',
+			Action::CALLABLE => function(MockTypeHint $th, bool $bool, int $int) {
+				$this->assertTrue($bool);
+				$this->assertEquals(123, $int);
+			},
+			Action::MAP => [\DI\get(MockTypeHint::class)],
+			Action::NUM_ARGS => 2
+		]);
 
 		$this->collection->add_action($action);
 
-		$this->assertSame($action, $this->collection->get($action->id()));
+		$this->assertSame($action, $this->collection->get_by_id($action->id()));
 
 		WP_Mock::onAction('test')
 			->with(true, 123)
 			->perform(function() use ($action) {
-				call_user_func([$this->collection, $action->id()], true, 123);
+				call_user_func([$this->collection, (string) $action->id()], true, 123);
 			});
 
 		do_action('test', true, 123);
@@ -343,21 +352,24 @@ class FilterCollectionTest extends \WP_Mock\Tools\TestCase
 
 		$this->container->set(Request::class, Mockery::mock(Request::class));
 
-		$action = new Action('test', function(Request $request) use ($response) {
-			$this->assertInstanceOf(Request::class, $request);
-			return $response;
-		});
+		$action = Action::create([
+			Action::HOOK => 'test',
+			Action::CALLABLE => function(Request $request) use ($response) {
+				$this->assertInstanceOf(Request::class, $request);
+				return $response;
+			}
+		]);
 
 		$this->collection->add_action($action);
 
-		$this->assertSame($action, $this->collection->get($action->id()));
+		$this->assertSame($action, $this->collection->get_by_id($action->id()));
 
 		$response->expects()->send();
 
 		WP_Mock::onAction('test')
 			->with(null)
 			->perform(function() use ($action) {
-				call_user_func([$this->collection, $action->id()]);
+				call_user_func([$this->collection, (string) $action->id()]);
 			});
 
 		do_action('test');
@@ -374,23 +386,27 @@ class FilterCollectionTest extends \WP_Mock\Tools\TestCase
 	{
 		$response = Mockery::mock(Response::class);
 
-		$api = new Api('test', function(Request $request) use ($response) {
-			return $response;
-		}, 'GET', $this->request);
+		$api = Api::create([
+			Api::HOOK => 'test',
+			Api::CALLABLE => function(Request $request) use ($response) {
+				return $response;
+			},
+			Api::REQUEST => $this->request
+		]);
 
 		$this->request->expects()->getMethod()->twice()->andReturn('GET');
 		$this->request->expects()->get('key')->twice()->andReturn(null);
 
 		$this->collection->add_action($api);
 
-		$this->assertSame($api, $this->collection->get($api->id()));
+		$this->assertSame($api, $this->collection->get_by_id($api->id()));
 
 		$response->expects()->send();
 
 		WP_Mock::onAction('test')
 			->with(null)
 			->perform(function() use ($api) {
-				call_user_func([$this->collection, $api->id()]);
+				call_user_func([$this->collection, (string) $api->id()]);
 			});
 
 		do_action('test');
@@ -402,34 +418,29 @@ class FilterCollectionTest extends \WP_Mock\Tools\TestCase
 	 * @group wordpress
 	 * @group api
 	 * @group action
-	 *
-	 * @return void
 	 */
 	public function testApiReturnsJsonResponseOnInvalidApiKey()
 	{
-		$api = new Api(
-			'test',
-			function(Request $request) {
-			
+		$api = Api::create([
+			Api::HOOK => 'test',
+			Api::CALLABLE => function(Request $request) {
+
 			},
-			'GET',
-			$this->request,
-			[
-				'api_key' => 'good_key'
-			]
-		);
+			Api::REQUEST => $this->request,
+			Api::API_KEY => 'good_key'
+		]);
 
 		$this->request->expects()->getMethod()->andReturn('GET');
 		$this->request->expects()->get('key')->twice()->andReturn('bad_key');
 
 		$this->collection->add_action($api);
 
-		$this->assertSame($api, $this->collection->get($api->id()));
+		$this->assertSame($api, $this->collection->get_by_id($api->id()));
 
 		WP_Mock::onAction('test')
 			->with(null)
 			->perform(function() use ($api) {
-				$response = call_user_func([$this->collection, $api->id()]);
+				$response = call_user_func([$this->collection, (string) $api->id()]);
 
 				$this->assertInstanceOf(JsonResponse::class, $response);
 				$this->assertEquals($response->getContent(), json_encode(Api::ACTION_NOT_RECOGNIZED));
@@ -448,26 +459,25 @@ class FilterCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testApiReturnsJsonResponseOnInvalidMethod()
 	{
-		$api = new Api(
-			'test',
-			function(Request $request) {
-			
+		$api = Api::create([
+			Api::HOOK => 'test',
+			Api::CALLABLE => function(Request $request) {
+
 			},
-			'GET',
-			$this->request
-		);
+			Api::REQUEST => $this->request
+		]);
 
 		$this->request->expects()->getMethod()->twice()->andReturn('POST');
 		$this->request->expects()->get('key')->twice()->andReturn(null);
 
 		$this->collection->add_action($api);
 
-		$this->assertSame($api, $this->collection->get($api->id()));
+		$this->assertSame($api, $this->collection->get_by_id($api->id()));
 
 		WP_Mock::onAction('test')
 			->with(null)
 			->perform(function() use ($api) {
-				$response = call_user_func([$this->collection, $api->id()]);
+				$response = call_user_func([$this->collection, (string) $api->id()]);
 
 				$this->assertInstanceOf(JsonResponse::class, $response);
 				$this->assertEquals($response->getContent(), json_encode(Api::INVALID_METHOD));

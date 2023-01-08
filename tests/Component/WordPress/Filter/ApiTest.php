@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JayWolfeLib\Tests\Component\WordPress\Filter;
 
@@ -15,7 +15,7 @@ class ApiTest extends \WP_Mock\Tools\TestCase
 {
 	use DevContainerTrait;
 
-	private $request;
+	private Request $request;
 
 	public function setUp(): void
 	{
@@ -41,10 +41,14 @@ class ApiTest extends \WP_Mock\Tools\TestCase
 	{
 		$response = Mockery::mock(Response::class);
 
-		$api = new Api('test', function(Request $request) use ($response) {
-			$this->assertInstanceOf(Request::class, $request);
-			return $response;
-		}, 'GET', $this->request);
+		$api = Api::create([
+			Api::HOOK => 'test',
+			Api::CALLABLE => function(Request $request) use ($response) {
+				$this->assertInstanceOf(Request::class, $request);
+				return $response;
+			},
+			Api::REQUEST => $this->request
+		]);
 
 		$this->request->expects()->getMethod()->twice()->andReturn('GET');
 		$this->request->expects()->get('key')->twice()->andReturn(null);
@@ -67,17 +71,14 @@ class ApiTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testReturnsJsonResponseOnInvalidApiKey()
 	{
-		$api = new Api(
-			'test',
-			function(Request $request) {
-				
+		$api = Api::create([
+			Api::HOOK => 'test',
+			Api::CALLABLE => function(Request $request) {
+
 			},
-			'GET',
-			$this->request,
-			[
-				'api_key' => 'good_key'
-			]
-		);
+			Api::REQUEST => $this->request,
+			Api::API_KEY => 'good_key'
+		]);
 
 		$this->request->expects()->getMethod()->andReturn('GET');
 		$this->request->expects()->get('key')->twice()->andReturn('bad_key');
@@ -97,14 +98,13 @@ class ApiTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testReturnsJsonResponseOnInvalidMethod()
 	{
-		$api = new Api(
-			'test',
-			function(Request $request) {
+		$api = Api::create([
+			Api::HOOK => 'test',
+			Api::CALLABLE => function(Request $request) {
 
 			},
-			'GET',
-			$this->request,
-		);
+			Api::REQUEST => $this->request
+		]);
 
 		$this->request->expects()->getMethod()->andReturn('POST');
 		$this->request->expects()->get('key')->twice()->andReturn(null);

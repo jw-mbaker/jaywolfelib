@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JayWolfeLib;
 
@@ -20,11 +20,9 @@ final class JayWolfeLib
 {
 	use ContainerAwareTrait;
 
-	/** @var bool */
-	private static $loaded = false;
+	private static bool $loaded = false;
 
-	/** @var ContainerBuilder */
-	private $containerBuilder;
+	private ContainerBuilder $containerBuilder;
 
 	public function __construct(ContainerBuilder $containerBuilder)
 	{

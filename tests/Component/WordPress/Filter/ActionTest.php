@@ -1,9 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JayWolfeLib\Tests\Component\WordPress\Filter;
 
 use JayWolfeLib\Component\WordPress\Filter\Action;
-use JayWolfeLib\Tests\Component\MockTypeHint;
+use JayWolfeLib\Tests\Invoker\MockTypeHint;
 use JayWolfeLib\Tests\Traits\DevContainerTrait;
 use Invoker\InvokerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -33,11 +33,14 @@ class ActionTest extends \WP_Mock\Tools\TestCase
 	 * @group wordpress
 	 * @group action
 	 */
-	public function testCanInvokeAction()
+	public function testCanInvokeActionWithNoArgs()
 	{
-		$action = new Action('test', function() {
-			$this->assertTrue(true);
-		});
+		$action = Action::create([
+			Action::HOOK => 'test',
+			Action::CALLABLE => function() {
+				$this->assertTrue(true);
+			}
+		]);
 
 		WP_Mock::onAction($action->hook())
 			->with(null)
@@ -55,15 +58,19 @@ class ActionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testCanInvokeActionWithArgs()
 	{
-		$action = new Action('test', function(string $test, int $testInt) {
-			$this->assertEquals('test', $test);
-			$this->assertEquals(123, $testInt);
-		}, ['num_args' => 2]);
+		$action = Action::create([
+			Action::HOOK => 'test',
+			Action::CALLABLE => function(string $test, int $testInt) {
+				$this->assertEquals('test', $test);
+				$this->assertEquals(123, $testInt);
+			},
+			Action::NUM_ARGS => 2
+		]);
 
 		WP_Mock::onAction($action->hook())
 			->with('test', 123)
 			->perform(function() use ($action) {
-				$this->container->call($action, [\DI\get(InvokerInterface::class), 'test', 123]);
+				$this->container->call($action, [$this->container, 'test', 123]);
 			});
 
 		do_action($action->hook(), 'test', 123);
@@ -76,9 +83,12 @@ class ActionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testCanInvokeActionWithTypeHint()
 	{
-		$action = new Action('test', function(MockTypeHint $th) {
-			$this->assertInstanceOf(MockTypeHint::class, $th);
-		});
+		$action = Action::create([
+			Action::HOOK => 'test',
+			Action::CALLABLE => function(MockTypeHint $th) {
+				$this->assertInstanceOf(MockTypeHint::class, $th);
+			}
+		]);
 
 		WP_Mock::onAction($action->hook())
 			->with(null)
@@ -91,10 +101,15 @@ class ActionTest extends \WP_Mock\Tools\TestCase
 
 	public function testCanInvokeActionWithTypeHintAndArgs()
 	{
-		$action = new Action('test', function(MockTypeHint $th, string $test, bool $bool) {
-			$this->assertEquals('test', $test);
-			$this->assertTrue($bool);
-		}, ['map' => [\DI\get(MockTypeHint::class)], 'num_args' => 2]);
+		$action = Action::create([
+			Action::HOOK => 'test',
+			Action::CALLABLE => function(MockTypeHint $th, string $test, bool $bool) {
+				$this->assertEquals('test', $test);
+				$this->assertTrue($bool);
+			},
+			Action::MAP => [\DI\get(MockTypeHint::class)],
+			Action::NUM_ARGS => 2
+		]);
 
 		WP_Mock::onAction($action->hook())
 			->with('test', true)
@@ -114,10 +129,13 @@ class ActionTest extends \WP_Mock\Tools\TestCase
 	{
 		$response = Mockery::mock(Response::class);
 
-		$action = new Action('test', function() use ($response) {
-			$this->assertTrue(true);
-			return $response;
-		});
+		$action = Action::create([
+			Action::HOOK => 'test',
+			Action::CALLABLE => function() use ($response) {
+				$this->assertTrue(true);
+				return $response;
+			}
+		]);
 
 		WP_Mock::onAction($action->hook())
 			->with(null)
@@ -139,10 +157,13 @@ class ActionTest extends \WP_Mock\Tools\TestCase
 
 		$this->container->set(Request::class, Mockery::mock(Request::class));
 
-		$action = new Action('test', function(Request $request) use ($response) {
-			$this->assertInstanceOf(Request::class, $request);
-			return $response;
-		});
+		$action = Action::create([
+			Action::HOOK => 'test',
+			Action::CALLABLE => function(Request $request) use ($response) {
+				$this->assertInstanceOf(Request::class, $request);
+				return $response;
+			}
+		]);
 
 		WP_Mock::onAction($action->hook())
 			->with(null)
