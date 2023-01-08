@@ -11,7 +11,7 @@ class MenuPage extends AbstractMenuPage
 		self::ICON_URL => ''
 	];
 
-	private $icon_url;
+	private string $icon_url;
 
 	public function __construct(
 		string $slug,
