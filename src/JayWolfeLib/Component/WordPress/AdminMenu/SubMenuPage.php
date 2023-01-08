@@ -7,7 +7,7 @@ class SubMenuPage extends AbstractMenuPage
 	public const MENU_TYPE = 'submenu_page';
 	public const PARENT_SLUG = 'parent_slug';
 
-	protected $parent_slug;
+	protected string $parent_slug;
 
 	public function __construct(
 		string $slug,
