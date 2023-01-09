@@ -53,7 +53,7 @@ class MetaBox implements MetaBoxInterface
 		$screen = self::DEFAULTS[self::SCREEN],
 		string $context = self::DEFAULTS[self::CONTEXT],
 		string $pirority = self::DEFAULTS[self::PRIORITY],
-		array $callback_args = self::DEFAULTS[self::CALLBACK_ARGS],
+		?array $callback_args = self::DEFAULTS[self::CALLBACK_ARGS],
 		array $map = self::DEFAULTS[self::MAP]
 	) {
 		self::validate_screen($screen);
