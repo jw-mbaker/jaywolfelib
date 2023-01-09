@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JayWolfeLib\Component\WordPress\MetaBox;
 
@@ -11,24 +11,24 @@ class MetaBoxCollection extends AbstractInvokerCollection
 	/**
 	 * @var array<string, MetaBoxInterface>
 	 */
-	private $meta_boxes = [];
+	private array $meta_boxes = [];
 
-	private function add(string $name, MetaBoxInterface $meta_box)
+	private function add(MetaBoxInterface $meta_box)
 	{
-		$this->meta_boxes[$name] = $meta_box;
+		$this->meta_boxes[(string) $meta_box->id()] = $meta_box;
 	}
 
 	public function add_meta_box(MetaBoxInterface $meta_box)
 	{
-		$this->add($meta_box->id(), $meta_box);
+		$this->add($meta_box);
 		add_meta_box(
 			$meta_box->meta_id(),
 			$meta_box->title(),
-			[$this, $meta_box->id()],
-			$meta_box->get('screen'),
-			$meta_box->get('context'),
-			$meta_box->get('priority'),
-			$meta_box->get('callback_args')
+			[$this, (string) $meta_box->id()],
+			$meta_box->screen(),
+			$meta_box->context(),
+			$meta_box->priority(),
+			$meta_box->callback_args()
 		);
 	}
 
@@ -42,10 +42,10 @@ class MetaBoxCollection extends AbstractInvokerCollection
 	 */
 	public function remove_meta_box(string $meta_id, $screen, string $context): bool
 	{
-		$meta_box = $this->get_meta_box($meta_id, $screen, $context);
+		$meta_box = $this->get($meta_id, $screen, $context);
 
 		if (null !== $meta_box) {
-			$this->remove($meta_box->id());
+			$this->remove($meta_box);
 			return true;
 		}
 
@@ -57,9 +57,9 @@ class MetaBoxCollection extends AbstractInvokerCollection
 		return $this->meta_boxes;
 	}
 
-	public function get(string $name): ?MetaBoxInterface
+	public function get_by_id(MetaBoxId $id): ?MetaBoxInterface
 	{
-		return $this->meta_boxes[$name] ?? null;
+		return $this->meta_boxes[(string) $id] ?? null;
 	}
 
 	/**
@@ -70,15 +70,15 @@ class MetaBoxCollection extends AbstractInvokerCollection
 	 * @param string $context
 	 * @return MetaBoxInterface|null
 	 */
-	public function get_meta_box(string $meta_id, $screen, string $context): ?MetaBoxInterface
+	public function get(string $meta_id, $screen, string $context): ?MetaBoxInterface
 	{
 		$meta_box = array_reduce($this->meta_boxes, function($carry, $item) use ($meta_id, $screen, $context) {
 			if (null !== $carry) return $carry;
 
 			if (
 				$item->meta_id() === $meta_id &&
-				$item->get('screen') === $screen &&
-				$item->get('context') === $context
+				$item->screen() === $screen &&
+				$item->context() === $context
 			) {
 				return $item;
 			}
@@ -89,19 +89,15 @@ class MetaBoxCollection extends AbstractInvokerCollection
 		return $meta_box;
 	}
 
-	public function remove($name)
+	private function remove(MetaBoxInterface $meta_box)
 	{
-		foreach ((array) $name as $n) {
-			$meta_box = $this->meta_boxes[$n];
-
-			remove_meta_box($meta_box->meta_id(), $meta_box->get('screen'), $meta_box->get('context'));
-			unset($this->meta_boxes[$n]);
-		}
+		remove_meta_box($meta_box->meta_id(), $meta_box->screen(), $meta_box->context());
+		unset($this->meta_boxes[(string) $meta_box->id()]);
 	}
 
 	public function __call(string $name, array $arguments)
 	{
-		$response = $this->resolve($this->get($name), $arguments);
+		$response = $this->resolve($this->meta_boxes[$name], $arguments);
 
 		if ($response instanceof Response) {
 			$response->send();

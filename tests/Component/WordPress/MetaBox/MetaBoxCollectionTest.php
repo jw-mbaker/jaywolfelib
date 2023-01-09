@@ -1,13 +1,14 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JayWolfeLib\Tests\Component\WordPress\MetaBox;
 
 use JayWolfeLib\Component\WordPress\MetaBox\MetaBoxCollection;
 use JayWolfeLib\Component\WordPress\MetaBox\MetaBoxInterface;
 use JayWolfeLib\Component\WordPress\MetaBox\MetaBox;
-use JayWolfeLib\Tests\Component\MockTypeHint;
+use JayWolfeLib\Tests\Invoker\MockTypeHint;
 use JayWolfeLib\Tests\Traits\DevContainerTrait;
 use Symfony\Component\HttpFoundation\Response;
+use WP_Post;
 use WP_Mock;
 use Mockery;
 
@@ -15,14 +16,14 @@ class MetaBoxCollectionTest extends \WP_Mock\Tools\TestCase
 {
 	use DevContainerTrait;
 
-	private $collection;
-	private $post;
+	private MetaBoxCollection $collection;
+	private WP_Post $post;
 
 	public function setUp(): void
 	{
 		$this->container = $this->createDevContainer();
 		$this->collection = new MetaBoxCollection($this->container);
-		$this->post = Mockery::mock(\WP_Post::class);
+		$this->post = Mockery::mock(WP_Post::class);
 		WP_Mock::setUp();
 		WP_Mock::userFunction('add_meta_box');
 		WP_Mock::userFunction('remove_meta_box');
@@ -41,35 +42,22 @@ class MetaBoxCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testCanAddMetaBox()
 	{
-		$mb = Mockery::mock(MetaBoxInterface::class);
-		$mb->expects()->id()->twice()->andReturn(spl_object_hash($mb));
-		$mb->expects()->meta_id()->andReturn('test');
-		$mb->expects()->title()->andReturn('test');
-		$mb->expects()->get('screen')->andReturn(null);
-		$mb->expects()->get('context')->andReturn('advanced');
-		$mb->expects()->get('priority')->andReturn('default');
-		$mb->expects()->get('callback_args')->andReturn(null);
+		$mb = $this->createMetaBox();
 
 		$this->collection->add_meta_box($mb);
 		$this->assertContains($mb, $this->collection->all());
+		$this->assertSame($mb, $this->collection->get_by_id($mb->id()));
 	}
 
 	/**
 	 * @group meta_box
 	 * @group wordpress
 	 * @group collection
-	 * @depends testGetMetaBoxMethod
+	 * @depends testCanGetMetaBox
 	 */
 	public function testCanRemoveMetaBox()
 	{
-		$mb = Mockery::mock(MetaBoxInterface::class);
-		$mb->expects()->id()->times(3)->andReturn(spl_object_hash($mb));
-		$mb->expects()->meta_id()->times(3)->andReturn('test');
-		$mb->expects()->title()->andReturn('test');
-		$mb->expects()->get('screen')->times(3)->andReturn(null);
-		$mb->expects()->get('context')->times(3)->andReturn('advanced');
-		$mb->expects()->get('priority')->andReturn('default');
-		$mb->expects()->get('callback_args')->andReturn(null);
+		$mb = $this->createMetaBox();
 
 		$this->collection->add_meta_box($mb);
 		$this->assertContains($mb, $this->collection->all());
@@ -84,7 +72,7 @@ class MetaBoxCollectionTest extends \WP_Mock\Tools\TestCase
 	 * @group meta_box
 	 * @group wordpress
 	 * @group collection
-	 * @depends testGetMetaBoxMethod
+	 * @depends testCanGetMetaBox
 	 */
 	public function testRemoveMetaBoxReturnsFalseOnInvalidKey()
 	{
@@ -97,21 +85,14 @@ class MetaBoxCollectionTest extends \WP_Mock\Tools\TestCase
 	 * @group wordpress
 	 * @group collection
 	 */
-	public function testGetMetaBoxMethod()
+	public function testCanGetMetaBox()
 	{
-		$mb = Mockery::mock(MetaBoxInterface::class);
-		$mb->expects()->id()->twice()->andReturn(spl_object_hash($mb));
-		$mb->expects()->meta_id()->twice()->andReturn('test');
-		$mb->expects()->title()->andReturn('test');
-		$mb->expects()->get('screen')->twice()->andReturn(null);
-		$mb->expects()->get('context')->twice()->andReturn('advanced');
-		$mb->expects()->get('priority')->andReturn('default');
-		$mb->expects()->get('callback_args')->andReturn(null);
+		$mb = $this->createMetaBox();
 
 		$this->collection->add_meta_box($mb);
 		$this->assertContains($mb, $this->collection->all());
 
-		$obj = $this->collection->get_meta_box('test', null, 'advanced');
+		$obj = $this->collection->get('test', null, 'advanced');
 		$this->assertInstanceOf(MetaBoxInterface::class, $obj);
 		$this->assertSame($obj, $mb);
 	}
@@ -121,30 +102,10 @@ class MetaBoxCollectionTest extends \WP_Mock\Tools\TestCase
 	 * @group wordpress
 	 * @group collection
 	 */
-	public function testGetMetaBoxMethodReturnsNullIfNotFound()
+	public function testGetMetaBoxReturnsNullIfNotFound()
 	{
-		$obj = $this->collection->get_meta_box('test', null, 'advanced');
+		$obj = $this->collection->get('test', null, 'advanced');
 		$this->assertNull($obj);
-	}
-
-	/**
-	 * @group meta_box
-	 * @group wordpress
-	 * @group collection
-	 */
-	public function testCanGetMetaBox()
-	{
-		$mb = Mockery::mock(MetaBoxInterface::class);
-		$mb->expects()->id()->twice()->andReturn(spl_object_hash($mb));
-		$mb->expects()->meta_id()->andReturn('test');
-		$mb->expects()->title()->andReturn('test');
-		$mb->expects()->get('screen')->andReturn(null);
-		$mb->expects()->get('context')->andReturn('advanced');
-		$mb->expects()->get('priority')->andReturn('default');
-		$mb->expects()->get('callback_args')->andReturn(null);
-
-		$this->collection->add_meta_box($mb);
-		$this->assertSame($mb, $this->collection->get(spl_object_hash($mb)));
 	}
 
 	/**
@@ -154,14 +115,18 @@ class MetaBoxCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testCanInvokeMetaBox()
 	{
-		$mb = new MetaBox('test', 'test', function(\WP_Post $post) {
-			$this->assertTrue(true);
-		});
+		$mb = MetaBox::create([
+			MetaBox::META_ID => 'test',
+			MetaBox::TITLE => 'test',
+			MetaBox::CALLABLE => function(WP_Post $post) {
+				$this->assertTrue(true);
+			}
+		]);
 
 		$this->collection->add_meta_box($mb);
 
-		$this->assertSame($mb, $this->collection->get($mb->id()));
-		call_user_func([$this->collection, $mb->id()], $this->post);
+		$this->assertSame($mb, $this->collection->get_by_id($mb->id()));
+		call_user_func([$this->collection, (string) $mb->id()], $this->post);
 	}
 
 	/**
@@ -171,14 +136,19 @@ class MetaBoxCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testCanInvokeMetaBoxWithTypeHint()
 	{
-		$mb = new MetaBox('test', 'test', function(MockTypeHint $th, \WP_Post $post) {
-			$this->assertInstanceOf(MockTypeHint::class, $th);
-		}, ['map' => [\DI\get(MockTypeHint::class)]]);
+		$mb = MetaBox::create([
+			MetaBox::META_ID => 'test',
+			MetaBox::TITLE => 'test',
+			MetaBox::CALLABLE => function(MockTypeHint $th, WP_Post $post) {
+				$this->assertInstanceOf(MockTypeHint::class, $th);
+			},
+			MetaBox::MAP => [\DI\get(MockTypeHint::class)]
+		]);
 
 		$this->collection->add_meta_box($mb);
 
-		$this->assertSame($mb, $this->collection->get($mb->id()));
-		call_user_func([$this->collection, $mb->id()], $this->post);
+		$this->assertSame($mb, $this->collection->get_by_id($mb->id()));
+		call_user_func([$this->collection, (string) $mb->id()], $this->post);
 	}
 
 	/**
@@ -188,23 +158,21 @@ class MetaBoxCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testCanInvokeMetaBoxWithTypeHintAndArguments()
 	{
-		$mb = new MetaBox(
-			'test',
-			'test',
-			function(MockTypeHint $th, \WP_Post $post, array $args) {
+		$mb = MetaBox::create([
+			MetaBox::META_ID => 'test',
+			MetaBox::TITLE => 'test',
+			MetaBox::CALLABLE => function(MockTypeHint $th, WP_Post $post, array $args) {
 				$this->assertInstanceOf(MockTypeHint::class, $th);
-				$this->assertEquals(123, $args['test']);
+				$this->assertSame(123, $args['test']);
 			},
-			[
-				'map' => [\DI\get(MockTypeHint::class)],
-				'callback_args' => ['test' => 123]
-			]
-		);
+			MetaBox::CALLBACK_ARGS => ['test' => 123],
+			MetaBox::MAP => [\DI\get(MockTypeHint::class)]
+		]);
 
 		$this->collection->add_meta_box($mb);
 
-		$this->assertSame($mb, $this->collection->get($mb->id()));
-		call_user_func([$this->collection, $mb->id()], $this->post, $mb->get('callback_args'));
+		$this->assertSame($mb, $this->collection->get_by_id($mb->id()));
+		call_user_func([$this->collection, (string) $mb->id()], $this->post, $mb->callback_args());
 	}
 
 	/**
@@ -216,17 +184,30 @@ class MetaBoxCollectionTest extends \WP_Mock\Tools\TestCase
 	{
 		$response = Mockery::mock(Response::class);
 
-		$mb = new MetaBox('test', 'test', function(\WP_Post $post) use ($response){
-			$this->assertTrue(true);
-			return $response;
-		});
+		$mb = MetaBox::create([
+			MetaBox::META_ID => 'test',
+			MetaBox::TITLE => 'test',
+			MetaBox::CALLABLE => function(WP_Post $post) use ($response) {
+				$this->assertTrue(true);
+				return $response;
+			}
+		]);
 
 		$this->collection->add_meta_box($mb);
 
-		$this->assertSame($mb, $this->collection->get($mb->id()));
+		$this->assertSame($mb, $this->collection->get_by_id($mb->id()));
 
 		$response->expects()->send();
 
-		call_user_func([$this->collection, $mb->id()], $this->post);
+		call_user_func([$this->collection, (string) $mb->id()], $this->post);
+	}
+
+	private function createMetaBox(): MetaBoxInterface
+	{
+		return MetaBox::create([
+			MetaBox::META_ID => 'test',
+			MetaBox::TITLE => 'test',
+			MetaBox::CALLABLE => function() {}
+		]);
 	}
 }
