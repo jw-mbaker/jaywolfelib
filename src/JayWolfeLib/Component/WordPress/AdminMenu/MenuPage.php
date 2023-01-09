@@ -4,7 +4,6 @@ namespace JayWolfeLib\Component\WordPress\AdminMenu;
 
 class MenuPage extends AbstractMenuPage
 {
-	public const MENU_TYPE = 'menu_page';
 	public const ICON_URL = 'icon_url';
 
 	public const DEFAULTS = [

@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Invoker\InvokerInterface;
 
-class Api extends Action
+class Api extends AbstractHook
 {
 	public const METHOD = 'method';
 	public const REQUEST = 'request';

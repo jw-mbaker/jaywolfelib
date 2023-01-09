@@ -15,6 +15,7 @@ abstract class AbstractHook implements HookInterface
 		self::MAP => []
 	];
 
+	protected HookId $id;
 	protected string $hook;
 	protected int $priority;
 	protected int $num_args;

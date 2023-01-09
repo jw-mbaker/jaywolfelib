@@ -23,6 +23,11 @@ class MenuCollection extends AbstractInvokerCollection
 		return $this->menu_pages;
 	}
 
+	public function get_by_id(MenuId $id): ?MenuPageInterface
+	{
+		return $this->menu_pages[(string) $id] ?? null;
+	}
+
 	public function get(string $slug): ?MenuPageInterface
 	{
 		$menu_page = array_reduce($this->menu_pages, function($carry, $item) use ($slug) {
@@ -68,11 +73,11 @@ class MenuCollection extends AbstractInvokerCollection
 	 */
 	private function remove(MenuPageInterface $menu_page)
 	{
-		switch ($menu_page::MENU_TYPE) {
-			case 'menu_page':
+		switch (get_class($menu_page)) {
+			case MenuPage::class:
 				remove_menu_page($menu_page->slug());
 				break;
-			case 'submenu_page':
+			case SubMenuPage::class:
 				remove_submenu_page($menu_page->parent_slug(), $menu_page->slug());
 				break;
 		}
