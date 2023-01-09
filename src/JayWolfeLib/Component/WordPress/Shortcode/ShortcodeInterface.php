@@ -1,15 +1,12 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JayWolfeLib\Component\WordPress\Shortcode;
 
-use JayWolfeLib\Component\HandlerInterface;
-use JayWolfeLib\Component\ParameterInterface;
-use JayWolfeLib\Component\ObjectHash\ObjectHashInterface;
+use JayWolfeLib\Invoker\HandlerInterface;
 
-interface ShortcodeInterface extends
-	HandlerInterface,
-	ParameterInterface,
-	ObjectHashInterface
+interface ShortcodeInterface extends HandlerInterface
 {
+	public const TAG = 'tag';
+
 	public function tag(): string;
 }

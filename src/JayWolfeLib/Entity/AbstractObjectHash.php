@@ -11,7 +11,7 @@ abstract class AbstractObjectHash implements EntityInterface
 		$this->set_id(spl_object_hash($obj));
 	}
 
-	public function set_id($id)
+	public function set_id(string $id)
 	{
 		$this->id = $id;
 	}

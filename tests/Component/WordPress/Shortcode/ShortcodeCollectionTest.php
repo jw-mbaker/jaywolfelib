@@ -1,11 +1,12 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JayWolfeLib\Tests\Component\WordPress\Shortcode;
 
 use JayWolfeLib\Component\WordPress\Shortcode\ShortcodeCollection;
 use JayWolfeLib\Component\WordPress\Shortcode\ShortcodeInterface;
 use JayWolfeLib\Component\WordPress\Shortcode\Shortcode;
-use JayWolfeLib\Tests\Component\MockTypeHint;
+use JayWolfeLib\Component\WordPress\Shortcode\ShortcodeId;
+use JayWolfeLib\Tests\Invoker\MockTypeHint;
 use JayWolfeLib\Tests\Traits\DevContainerTrait;
 use WP_Mock;
 use Mockery;
@@ -14,7 +15,7 @@ class ShortcodeCollectionTest extends \WP_Mock\Tools\TestCase
 {
 	use DevContainerTrait;
 
-	private $collection;
+	private ShortcodeCollection $collection;
 
 	public function setUp(): void
 	{
@@ -38,9 +39,7 @@ class ShortcodeCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testCanAddShortcode()
 	{
-		$shortcode = Mockery::mock(ShortcodeInterface::class);
-		$shortcode->expects()->id()->twice()->andReturn(spl_object_hash($shortcode));
-		$shortcode->expects()->tag()->andReturn('test');
+		$shortcode = $this->createShortcode();
 
 		$this->collection->add_shortcode($shortcode);
 		$this->assertContains($shortcode, $this->collection->all());
@@ -53,9 +52,7 @@ class ShortcodeCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testCanRemoveShortcode()
 	{
-		$shortcode = Mockery::mock(ShortcodeInterface::class);
-		$shortcode->expects()->id()->times(3)->andReturn(spl_object_hash($shortcode));
-		$shortcode->expects()->tag()->times(3)->andReturn('test');
+		$shortcode = $this->createShortcode();
 
 		$this->collection->add_shortcode($shortcode);
 		$this->assertContains($shortcode, $this->collection->all());
@@ -63,7 +60,7 @@ class ShortcodeCollectionTest extends \WP_Mock\Tools\TestCase
 		$bool = $this->collection->remove_shortcode('test');
 		$this->assertTrue($bool);
 
-		$this->assertNotContains($bool, $this->collection->all());
+		$this->assertNotContains($shortcode, $this->collection->all());
 	}
 
 	/**
@@ -84,12 +81,10 @@ class ShortcodeCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testCanGetShortcode()
 	{
-		$shortcode = Mockery::mock(ShortcodeInterface::class);
-		$shortcode->expects()->id()->twice()->andReturn(spl_object_hash($shortcode));
-		$shortcode->expects()->tag()->andReturn('test');
+		$shortcode = $this->createShortcode();
 
 		$this->collection->add_shortcode($shortcode);
-		$this->assertSame($shortcode, $this->collection->get(spl_object_hash($shortcode)));
+		$this->assertSame($shortcode, $this->collection->get_by_id($shortcode->id()));
 	}
 
 	/**
@@ -99,16 +94,19 @@ class ShortcodeCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testCanInvokeShortcode()
 	{
-		$shortcode = new Shortcode('test', function(array $atts, string $content = '') {
-			$this->assertEquals(123, $atts['test']);
-			return $content;
-		});
+		$shortcode = Shortcode::create([
+			Shortcode::TAG => 'test',
+			Shortcode::CALLABLE => function(array $atts, string $content = '') {
+				$this->assertEquals(123, $atts['test']);
+				return $content;
+			}
+		]);
 
 		$this->collection->add_shortcode($shortcode);
 
-		$this->assertSame($shortcode, $this->collection->get($shortcode->id()));
+		$this->assertSame($shortcode, $this->collection->get_by_id($shortcode->id()));
 
-		$content = call_user_func([$this->collection, $shortcode->id()], ['test' => 123], 'xyz');
+		$content = call_user_func([$this->collection, (string) $shortcode->id()], ['test' => 123], 'xyz');
 		$this->assertEquals('xyz', $content);
 	}
 
@@ -119,17 +117,29 @@ class ShortcodeCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testCanInvokeShortcodeWithTypeHint()
 	{
-		$shortcode = new Shortcode('test', function(MockTypeHint $th, array $atts, string $content = '') {
-			$this->assertInstanceOf(MockTypeHint::class, $th);
-			$this->assertEquals(123, $atts['test']);
-			return $content;
-		}, ['map' => [\DI\get(MockTypeHint::class)]]);
+		$shortcode = Shortcode::create([
+			Shortcode::TAG => 'test',
+			Shortcode::CALLABLE => function(MockTypeHint $th, array $atts, string $content = '') {
+				$this->assertInstanceOf(MockTypeHint::class, $th);
+				$this->assertEquals(123, $atts['test']);
+				return $content;
+			},
+			Shortcode::MAP => [\DI\get(MockTypeHint::class)]
+		]);
 
 		$this->collection->add_shortcode($shortcode);
 
-		$this->assertSame($shortcode, $this->collection->get($shortcode->id()));
+		$this->assertSame($shortcode, $this->collection->get_by_id($shortcode->id()));
 
-		$content = call_user_func([$this->collection, $shortcode->id()], ['test' => 123], 'xyz');
+		$content = call_user_func([$this->collection, (string) $shortcode->id()], ['test' => 123], 'xyz');
 		$this->assertEquals('xyz', $content);
+	}
+
+	private function createShortcode(): ShortcodeInterface
+	{
+		return Shortcode::create([
+			Shortcode::TAG => 'test',
+			Shortcode::CALLABLE => function() {}
+		]);
 	}
 }

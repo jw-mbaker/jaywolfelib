@@ -13,5 +13,4 @@ interface MenuPageInterface extends HandlerInterface
 	public const POSITION = 'position';
 
 	public function slug(): string;
-	public static function create(array $args): MenuPageInterface;
 }

@@ -9,11 +9,11 @@ class ShortcodeCollection extends AbstractInvokerCollection
 	/**
 	 * @var array<string, ShortcodeInterface>
 	 */
-	private $shortcodes = [];
+	private array $shortcodes = [];
 
-	private function add(string $name, ShortcodeInterface $shortcode)
+	private function add(ShortcodeInterface $shortcode)
 	{
-		$this->shortcodes[$name] = $shortcode;
+		$this->shortcodes[(string) $shortcode->id()] = $shortcode;
 	}
 
 	/**
@@ -23,8 +23,8 @@ class ShortcodeCollection extends AbstractInvokerCollection
 	 */
 	public function add_shortcode(ShortcodeInterface $shortcode)
 	{
-		$this->add($shortcode->id(), $shortcode);
-		add_shortcode($shortcode->tag(), [$this, $shortcode->id()]);
+		$this->add($shortcode);
+		add_shortcode($shortcode->tag(), [$this, (string) $shortcode->id()]);
 	}
 
 	/**
@@ -35,14 +35,10 @@ class ShortcodeCollection extends AbstractInvokerCollection
 	 */
 	public function remove_shortcode(string $tag): bool
 	{
-		$shortcode = array_reduce($this->shortcodes, function($carry, $item) use ($tag) {
-			if (null !== $carry) return $carry;
-
-			return $item->tag() === $tag ? $item : null;
-		}, null);
+		$shortcode = $this->get($tag);
 
 		if (null !== $shortcode) {
-			$this->remove($shortcode->id());
+			$this->remove($shortcode);
 			return true;
 		}
 
@@ -54,23 +50,30 @@ class ShortcodeCollection extends AbstractInvokerCollection
 		return $this->shortcodes;
 	}
 
-	public function get(string $name): ?ShortcodeInterface
+	public function get_by_id(ShortcodeId $id): ?ShortcodeInterface
 	{
-		return $this->shortcodes[$name] ?? null;
+		return $this->shortcodes[(string) $id] ?? null;
 	}
 
-	public function remove($name)
+	public function get(string $tag): ?ShortcodeInterface
 	{
-		foreach ((array) $name as $n) {
-			$shortcode = $this->shortcodes[$n];
+		$shortcode = array_reduce($this->shortcodes, function($carry, $item) use ($tag) {
+			if (null !== $carry) return $carry;
 
-			remove_shortcode($shortcode->tag());
-			unset($this->shortcodes[$n]);
-		}
+			return $item->tag() === $tag ? $item : null;
+		}, null);
+
+		return $shortcode;
+	}
+
+	private function remove(ShortcodeInterface $shortcode)
+	{
+		remove_shortcode($shortcode->tag());
+		unset($this->shortcodes[(string) $shortcode->id()]);
 	}
 
 	public function __call(string $name, array $arguments)
 	{
-		return $this->resolve($this->get($name), $arguments);
+		return $this->resolve($this->shortcodes[$name], $arguments);
 	}
 }
