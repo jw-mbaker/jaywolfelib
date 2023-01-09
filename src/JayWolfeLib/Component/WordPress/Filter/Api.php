@@ -31,7 +31,7 @@ class Api extends AbstractHook
 		$callable,
 		string $method = self::DEFAULTS[self::METHOD],
 		Request $request = self::DEFAULTS[self::REQUEST],
-		string $api_key = self::DEFAULTS[self::API_KEY],
+		?string $api_key = self::DEFAULTS[self::API_KEY],
 		array $map = parent::DEFAULTS[self::MAP]
 	) {
 		parent::__construct($hook, $callable, parent::DEFAULTS[self::PRIORITY], parent::DEFAULTS[self::NUM_ARGS], $map);
