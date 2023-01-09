@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JayWolfeLib\Tests\Component\Config;
 
@@ -84,7 +84,7 @@ class ConfigTest extends \WP_Mock\Tools\TestCase
 
 		$file = 'xyz.file';
 
-		$this->expectException(\JayWolfeLib\Exception\InvalidConfig::class);
+		$this->expectException(\JayWolfeLib\Exception\InvalidConfigException::class);
 		$this->expectExceptionMessage(sprintf('%s not found.', $file));
 
 		$config = Config::from_file($file, $dependencies);

@@ -138,7 +138,7 @@ class FunctionTest extends \WP_Mock\Tools\TestCase
 	public function testInstallThrowsInvalidConfigOnNonFile()
 	{
 		$file = 'xyz.file';
-		$this->expectException(\JayWolfeLib\Exception\InvalidConfig::class);
+		$this->expectException(\JayWolfeLib\Exception\InvalidConfigException::class);
 		$this->expectExceptionMessage(
 			sprintf('%s not found.', $file)
 		);
@@ -160,7 +160,7 @@ class FunctionTest extends \WP_Mock\Tools\TestCase
 
 		$this->assertTrue(file_exists($file));
 
-		$this->expectException(\JayWolfeLib\Exception\InvalidConfig::class);
+		$this->expectException(\JayWolfeLib\Exception\InvalidConfigException::class);
 		$this->expectExceptionMessage(
 			sprintf('"db" option not set for %s.', basename(MOCK_PLUGIN_REL_PATH))
 		);
@@ -367,7 +367,7 @@ class FunctionTest extends \WP_Mock\Tools\TestCase
 			->get('plugin_file')
 			->andReturn($plugin_file);
 
-		$this->expectException(\JayWolfeLib\Exception\InvalidConfig::class);
+		$this->expectException(\JayWolfeLib\Exception\InvalidConfigException::class);
 		$this->expectExceptionMessage(
 			sprintf('Array path not set for %s', basename($plugin_file))
 		);

@@ -5,7 +5,7 @@ namespace JayWolfeLib\Tests\Views;
 use JayWolfeLib\Views\View;
 use JayWolfeLib\Component\Config\ConfigInterface;
 use JayWolfeLib\Component\Config\Config;
-use JayWolfeLib\Exception\InvalidTemplate;
+use JayWolfeLib\Exception\InvalidTemplateException;
 use WP_Mock;
 use Mockery;
 
@@ -98,7 +98,7 @@ class ViewTest extends \WP_Mock\Tools\TestCase
 		$config->expects()->get('paths')->andReturn([]);
 		$config->expects()->get('plugin_file')->andReturn(MOCK_PLUGIN_REL_PATH);
 
-		$this->expectException(InvalidTemplate::class);
+		$this->expectException(InvalidTemplateException::class);
 		$this->expectExceptionMessage(
 			sprintf('Template path not set for %s.', MOCK_PLUGIN_REL_PATH)
 		);

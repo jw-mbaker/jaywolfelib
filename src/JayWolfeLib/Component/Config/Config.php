@@ -2,19 +2,13 @@
 
 namespace JayWolfeLib\Component\Config;
 
-use JayWolfeLib\Traits\SettingsTrait;
-use JayWolfeLib\Exception\InvalidConfig;
+use JayWolfeLib\Parameter\ParameterBag;
+use JayWolfeLib\Exception\InvalidConfigException;
 
 class Config implements ConfigInterface
 {
-	use SettingsTrait;
-
-	/**
-	 * The Dependencies object.
-	 *
-	 * @var Dependencies
-	 */
-	protected $dependencies;
+	protected ParameterBag $settings;
+	protected Dependencies $dependencies;
 
 	/**
 	 * Constructor.
@@ -22,11 +16,41 @@ class Config implements ConfigInterface
 	 * @param array $settings
 	 * @param Dependencies|null $dependencies
 	 */
-	public function __construct(array $settings, Dependencies $dependencies = null)
+	public function __construct(array $settings, ?Dependencies $dependencies = null)
 	{
-		$this->settings = $settings;
+		$this->settings = new ParameterBag($settings);
 		$this->dependencies ??= new Dependencies($settings['dependencies'] ?? []);
-	}		
+	}
+
+	public function set(string $key, $setting)
+	{
+		$this->settings->set($key, $setting);
+	}
+
+	public function get(string $key)
+	{
+		return $this->settings->get($key);
+	}
+
+	public function remove(string $key)
+	{
+		$this->settings->remove($key);
+	}
+
+	public function has(string $key): bool
+	{
+		return $this->settings->has($key);
+	}
+
+	public function all(?string $key = null): array
+	{
+		return $this->settings->all($key);
+	}
+
+	public function clear()
+	{
+		$this->settings->clear();
+	}
 
 	/**
 	 * Check if plugin requirements are met.
@@ -77,13 +101,13 @@ class Config implements ConfigInterface
 	 * Factory method for creating a new Config instance.
 	 *
 	 * @param string $file The config file location.
-	 * @throws InvalidConfig
+	 * @throws InvalidConfigException
 	 * @return self
 	 */
-	public static function from_file(string $file, Dependencies $dependencies = null): self
+	public static function from_file(string $file, ?Dependencies $dependencies = null): self
 	{
 		if (!is_readable($file)) {
-			throw new InvalidConfig(
+			throw new InvalidConfigException(
 				sprintf('%s not found.', $file)
 			);
 		}

@@ -2,54 +2,42 @@
 
 namespace JayWolfeLib\Component\Config;
 
-use JayWolfeLib\Component\ParameterInterface;
+use JayWolfeLib\Parameter\ParameterBag;
 
-class Dependencies implements ParameterInterface
+class Dependencies
 {
-	/**
-	 * The dependencies.
-	 *
-	 * @var array
-	 */
-	private $dependencies = [];
+	private ParameterBag $dependencies;
+	private ParameterBag $errors;
 
-	/**
-	 * An array of errors.
-	 *
-	 * @var array
-	 */
-	private $errors = [];
-
-	public function __construct(array $dependencies)
+	public function __construct(array $dependencies = [])
 	{
-		$this->dependencies = $dependencies;
+		$this->dependencies = new ParameterBag($dependencies);
+		$this->errors = new ParameterBag();
 	}
 
 	public function all(): array
 	{
-		return $this->dependencies;
+		return $this->dependencies->all();
 	}
 
 	public function add(array $dependencies)
 	{
-		foreach ($dependencies as $key => $value) {
-			$this->set($key, $value);
-		}
+		$this->depependencies->add($dependencies);
 	}
 
 	public function set(string $name, $value)
 	{
-		$this->dependencies[$name] = $value;
+		$this->dependencies->set($name, $value);
 	}
 
 	public function get(string $name)
 	{
-		return $this->dependencies[$name] ?? null;
+		return $this->dependencies->get($name);
 	}
 
 	public function has(string $name): bool
 	{
-		return array_key_exists($name, $this->dependencies);
+		return $this->dependencies->has($name);
 	}
 
 	public function requirements_met(): bool
@@ -73,37 +61,35 @@ class Dependencies implements ParameterInterface
 
 	public function remove(string $name)
 	{
-		unset($this->dependencies[$name]);
+		$this->dependencies->remove($name);
 	}
 
 	public function clear()
 	{
-		$this->dependencies = [];
+		$this->dependencies->clear();
 	}
 
 	/**
 	 * Get the errors.
-	 *
-	 * @return array
 	 */
 	public function get_errors(): array
 	{
-		return $this->errors;
+		return $this->errors->all();
 	}
 
 	private function is_php_version_dependency_met(): bool
 	{
-		if (!isset($this->dependencies['min_php_version'])) {
+		if (null === $this->dependencies->get('min_php_version')) {
 			return true;
 		}
 
-		if ( 1 == version_compare( PHP_VERSION, $this->dependencies['min_php_version'], '>=' ) ) {
+		if ( 1 == version_compare( PHP_VERSION, $this->dependencies->get('min_php_version'), '>=' ) ) {
 			return true;
 		}
 
 		$this->add_error_notice(
-			"PHP {$this->dependencies['min_php_version']} is required.",
-			"You're running version " . PHP_VERSION
+			sprintf('PHP %s is required.', $this->dependencies->get('min_php_version')),
+			sprintf("You're running version %s", PHP_VERSION)
 		);
 
 		return false;
@@ -113,16 +99,16 @@ class Dependencies implements ParameterInterface
 	{
 		global $wp_version;
 
-		if (!isset($this->dependencies['min_wp_version'])) {
+		if (null === $this->dependencies->get('min_wp_version')) {
 			return true;
 		}
 
-		if ( 1 == version_compare( $wp_version, $this->dependencies['min_wp_version'], '>=' )) {
+		if ( 1 == version_compare( $wp_version, $this->dependencies->get('min_wp_version'), '>=' )) {
 			return true;
 		}
 
 		$this->add_error_notice(
-			"WordPress {$this->dependencies['min_wp_version']} is required.",
+			sprintf('WordPress %s is required.', $this->dependencies->get('min_wp_version')),
 			"You're running version $wp_version"
 		);
 
@@ -149,15 +135,15 @@ class Dependencies implements ParameterInterface
 	{
 		$plugin_dependency_met = true;
 
-		if (empty($this->dependencies['plugins'])) {
+		if (empty($this->dependencies->get('plugins'))) {
 			return true;
 		}
 
-		$installed_plugins = array_filter($this->dependencies['plugins'], function(string $slug) {
+		$installed_plugins = array_filter($this->dependencies->get('plugins'), function(string $slug) {
 			return $this->is_plugin_active($slug);
 		});
 
-		if (count($installed_plugins) !== count($this->dependencies['plugins'])) {
+		if (count($installed_plugins) !== count($this->dependencies->get('plugins'))) {
 			$plugin_dependency_met = false;
 		}
 
@@ -166,9 +152,10 @@ class Dependencies implements ParameterInterface
 
 	private function add_error_notice(string $message, string $info)
 	{
-		$this->errors[] = (object) [
+		$key = count($this->errors);
+		$this->errors->set((string) $key, (object) [
 			'error_message' => $message,
 			'info' => $info
-		];
+		]);
 	}
 }

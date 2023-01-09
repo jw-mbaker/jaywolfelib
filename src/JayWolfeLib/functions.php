@@ -4,7 +4,7 @@ namespace JayWolfeLib;
 
 use JayWolfeLib\Component\Config\ConfigInterface;
 use JayWolfeLib\Component\Config\Config;
-use JayWolfeLib\Exception\InvalidConfig;
+use JayWolfeLib\Exception\InvalidConfigException;
 
 /**
  * Helper function for installing plugins.
@@ -27,7 +27,7 @@ function install($config)
 	}
 
 	if (null === $config->get('db')) {
-		throw new InvalidConfig(
+		throw new InvalidConfigException(
 			sprintf('"db" option not set for %s.', plugin_basename($config->get('plugin_file')))
 		);
 	}
@@ -69,7 +69,7 @@ function update_db_check($config): void
 	}
 
 	if (null === $config->get('db')) {
-		throw new InvalidConfig(
+		throw new InvalidConfigException(
 			sprintf('"db" option not set for %s.', plugin_basename($config->get('plugin_file')))
 		);
 	}
@@ -122,7 +122,7 @@ function fetch_array(string $file, ConfigInterface $config = null): array
 		$dir = trailingslashit( dirname($file) );
 	} else {
 		if (!isset($config->get('paths')['arrays'])) {
-			throw new InvalidConfig(
+			throw new InvalidConfigException(
 				sprintf('Array path not set for %s.', plugin_basename($config->get('plugin_file')))
 			);
 		}

@@ -4,8 +4,7 @@ namespace JayWolfeLib\Views;
 
 use JayWolfeLib\Component\Config\ConfigInterface;
 use JayWolfeLib\Component\Config\ConfigTrait;
-use JayWolfeLib\Hooks\Hooks;
-use JayWolfeLib\Exception\InvalidTemplate;
+use JayWolfeLib\Exception\InvalidTemplateException;
 
 class View implements ViewInterface
 {
@@ -60,7 +59,7 @@ class View implements ViewInterface
 
 		if ($this->config instanceof ConfigInterface) {
 			if (empty($this->config->get('paths')['templates'])) {
-				throw new InvalidTemplate('Template path not set for ' . $this->config->get('plugin_file') . '.');
+				throw new InvalidTemplateException('Template path not set for ' . $this->config->get('plugin_file') . '.');
 			}
 	
 			$template_path ??= $this->config->get('paths')['templates'];
