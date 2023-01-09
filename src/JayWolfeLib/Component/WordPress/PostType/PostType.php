@@ -14,7 +14,7 @@ class PostType implements PostTypeInterface
 	 * @param string $post_type
 	 * @param array $args
 	 */
-	public function __construct(string $post_type, array $args = self::DEFAULTS[self::ARGS])
+	public function __construct(string $post_type, array $args = [])
 	{
 		$this->post_type = $post_type;
 		$this->args = $args;

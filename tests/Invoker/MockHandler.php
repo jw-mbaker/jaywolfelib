@@ -3,31 +3,29 @@
 namespace JayWolfeLib\Tests\Invoker;
 
 use JayWolfeLib\Invoker\HandlerInterface;
+use JayWolfeLib\Invoker\CallableTrait;
+use JayWolfeLib\Entity\AbstractObjectHash;
+use JayWolfeLib\Entity\EntityInterface;
 use Invoker\InvokerInterface;
 
 class MockHandler implements HandlerInterface
 {
+	use CallableTrait;
+
+	public const NAME = 'name';
+
 	public const DEFAULTS = [
 		self::MAP => []
 	];
 
-	private $callable;
-	private array $map;
+	private $id;
+	private string $name;
 
-	public function __construct($callable, array $map = [])
+	public function __construct(string $name, $callable, array $map = [])
 	{
+		$this->name = $name;
 		$this->callable = $callable;
 		$this->map = $map;
-	}
-
-	public function callable()
-	{
-		return $this->callable;
-	}
-
-	public function map(): array
-	{
-		return $this->map;
 	}
 
 	public function __invoke(InvokerInterface $invoker, ...$args)
@@ -35,11 +33,22 @@ class MockHandler implements HandlerInterface
 		return $invoker->call($this->callable, $args);
 	}
 
+	public function id(): EntityInterface
+	{
+		return $this->id ??= new class($this) extends AbstractObjectHash {};
+	}
+
+	public function name(): string
+	{
+		return $this->name;
+	}
+
 	public static function create(array $args): self
 	{
 		$args = array_merge(self::DEFAULTS, $args);
 
 		return new self(
+			$args[self::NAME],
 			$args[self::CALLABLE],
 			$args[self::MAP]
 		);

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JayWolfeLib\Tests;
 
@@ -7,18 +7,23 @@ use JayWolfeLib\Component\Config\ConfigCollection;
 use JayWolfeLib\Component\Config\ConfigInterface;
 use JayWolfeLib\Component\WordPress\Filter\FilterCollection;
 use JayWolfeLib\Component\WordPress\Filter\HookInterface;
+use JayWolfeLib\Component\WordPress\Filter\Filter;
 use JayWolfeLib\Component\WordPress\PostType\PostTypeCollection;
 use JayWolfeLib\Component\WordPress\PostType\PostTypeInterface;
+use JayWolfeLib\Component\WordPress\PostType\PostType;
 use JayWolfeLib\Component\WordPress\AdminMenu\MenuCollection;
 use JayWolfeLib\Component\WordPress\AdminMenu\MenuPageInterface;
 use JayWolfeLib\Component\WordPress\AdminMenu\MenuPage;
 use JayWolfeLib\Component\WordPress\AdminMenu\SubMenuPage;
 use JayWolfeLib\Component\WordPress\Widget\WidgetCollection;
 use JayWolfeLib\Component\WordPress\Widget\WidgetInterface;
+use JayWolfeLib\Component\WordPress\Widget\Widget;
 use JayWolfeLib\Component\WordPress\MetaBox\MetaBoxCollection;
 use JayWolfeLib\Component\WordPress\MetaBox\MetaBoxInterface;
+use JayWolfeLib\Component\WordPress\MetaBox\MetaBox;
 use JayWolfeLib\Component\WordPress\Shortcode\ShortcodeCollection;
 use JayWolfeLib\Component\WordPress\Shortcode\ShortcodeInterface;
+use JayWolfeLib\Component\WordPress\Shortcode\Shortcode;
 use JayWolfeLib\Tests\Traits\DevContainerTrait;
 use DI\ContainerBuilder;
 use Psr\Container\ContainerInterface;
@@ -166,28 +171,27 @@ class JayWolfeLibTest extends \WP_Mock\Tools\TestCase
 		$jwlib = new JayWolfeLib($this->containerBuilder);
 
 		WP_Mock::onAction('jwlib_container_definitions')
-		->with($this->containerBuilder)
-		->perform(function() use ($collection) {
-			$this->containerBuilder->addDefinitions([
-				FilterCollection::class => $collection
-			]);
-		});
+			->with($this->containerBuilder)
+			->perform(function() use ($collection) {
+				$this->containerBuilder->addDefinitions([
+					FilterCollection::class => $collection
+				]);
+			});
 
-		$hook = Mockery::mock(HookInterface::class);
-		$hook->expects()->hook()->andReturn('test');
-		$hook->expects()->id()->twice()->andReturn(spl_object_hash($hook));
-		$hook->expects()->get('priority')->andReturn(10);
-		$hook->expects()->get('num_args')->andReturn(1);
+		$filter = Filter::create([
+			Filter::HOOK => 'test',
+			Filter::CALLABLE => function() {}
+		]);
 
 		WP_Mock::onAction('jwlib_hooks')
 			->with($collection)
-			->perform(function() use ($collection, $hook) {
-				$collection->add_filter($hook);
+			->perform(function() use ($collection, $filter) {
+				$collection->add_filter($filter);
 			});
 
 		$jwlib->init();
 
-		$this->assertInstanceOf(HookInterface::class, $collection->get(spl_object_hash($hook)));
+		$this->assertInstanceOf(HookInterface::class, $collection->get_by_id($filter->id()));
 	}
 
 	/**
@@ -209,10 +213,7 @@ class JayWolfeLibTest extends \WP_Mock\Tools\TestCase
 		WP_Mock::userFunction('register_post_type', ['times' => 1]);
 		WP_Mock::userFunction('is_wp_error', ['times' => 1, 'return' => false]);
 
-		$post_type = Mockery::mock(PostTypeInterface::class);
-		$post_type->expects()->id()->andReturn(spl_object_hash($post_type));
-		$post_type->expects()->post_type()->andReturn('test');
-		$post_type->expects()->args()->andReturn([]);
+		$post_type = new PostType('test');
 
 		WP_Mock::onAction('jwlib_post_types')
 			->with($collection)
@@ -222,7 +223,7 @@ class JayWolfeLibTest extends \WP_Mock\Tools\TestCase
 
 		$jwlib->init();
 
-		$this->assertInstanceOf(PostTypeInterface::class, $collection->get(spl_object_hash($post_type)));
+		$this->assertInstanceOf(PostTypeInterface::class, $collection->get_by_id($post_type->id()));
 	}
 
 	/**
@@ -244,14 +245,10 @@ class JayWolfeLibTest extends \WP_Mock\Tools\TestCase
 		WP_Mock::expectActionAdded('admin_menu', '__CLOSURE__');
 		WP_Mock::userFunction('add_menu_page', ['times' => 1, 'return' => '']);
 
-		$mp = Mockery::mock(MenuPage::class);
-		$mp->expects()->id()->twice()->andReturn(spl_object_hash($mp));
-		$mp->expects()->get('page_title')->andReturn('test');
-		$mp->expects()->get('menu_title')->andReturn('test');
-		$mp->expects()->get('capability')->andReturn('administrator');
-		$mp->expects()->slug()->andReturn('test');
-		$mp->expects()->get('icon_url')->andReturn('');
-		$mp->expects()->get('position')->andReturn(null);
+		$mp = MenuPage::create([
+			MenuPage::SLUG => 'test',
+			MenuPage::CALLABLE => function() {}
+		]);
 
 		WP_Mock::onAction('jwlib_admin_menu')
 			->with($collection)
@@ -261,7 +258,7 @@ class JayWolfeLibTest extends \WP_Mock\Tools\TestCase
 
 		do_action('jwlib_admin_menu', $jwlib->get_container()->get(MenuCollection::class));
 
-		$this->assertInstanceOf(MenuPage::class, $collection->get(spl_object_hash($mp)));
+		$this->assertInstanceOf(MenuPage::class, $collection->get_by_id($mp->id()));
 	}
 
 	/**
@@ -283,14 +280,11 @@ class JayWolfeLibTest extends \WP_Mock\Tools\TestCase
 		WP_Mock::expectActionAdded('admin_menu', '__CLOSURE__');
 		WP_Mock::userFunction('add_submenu_page', ['times' => 1, 'return' => '']);
 
-		$smp = Mockery::mock(SubMenuPage::class);
-		$smp->expects()->id()->twice()->andReturn(spl_object_hash($smp));
-		$smp->expects()->parent_slug()->andReturn('parent-test');
-		$smp->expects()->get('page_title')->andReturn('test');
-		$smp->expects()->get('menu_title')->andReturn('test');
-		$smp->expects()->get('capability')->andReturn('administrator');
-		$smp->expects()->slug()->andReturn('test');
-		$smp->expects()->get('position')->andReturn(null);
+		$smp = SubMenuPage::create([
+			SubMenuPage::SLUG => 'test',
+			SubMenuPage::PARENT_SLUG => 'parent-test',
+			SubMenuPage::CALLABLE => function() {}
+		]);
 
 		WP_Mock::onAction('jwlib_admin_menu')
 			->with($collection)
@@ -300,7 +294,7 @@ class JayWolfeLibTest extends \WP_Mock\Tools\TestCase
 
 		do_action('jwlib_admin_menu', $jwlib->get_container()->get(MenuCollection::class));
 
-		$this->assertInstanceOf(SubMenuPage::class, $collection->get(spl_object_hash($smp)));
+		$this->assertInstanceOf(SubMenuPage::class, $collection->get_by_id($smp->id()));
 	}
 
 	/**
@@ -322,9 +316,7 @@ class JayWolfeLibTest extends \WP_Mock\Tools\TestCase
 		WP_Mock::expectActionAdded('widgets_init', '__CLOSURE__');
 		WP_Mock::userFunction('register_widget', ['times' => 1, 'args' => [\WP_Widget::class]]);
 
-		$widget = Mockery::mock(WidgetInterface::class);
-		$widget->expects()->id()->andReturn(spl_object_hash($widget));
-		$widget->expects()->widget()->andReturn(\WP_Widget::class);
+		$widget = new Widget(Mockery::mock(\WP_Widget::class));
 
 		WP_Mock::onAction('jwlib_register_widgets')
 			->with($collection)
@@ -334,7 +326,7 @@ class JayWolfeLibTest extends \WP_Mock\Tools\TestCase
 
 		do_action('jwlib_register_widgets', $jwlib->get_container()->get(WidgetCollection::class));
 
-		$this->assertInstanceOf(WidgetInterface::class, $collection->get(spl_object_hash($widget)));
+		$this->assertInstanceOf(WidgetInterface::class, $collection->get_by_id($widget->id()));
 	}
 
 	/**
@@ -356,14 +348,11 @@ class JayWolfeLibTest extends \WP_Mock\Tools\TestCase
 		WP_Mock::expectActionAdded('add_meta_boxes', '__CLOSURE__');
 		WP_Mock::userFunction('add_meta_box', ['times' => 1]);
 
-		$mb = Mockery::mock(MetaBoxInterface::class);
-		$mb->expects()->id()->twice()->andReturn(spl_object_hash($mb));
-		$mb->expects()->meta_id()->andReturn('test');
-		$mb->expects()->title()->andReturn('test');
-		$mb->expects()->get('screen')->andReturn(null);
-		$mb->expects()->get('context')->andReturn('advanced');
-		$mb->expects()->get('priority')->andReturn('default');
-		$mb->expects()->get('callback_args')->andReturn([]);
+		$mb = MetaBox::create([
+			MetaBox::META_ID => 'test',
+			MetaBox::TITLE => 'test',
+			MetaBox::CALLABLE => function() {}
+		]);
 
 		WP_Mock::onAction('jwlib_meta_boxes')
 			->with($collection)
@@ -373,7 +362,7 @@ class JayWolfeLibTest extends \WP_Mock\Tools\TestCase
 
 		do_action('jwlib_meta_boxes', $jwlib->get_container()->get(MetaBoxCollection::class));
 
-		$this->assertInstanceOf(MetaBoxInterface::class, $collection->get(spl_object_hash($mb)));
+		$this->assertInstanceOf(MetaBoxInterface::class, $collection->get_by_id($mb->id()));
 	}
 
 	/**
@@ -394,9 +383,10 @@ class JayWolfeLibTest extends \WP_Mock\Tools\TestCase
 
 		WP_Mock::userFunction('add_shortcode', ['times' => 1]);
 
-		$shortcode = Mockery::mock(ShortcodeInterface::class);
-		$shortcode->expects()->id()->twice()->andReturn(spl_object_hash($shortcode));
-		$shortcode->expects()->tag()->andReturn('test');
+		$shortcode = Shortcode::create([
+			Shortcode::TAG => 'test',
+			Shortcode::CALLABLE => function() {}
+		]);
 
 		WP_Mock::onAction('jwlib_shortcodes')
 			->with($collection)
@@ -404,7 +394,7 @@ class JayWolfeLibTest extends \WP_Mock\Tools\TestCase
 
 		$jwlib->init();
 
-		$this->assertInstanceOf(ShortcodeInterface::class, $collection->get(spl_object_hash($shortcode)));
+		$this->assertInstanceOf(ShortcodeInterface::class, $collection->get_by_id($shortcode->id()));
 	}
 
 	public function testShouldThrowExceptionOnInit()

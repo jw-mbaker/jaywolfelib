@@ -18,23 +18,14 @@ class HandlerInterfaceTest extends \WP_Mock\Tools\TestCase
 	/**
 	 * @group handler
 	 */
-	public function testCanAutowireInvoker()
-	{
-		$handler = new MockHandler(function(string $test) {
-			$this->assertEquals($test, '123');
-		});
-
-		$this->container->call($handler, [\DI\get(InvokerInterface::class), '123']);
-	}
-
-	/**
-	 * @group handler
-	 */
 	public function testCanPassContainerAsInvoker()
 	{
-		$handler = new MockHandler(function(string $test) {
-			$this->assertEquals($test, 'abc');
-		});
+		$handler = MockHandler::create([
+			MockHandler::NAME => 'test',
+			MockHandler::CALLABLE => function(string $test) {
+				$this->assertSame('abc', $test);
+			}
+		]);
 
 		$this->container->call($handler, [$this->container, 'abc']);
 	}
@@ -44,12 +35,15 @@ class HandlerInterfaceTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testCanPassMultipleValuesToCallable()
 	{
-		$handler = new MockHandler(function(string $test1, int $test2, float $test3) {
-			$this->assertEquals($test1, '123');
-			$this->assertEquals($test2, 123);
-			$this->assertEquals($test3, 1.23);
-		});
+		$handler = MockHandler::create([
+			MockHandler::NAME => 'test',
+			MockHandler::CALLABLE => function(string $test1, int $test2, float $test3) {
+				$this->assertSame('123', $test1);
+				$this->assertSame(123, $test2);
+				$this->assertSame(1.23, $test3);
+			}
+		]);
 
-		$this->container->call($handler, [\DI\get(InvokerInterface::class), '123', 123, 1.23]);
+		$this->container->call($handler, [$this->container, '123', 123, 1.23]);
 	}
 }

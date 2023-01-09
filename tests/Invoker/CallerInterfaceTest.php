@@ -10,24 +10,25 @@ class CallerInterfaceTest extends \WP_Mock\Tools\TestCase
 {
 	use DevContainerTrait;
 
-	private MockCaller $caller;
+	private MockHandlerCollection $collection;
 
 	public function setUp(): void
 	{
 		$this->container = $this->createDevContainer();
-		$this->caller = $this->container->get(MockCaller::class);
+		$this->collection = new MockHandlerCollection($this->container);
 	}
 
 	/**
 	 * @group caller
 	 * @group handler
 	 */
-	public function testCanAddAndGetHandler()
+	public function testCanAddHandler()
 	{
-		$handler = new MockHandler(function() {});
-		$this->caller->addHandler('test', $handler);
+		$handler = $this->createMockHandler();
 
-		$this->assertSame($handler, $this->caller->getHandler('test'));
+		$this->collection->addHandler($handler);
+
+		$this->assertSame($handler, $this->collection->get_by_id($handler->id()));
 	}
 
 	/**
@@ -36,50 +37,75 @@ class CallerInterfaceTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testCanInvokeHandler()
 	{
-		$handler = new MockHandler(function(string $test) {
-			$this->assertEquals($test, '123');
-		});
+		$handler = MockHandler::create([
+			MockHandler::NAME => 'test',
+			MockHandler::CALLABLE => function(string $test) {
+				$this->assertSame('123', $test);
+			}
+		]);
 
-		$this->caller->addHandler('test', $handler);
+		$this->collection->addHandler($handler);
 
-		call_user_func([$this->caller, 'test'], '123');
+		call_user_func([$this->collection, (string) $handler->id()], '123');
 	}
 
 	/**
 	 * @group caller
 	 * @group handler
+	 * @dataProvider handlerProvider
 	 */
-	public function testCanInvokeMultipleHandlers()
+	public function testCanInvokeMultipleHandlers(array $handlers)
 	{
-		$handlers = [
-			'test1' => new MockHandler(function (string $test) {
-				$this->assertEquals($test, '123');
-			}),
-			'test2' => new MockHandler(function (string $str, bool $bool) {
-				$this->assertEquals($str, 'test');
-				$this->assertFalse($bool);
-			}),
-			'test3' => new MockHandler(function (float $float, int $int) {
-				$this->assertEquals($float, 1.2);
-				$this->assertEquals($int, 345);
-			}),
-			'test4' => new MockHandler(function (MockTypeHint $th, $test) {
-				$this->assertEquals($test, 'test');
-			}, ['map' => [\DI\get(MockTypeHint::class)]]),
-			'test5' => new MockHandler(function (MockTypeHint $th) {
-				$this->assertInstanceOf(MockTypeHint::class, $th);
-			})
-		];
-
-		foreach ($handlers as $key => $handler) {
-			$this->caller->addHandler($key, $handler);
+		foreach ($handlers as $handler) {
+			$this->collection->addHandler($handler);
 		}
 
-		call_user_func([$this->caller, 'test1'], '123');
-		call_user_func([$this->caller, 'test2'], 'test', false);
-		call_user_func([$this->caller, 'test3'], 1.2, 345);
-		call_user_func([$this->caller, 'test4'], 'test');
-		call_user_func([$this->caller, 'test5']);
+		call_user_func([$this->collection, (string) $handlers[0]->id()], '123');
+		call_user_func([$this->collection, (string) $handlers[1]->id()], 'test', false);
+		call_user_func([$this->collection, (string) $handlers[2]->id()], 1.2, 345);
+		call_user_func([$this->collection, (string) $handlers[3]->id()], 'test');
+		call_user_func([$this->collection, (string) $handlers[4]->id()]);
+	}
+
+	public function handlerProvider(): array
+	{
+		$handlers = [
+			MockHandler::create([
+				MockHandler::NAME => 'test1',
+				MockHandler::CALLABLE => function(string $test) {
+					$this->assertSame('123', $test);
+				}
+			]),
+			MockHandler::create([
+				MockHandler::NAME => 'test2',
+				MockHandler::CALLABLE => function(string $str, bool $bool) {
+					$this->assertSame('test', $str);
+					$this->assertFalse($bool);
+				}
+			]),
+			MockHandler::create([
+				MockHandler::NAME => 'test3',
+				MockHandler::CALLABLE => function(float $float, int $int) {
+					$this->assertSame(1.2, $float);
+					$this->assertSame(345, $int);
+				}
+			]),
+			MockHandler::create([
+				MockHandler::NAME => 'test4',
+				MockHandler::CALLABLE => function(MockTypeHint $th, string $test) {
+					$this->assertSame('test', $test);
+				},
+				MockHandler::MAP => [\DI\get(MockTypeHint::class)]
+			]),
+			MockHandler::create([
+				MockHandler::NAME => 'test5',
+				MockHandler::CALLABLE => function(MockTypeHint $th) {
+					$this->assertInstanceOf(MockTypeHint::class, $th);
+				}
+			])
+		];
+
+		return [ [ $handlers ] ];
 	}
 
 	/**
@@ -88,28 +114,43 @@ class CallerInterfaceTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testCanUseTypeHint()
 	{
-		$handler = new MockHandler(function (MockTypeHint $class) {
-			$this->assertInstanceOf(MockTypeHint::class, $class);
-		});
+		$handler = MockHandler::create([
+			MockHandler::NAME => 'test',
+			MockHandler::CALLABLE => function(MockTypeHint $class) {
+				$this->assertInstanceOf(MockTypeHint::class, $class);
+			}
+		]);
 
-		$this->caller->addHandler('test', $handler);
+		$this->collection->addHandler($handler);
 
-		call_user_func([$this->caller, 'test']);
+		call_user_func([$this->collection, (string) $handler->id()]);
 	}
 
 	/**
 	 * @group caller
 	 * @group handler
 	 */
-	public function testCanMixValuesAndTypeHints()
+	public function testCanMixScalarValuesAndTypeHints()
 	{
-		$handler = new MockHandler(function (MockTypeHint $class, string $str) {
-			$this->assertInstanceOf(MockTypeHint::class, $class);
-			$this->assertEquals('test', $str);
-		}, ['map' => [\DI\get(MockTypeHint::class)]]);
+		$handler = MockHandler::create([
+			MockHandler::NAME => 'test',
+			MockHandler::CALLABLE => function(MockTypeHint $class, string $str) {
+				$this->assertInstanceOf(MockTypeHint::class, $class);
+				$this->assertSame('test', $str);
+			},
+			MockHandler::MAP => [\DI\get(MockTypeHint::class)]
+		]);
 
-		$this->caller->addHandler('test', $handler);
+		$this->collection->addHandler($handler);
 
-		call_user_func([$this->caller, 'test'], 'test');
+		call_user_func([$this->collection, (string) $handler->id()], 'test');
+	}
+
+	private function createMockHandler(): MockHandler
+	{
+		return MockHandler::create([
+			MockHandler::NAME => 'test',
+			MockHandler::CALLABLE => function() {}
+		]);
 	}
 }
