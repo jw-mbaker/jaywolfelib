@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JayWolfeLib\Component\Config;
 
@@ -9,7 +9,7 @@ class ConfigCollection extends AbstractCollection
 	/**
 	 * @var array<string, ConfigInterface>
 	 */
-	private $configs = [];
+	private array $configs = [];
 
 	public function add(string $name, ConfigInterface $config)
 	{
