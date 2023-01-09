@@ -40,7 +40,7 @@ class Shortcode implements ShortcodeInterface
 
 	public static function create(array $args): self
 	{
-		$args = array_merge(self::DEFAULTS, static::DEFAULTS, $args);
+		$args = array_merge(self::DEFAULTS, $args);
 
 		return new static(
 			$args[self::TAG],
