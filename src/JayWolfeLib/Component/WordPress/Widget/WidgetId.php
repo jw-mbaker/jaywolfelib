@@ -2,7 +2,7 @@
 
 namespace JayWolfeLib\Component\WordPress\Widget;
 
-use JayWolfeLib\Entity\AbstractObjectHash;
+use JayWolfeLib\ObjectHash\AbstractObjectHash;
 
 class WidgetId extends AbstractObjectHash
 {

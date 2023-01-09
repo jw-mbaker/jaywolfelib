@@ -2,7 +2,7 @@
 
 namespace JayWolfeLib\Component\WordPress\Shortcode;
 
-use JayWolfeLib\Entity\AbstractObjectHash;
+use JayWolfeLib\ObjectHash\AbstractObjectHash;
 
 class ShortcodeId extends AbstractObjectHash
 {

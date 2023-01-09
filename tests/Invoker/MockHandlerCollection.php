@@ -4,7 +4,7 @@ namespace JayWolfeLib\Tests\Invoker;
 
 use JayWolfeLib\Collection\AbstractInvokerCollection;
 use JayWolfeLib\Invoker\CallerInterface;
-use JayWolfeLib\Entity\EntityInterface;
+use JayWolfeLib\ObjectHash\AbstractObjectHash;
 use Invoker\InvokerInterface;
 
 class MockHandlerCollection extends AbstractInvokerCollection
@@ -22,7 +22,7 @@ class MockHandlerCollection extends AbstractInvokerCollection
 		return $this->handlers;
 	}
 
-	public function get_by_id(EntityInterface $id): ?MockHandler
+	public function get_by_id(AbstractObjectHash $id): ?MockHandler
 	{
 		return $this->handlers[(string) $id] ?? null;
 	}

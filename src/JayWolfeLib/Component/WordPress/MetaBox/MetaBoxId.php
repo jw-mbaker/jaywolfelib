@@ -2,7 +2,7 @@
 
 namespace JayWolfeLib\Component\WordPress\MetaBox;
 
-use JayWolfeLib\Entity\AbstractObjectHash;
+use JayWolfeLib\ObjectHash\AbstractObjectHash;
 
 class MetaBoxId extends AbstractObjectHash
 {

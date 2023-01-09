@@ -4,8 +4,7 @@ namespace JayWolfeLib\Tests\Invoker;
 
 use JayWolfeLib\Invoker\HandlerInterface;
 use JayWolfeLib\Invoker\CallableTrait;
-use JayWolfeLib\Entity\AbstractObjectHash;
-use JayWolfeLib\Entity\EntityInterface;
+use JayWolfeLib\ObjectHash\AbstractObjectHash;
 use Invoker\InvokerInterface;
 
 class MockHandler implements HandlerInterface
@@ -33,7 +32,7 @@ class MockHandler implements HandlerInterface
 		return $invoker->call($this->callable, $args);
 	}
 
-	public function id(): EntityInterface
+	public function id(): AbstractObjectHash
 	{
 		return $this->id ??= new class($this) extends AbstractObjectHash {};
 	}

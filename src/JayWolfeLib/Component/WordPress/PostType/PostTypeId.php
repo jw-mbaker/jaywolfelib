@@ -2,7 +2,7 @@
 
 namespace JayWolfeLib\Component\WordPress\PostType;
 
-use JayWolfeLib\Entity\AbstractObjectHash;
+use JayWolfeLib\ObjectHash\AbstractObjectHash;
 
 class PostTypeId extends AbstractObjectHash
 {

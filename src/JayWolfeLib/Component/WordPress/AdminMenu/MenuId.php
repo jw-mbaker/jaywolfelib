@@ -2,7 +2,7 @@
 
 namespace JayWolfeLib\Component\WordPress\AdminMenu;
 
-use JayWolfeLib\Entity\AbstractObjectHash;
+use JayWolfeLib\ObjectHash\AbstractObjectHash;
 
 class MenuId extends AbstractObjectHash
 {

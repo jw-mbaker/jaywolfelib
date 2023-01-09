@@ -2,7 +2,7 @@
 
 namespace JayWolfeLib\Component\WordPress\Filter;
 
-use JayWolfeLib\Entity\AbstractObjectHash;
+use JayWolfeLib\ObjectHash\AbstractObjectHash;
 
 class HookId extends AbstractObjectHash
 {
