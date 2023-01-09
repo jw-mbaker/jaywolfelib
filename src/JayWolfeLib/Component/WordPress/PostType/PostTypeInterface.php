@@ -1,10 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JayWolfeLib\Component\WordPress\PostType;
 
-use JayWolfeLib\Component\ObjectHash\ObjectHashInterface;
-
-interface PostTypeInterface extends ObjectHashInterface
+interface PostTypeInterface
 {
 	public function post_type(): string;
 	public function args(): array;

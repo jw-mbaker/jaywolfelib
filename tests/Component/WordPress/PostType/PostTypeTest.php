@@ -1,8 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JayWolfeLib\Tests\Component\WordPress\PostType;
 
 use JayWolfeLib\Component\WordPress\PostType\PostType;
+use JayWolfeLib\Component\WordPress\PostType\PostTypeId;
 use WP_Mock;
 
 class PostTypeTest extends \WP_Mock\Tools\TestCase
@@ -17,6 +18,10 @@ class PostTypeTest extends \WP_Mock\Tools\TestCase
 		WP_Mock::tearDown();
 	}
 
+	/**
+	 * @group post_type
+	 * @group wordpress
+	 */
 	public function testCanGetPostTypeAndArgs()
 	{
 		$post_type = new PostType('test', ['label' => 'test123']);
@@ -55,5 +60,18 @@ class PostTypeTest extends \WP_Mock\Tools\TestCase
 		]);
 
 		$post_type->register_taxonomy('test');
+	}
+
+	/**
+	 * @group post_type
+	 * @group wordpress
+	 */
+	public function testPostTypeIdMethodShouldReturnPostTypeId()
+	{
+		$post_type = new PostType('test', []);
+
+		$id = $post_type->id();
+		$this->assertInstanceOf(PostTypeId::class, $id);
+		$this->assertSame((string) $id, spl_object_hash($post_type));
 	}
 }

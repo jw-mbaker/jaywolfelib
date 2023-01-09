@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JayWolfeLib\Component\WordPress\PostType;
 
@@ -9,16 +9,16 @@ class PostTypeCollection extends AbstractCollection
 	/**
 	 * @var array<string, PostTypeInterface>
 	 */
-	private $post_types = [];
+	private array $post_types = [];
 
-	private function add(string $name, PostTypeInterface $post_type)
+	private function add(PostTypeInterface $post_type)
 	{
-		$this->post_types[$name] = $post_type;
+		$this->post_types[(string) $post_type->id()] = $post_type;
 	}
 
 	public function register_post_type(PostTypeInterface $post_type)
 	{
-		$this->add($post_type->id(), $post_type);
+		$this->add($post_type);
 		$thing = \register_post_type($post_type->post_type(), $post_type->args());
 
 		if (is_wp_error( $thing )) {
@@ -30,10 +30,10 @@ class PostTypeCollection extends AbstractCollection
 
 	public function unregister_post_type(string $object_type): bool
 	{
-		$post_type = $this->get_by_object_type($object_type);
+		$post_type = $this->get($object_type);
 
 		if (null !== $post_type) {
-			$this->remove($post_type->id());
+			$this->remove($post_type);
 			return true;
 		}
 
@@ -50,7 +50,7 @@ class PostTypeCollection extends AbstractCollection
 	public function register_taxonomy(string $taxonomy, $object_type, array $args = [])
 	{
 		foreach ((array) $object_type as $t) {
-			$post_type = $this->get_by_object_type($t);
+			$post_type = $this->get($t);
 			if (null === $post_type) continue;
 
 			$post_type->register_taxonomy($taxonomy, $args);
@@ -62,26 +62,9 @@ class PostTypeCollection extends AbstractCollection
 		return $this->post_types;
 	}
 
-	public function get(string $name): ?PostTypeInterface
+	public function get_by_id(PostTypeId $id): ?PostTypeInterface
 	{
-		return $this->post_types[$name] ?? null;
-	}
-
-	public function remove($name)
-	{
-		foreach ((array) $name as $n) {
-			$post_type = $this->post_types[$n];
-
-			$thing = unregister_post_type($post_type->post_type());
-
-			if (is_wp_error($thing)) {
-				throw new \Exception(
-					sprintf('Error removing post type %s', $post_type->post_type())
-				);
-			}
-
-			unset($this->post_types[$n]);
-		}
+		return $this->post_types[(string) $id] ?? null;
 	}
 
 	/**
@@ -90,7 +73,7 @@ class PostTypeCollection extends AbstractCollection
 	 * @param string $object_type
 	 * @return PostTypeInterface|null
 	 */
-	public function get_by_object_type(string $object_type): ?PostTypeInterface
+	public function get(string $object_type): ?PostTypeInterface
 	{
 		$post_type = array_reduce($this->post_types, function($carry, $item) use ($object_type) {
 			if (null !== $carry) return $carry;
@@ -99,5 +82,18 @@ class PostTypeCollection extends AbstractCollection
 		}, null);
 
 		return $post_type;
+	}
+
+	private function remove(PostTypeInterface $post_type)
+	{
+		$thing = unregister_post_type($post_type->post_type());
+
+		if (is_wp_error($thing)) {
+			throw new \Exception(
+				sprintf('Error removing post type %s', $post_type->post_type())
+			);
+		}
+
+		unset($this->post_types[(string) $post_type->id()]);
 	}
 }

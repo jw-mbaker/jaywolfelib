@@ -1,20 +1,12 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JayWolfeLib\Component\WordPress\PostType;
 
-use JayWolfeLib\Component\ObjectHash\ObjectHashTrait;
-
 class PostType implements PostTypeInterface
 {
-	use ObjectHashTrait;
-
-	public const TYPE = 'post_type';
-
-	/** @var string */
-	protected $post_type;
-
-	/** @var array */
-	protected $args;
+	protected PostTypeId $id;
+	protected string $post_type;
+	protected array $args;
 
 	/**
 	 * Constructor.
@@ -22,12 +14,15 @@ class PostType implements PostTypeInterface
 	 * @param string $post_type
 	 * @param array $args
 	 */
-	public function __construct(string $post_type, array $args = array())
+	public function __construct(string $post_type, array $args = self::DEFAULTS[self::ARGS])
 	{
 		$this->post_type = $post_type;
 		$this->args = $args;
+	}
 
-		$this->set_id_from_type(static::TYPE);
+	public function id(): PostTypeId
+	{
+		return $this->id ??= PostTypeId::fromPostType($this);
 	}
 
 	public function post_type(): string
