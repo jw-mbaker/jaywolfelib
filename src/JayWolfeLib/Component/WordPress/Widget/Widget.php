@@ -1,39 +1,56 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JayWolfeLib\Component\WordPress\Widget;
 
-use JayWolfeLib\Component\ObjectHash\ObjectHashTrait;
 use WP_Widget;
+use InvalidArgumentException;
 
 class Widget implements WidgetInterface
 {
-	use ObjectHashTrait;
-
-	public const TYPE = 'widget';
+	protected WidgetId $id;
 
 	/**
 	 * The widget.
 	 * 
 	 * @var string|WP_Widget
 	 */
-	protected $widget;
+	protected $wp_widget;
 
 	/**
 	 * Constructor.
 	 *
 	 * @param string|WP_Widget $widget
 	 */
-	public function __construct($widget)
+	public function __construct($wp_widget)
 	{
-		$this->widget = $widget;
-		$this->set_id_from_type(static::TYPE);
+		self::validate_wp_widget($wp_widget);
+
+		$this->wp_widget = $wp_widget;
+	}
+
+	public function id(): WidgetId
+	{
+		return $this->id ??= WidgetId::fromWidget($this);
 	}
 	
 	/**
 	 * @return string|WP_Widget
 	 */
-	public function widget()
+	public function wp_widget()
 	{
-		return $this->widget;
+		return $this->wp_widget;
+	}
+
+	/**
+	 * Validate the widget.
+	 *
+	 * @param mixed $wp_widget
+	 * @throws InvalidArgumentException
+	 */
+	private static function validate_wp_widget($wp_widget)
+	{
+		if (!is_string($wp_widget) && !$wp_widget instanceof WP_Widget) {
+			throw new InvalidArgumentException('$wp_widget must be a string or an instance of WP_Widget.');
+		}
 	}
 }

@@ -1,18 +1,19 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JayWolfeLib\Tests\Component\WordPress\Widget;
 
 use JayWolfeLib\Component\WordPress\Widget\WidgetCollection;
 use JayWolfeLib\Component\WordPress\Widget\WidgetInterface;
 use JayWolfeLib\Component\WordPress\Widget\Widget;
+use JayWolfeLib\Component\WordPress\Widget\WidgetId;
 use WP_Widget;
 use WP_Mock;
 use Mockery;
 
 class WidgetCollectionTest extends \WP_Mock\Tools\TestCase
 {
-	private $collection;
-	private $wp_widget;
+	private WidgetCollection $collection;
+	private WP_Widget $wp_widget;
 
 	public function setUp(): void
 	{
@@ -34,43 +35,31 @@ class WidgetCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testCanRegisterWidget()
 	{
-		$widget = Mockery::mock(WidgetInterface::class);
-		$widget->expects()->id()->andReturn(spl_object_hash($widget));
-		$widget->expects()->widget()->andReturn($this->wp_widget);
+		$widget = $this->createWidget();
 
-		WP_Mock::userFunction('register_widget', [
-			'args' => [$this->wp_widget],
-			'times' => 1
-		]);
+		$this->mockRegisterWidget();
 
 		$this->collection->register_widget($widget);
 		$this->assertContains($widget, $this->collection->all());
+		$this->assertSame($widget, $this->collection->get_by_id($widget->id()));
 	}
 
 	/**
 	 * @group widget
 	 * @group wordpress
 	 * @group collection
-	 * @depends testCanGetByWpWidget
+	 * @depends testCanGetWidget
 	 */
 	public function testCanUnregisterWidget()
 	{
-		$widget = Mockery::mock(WidgetInterface::class);
-		$widget->expects()->id()->twice()->andReturn(spl_object_hash($widget));
-		$widget->expects()->widget()->times(3)->andReturn($this->wp_widget);
+		$widget = $this->createWidget();
 
-		WP_Mock::userFunction('register_widget', [
-			'args' => [$this->wp_widget],
-			'times' => 1
-		]);
+		$this->mockRegisterWidget();
 
 		$this->collection->register_widget($widget);
 		$this->assertContains($widget, $this->collection->all());
 
-		WP_Mock::userFunction('unregister_widget', [
-			'args' => [$this->wp_widget],
-			'times' => 1
-		]);
+		$this->mockUnregisterWidget();
 
 		$bool = $this->collection->unregister_widget($this->wp_widget);
 		$this->assertTrue($bool);
@@ -82,21 +71,16 @@ class WidgetCollectionTest extends \WP_Mock\Tools\TestCase
 	 * @group wordpress
 	 * @group collection
 	 */
-	public function testCanGetByWpWidget()
+	public function testCanGetWidget()
 	{
-		$widget = Mockery::mock(WidgetInterface::class);
-		$widget->expects()->id()->andReturn(spl_object_hash($widget));
-		$widget->expects()->widget()->twice()->andReturn($this->wp_widget);
+		$widget = $this->createWidget();
 
-		WP_Mock::userFunction('register_widget', [
-			'args' => [$this->wp_widget],
-			'times' => 1
-		]);
+		$this->mockRegisterWidget();
 
 		$this->collection->register_widget($widget);
 		$this->assertContains($widget, $this->collection->all());
 
-		$obj = $this->collection->get_by_wp_widget($this->wp_widget);
+		$obj = $this->collection->get($this->wp_widget);
 		$this->assertInstanceOf(WidgetInterface::class, $obj);
 		$this->assertSame($obj, $widget);
 	}
@@ -106,9 +90,30 @@ class WidgetCollectionTest extends \WP_Mock\Tools\TestCase
 	 * @group wordpress
 	 * @group collection
 	 */
-	public function testGetByWpWidgetReturnsNullIfNotFound()
+	public function testGetWidgetReturnsNullIfNotFound()
 	{
-		$widget = $this->collection->get_by_wp_widget($this->wp_widget);
+		$widget = $this->collection->get($this->wp_widget);
 		$this->assertNull($widget);
+	}
+
+	private function createWidget(): WidgetInterface
+	{
+		return new Widget($this->wp_widget);
+	}
+
+	private function mockRegisterWidget(int $times = 1): void
+	{
+		WP_Mock::userFunction('register_widget', [
+			'args' => [$this->wp_widget],
+			'times' => $times
+		]);
+	}
+
+	private function mockUnregisterWidget(int $times = 1): void
+	{
+		WP_Mock::userFunction('unregister_widget', [
+			'args' => [$this->wp_widget],
+			'times' => $times
+		]);
 	}
 }

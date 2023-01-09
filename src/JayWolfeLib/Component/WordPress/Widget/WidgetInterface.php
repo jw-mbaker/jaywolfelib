@@ -2,10 +2,10 @@
 
 namespace JayWolfeLib\Component\WordPress\Widget;
 
-use JayWolfeLib\Component\ObjectHash\ObjectHashInterface;
+use WP_Widget;
 
-interface WidgetInterface extends ObjectHashInterface
+interface WidgetInterface
 {
-	/** @return string|\WP_Widget */
-	public function widget();
+	/** @return string|WP_Widget */
+	public function wp_widget();
 }
