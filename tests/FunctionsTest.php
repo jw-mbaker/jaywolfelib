@@ -399,29 +399,6 @@ class FunctionsTest extends \WP_Mock\Tools\TestCase
 		$this->assertArrayHasKey('test2', $arr);
 	}
 
-	public function testSnakeCase()
-	{
-		$str1 = 'HelloWorld';
-		$str2 = 'I Should Be Snake Case';
-		$str3 = 'test 123';
-
-		$this->assertEquals('hello_world', snake_case($str1));
-		$this->assertEquals('i_should_be_snake_case', snake_case($str2));
-		$this->assertEquals('test123', snake_case($str3));
-	}
-
-	private function fragmentCacheSetup()
-	{
-		WP_Mock::onFilter('fragment_cache_prefix')
-			->with('fragment_cache_')
-			->reply('fragment_cache_');
-
-		WP_Mock::userFunction('get_transient', [
-			'args' => 'fragment_cache_test',
-			'return' => 'test123'
-		]);
-	}
-
 	private function fetchArrayDir(): string
 	{
 		return MOCK_ARRAY_PATH;

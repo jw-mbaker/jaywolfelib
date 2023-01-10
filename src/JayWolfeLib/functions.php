@@ -236,14 +236,3 @@ function rrmdir(string $dir): void
 		rmdir($dir);
 	}
 }
-
-function snake_case(string $str, string $delimiter = '_'): string
-{
-	if (!ctype_lower($str)) {
-		$str = preg_replace('/\s+/u', '', ucwords($str));
-
-		$str = mb_strtolower(preg_replace('/(.)(?=[A-Z])/u', '$1' . $delimiter, $str));
-	}
-
-	return $str;
-}
