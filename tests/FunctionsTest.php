@@ -14,11 +14,12 @@ use function JayWolfeLib\rrmdir;
 use function JayWolfeLib\fetch_array;
 use function JayWolfeLib\fragment_cache;
 use function JayWolfeLib\delete_fragment_cache;
+use function JayWolfeLib\snake_case;
 
 use const JayWolfeLib\MOCK_PLUGIN_REL_PATH;
 use const JayWolfeLib\MOCK_ARRAY_PATH;
 
-class FunctionTest extends \WP_Mock\Tools\TestCase
+class FunctionsTest extends \WP_Mock\Tools\TestCase
 {
 	use MockConfigTrait;
 
@@ -396,6 +397,17 @@ class FunctionTest extends \WP_Mock\Tools\TestCase
 
 		$this->assertArrayHasKey('test', $arr);
 		$this->assertArrayHasKey('test2', $arr);
+	}
+
+	public function testSnakeCase()
+	{
+		$str1 = 'HelloWorld';
+		$str2 = 'I Should Be Snake Case';
+		$str3 = 'test 123';
+
+		$this->assertEquals('hello_world', snake_case($str1));
+		$this->assertEquals('i_should_be_snake_case', snake_case($str2));
+		$this->assertEquals('test123', snake_case($str3));
 	}
 
 	private function fragmentCacheSetup()

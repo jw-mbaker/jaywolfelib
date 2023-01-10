@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Entity;
+namespace JayWolfeLib\Database\Entity;
 
 interface EntityInterface
 {
-	public function get_id();
+
 }
