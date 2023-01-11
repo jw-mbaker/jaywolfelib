@@ -1,13 +1,13 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Component\WordPress\AdminMenu;
+namespace JayWolfeLib\WordPress\AdminMenu;
 
-use JayWolfeLib\ObjectHash\AbstractObjectHash;
+use JayWolfeLib\Common\ObjectHash\AbstractObjectHash;
 
 class MenuId extends AbstractObjectHash
 {
-	public static function fromMenuPage(MenuPageInterface $menu_page): self
+	public static function fromMenuPage(MenuPageInterface $menuPage): self
 	{
-		return new self($menu_page);
+		return new self($menuPage);
 	}
 }

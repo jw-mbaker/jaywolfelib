@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Component\WordPress\Filter;
+namespace JayWolfeLib\WordPress\Filter;
 
 use JayWolfeLib\Invoker\CallableTrait;
 use Invoker\InvokerInterface;
@@ -18,19 +18,19 @@ abstract class AbstractHook implements HookInterface
 	protected HookId $id;
 	protected string $hook;
 	protected int $priority;
-	protected int $num_args;
+	protected int $numArgs;
 
 	public function __construct(
 		string $hook,
 		$callable,
 		int $priority = self::DEFAULTS[self::PRIORITY],
-		int $num_args = self::DEFAULTS[self::NUM_ARGS],
+		int $numArgs = self::DEFAULTS[self::NUM_ARGS],
 		array $map = self::DEFAULTS[self::MAP]
 	) {
 		$this->hook = $hook;
 		$this->callable = $callable;
 		$this->priority = $priority;
-		$this->num_args = $num_args;
+		$this->numArgs = $numArgs;
 		$this->map = $map;
 	}
 
@@ -49,9 +49,9 @@ abstract class AbstractHook implements HookInterface
 		return $this->priority;
 	}
 
-	public function num_args(): int
+	public function numArgs(): int
 	{
-		return $this->num_args;
+		return $this->numArgs;
 	}
 
 	public function __invoke(InvokerInterface $invoker, ...$args)

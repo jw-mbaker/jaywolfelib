@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Component\WordPress\Shortcode;
+namespace JayWolfeLib\WordPress\Shortcode;
 
-use JayWolfeLib\ObjectHash\AbstractObjectHash;
+use JayWolfeLib\Common\ObjectHash\AbstractObjectHash;
 
 class ShortcodeId extends AbstractObjectHash
 {

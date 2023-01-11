@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Component\WordPress\Widget;
+namespace JayWolfeLib\WordPress\Widget;
 
-use JayWolfeLib\ObjectHash\AbstractObjectHash;
+use JayWolfeLib\Common\ObjectHash\AbstractObjectHash;
 
 class WidgetId extends AbstractObjectHash
 {

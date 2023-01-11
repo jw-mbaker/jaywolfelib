@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Component\WordPress\Filter;
+namespace JayWolfeLib\WordPress\Filter;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,20 +24,20 @@ class Api extends AbstractHook
 
 	private Request $request;
 	private string $method;
-	private ?string $api_key;
+	private ?string $apiKey;
 
 	public function __construct(
 		string $hook,
 		$callable,
 		string $method = self::DEFAULTS[self::METHOD],
 		Request $request = self::DEFAULTS[self::REQUEST],
-		?string $api_key = self::DEFAULTS[self::API_KEY],
+		?string $apiKey = self::DEFAULTS[self::API_KEY],
 		array $map = parent::DEFAULTS[self::MAP]
 	) {
 		parent::__construct($hook, $callable, parent::DEFAULTS[self::PRIORITY], parent::DEFAULTS[self::NUM_ARGS], $map);
 
 		$this->method = $method;
-		$this->api_key = $api_key;
+		$this->apiKey = $apiKey;
 
 		$this->request = $request ??= Request::createFromGlobals();
 	}
@@ -47,9 +47,9 @@ class Api extends AbstractHook
 		return $this->method;
 	}
 
-	public function api_key(): string
+	public function apiKey(): string
 	{
-		return $this->api_key;
+		return $this->apiKey;
 	}
 
 	public function __invoke(InvokerInterface $invoker, ...$arguments)
@@ -68,7 +68,7 @@ class Api extends AbstractHook
 			}
 		}
 
-		if (null !== $this->request->get('key') && $this->request->get('key') !== $this->api_key) {
+		if (null !== $this->request->get('key') && $this->request->get('key') !== $this->apiKey) {
 			return new JsonResponse(self::ACTION_NOT_RECOGNIZED, Response::HTTP_NOT_FOUND);
 		}
 

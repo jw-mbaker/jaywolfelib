@@ -9,10 +9,10 @@ class ViewFactory
 	public function make(
 		string $template,
 		array $args = [],
-		string $template_path = null,
-		ConfigInterface $config = null
+		?string $templatePath = null,
+		?ConfigInterface $config = null
 	): string {
 		$view = new View($config);
-		return $view->render($template, $args, $template_path);
+		return $view->render($template, $args, $templatePath);
 	}
 }

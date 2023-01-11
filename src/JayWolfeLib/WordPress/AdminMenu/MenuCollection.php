@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Component\WordPress\AdminMenu;
+namespace JayWolfeLib\WordPress\AdminMenu;
 
-use JayWolfeLib\Collection\AbstractInvokerCollection;
+use JayWolfeLib\Invoker\AbstractInvokerCollection;
 use Symfony\Component\HttpFoundation\Response;
 use Invoker\InvokerInterface;
 
@@ -11,26 +11,29 @@ class MenuCollection extends AbstractInvokerCollection
 	/**
 	 * @var array<string, MenuPageInterface>
 	 */
-	private array $menu_pages = [];
+	private array $menuPages = [];
 
-	private function add(MenuPageInterface $menu_page)
+	private function add(MenuPageInterface $menuPage)
 	{
-		$this->menu_pages[(string) $menu_page->id()] = $menu_page;
+		$this->menuPages[(string) $menuPage->id()] = $menuPage;
 	}
 
+	/**
+	 * @return array<string, MenuPageInterface>
+	 */
 	public function all(): array
 	{
-		return $this->menu_pages;
+		return $this->menuPages;
 	}
 
-	public function get_by_id(MenuId $id): ?MenuPageInterface
+	public function getById(MenuId $id): ?MenuPageInterface
 	{
-		return $this->menu_pages[(string) $id] ?? null;
+		return $this->menuPages[(string) $id] ?? null;
 	}
 
 	public function get(string $slug): ?MenuPageInterface
 	{
-		$menu_page = array_reduce($this->menu_pages, function($carry, $item) use ($slug) {
+		$menuPage = array_reduce($this->menuPages, function($carry, $item) use ($slug) {
 			if (null !== $carry) return $carry;
 
 			if ($slug === $item->slug()) {
@@ -40,7 +43,7 @@ class MenuCollection extends AbstractInvokerCollection
 			return null;
 		}, null);
 
-		return $menu_page;
+		return $menuPage;
 	}
 
 	/**
@@ -49,21 +52,21 @@ class MenuCollection extends AbstractInvokerCollection
 	 * @param string $slug
 	 * @return bool
 	 */
-	public function remove_menu_page(string $slug): bool
+	public function removeMenuPage(string $slug): bool
 	{		
-		$menu_page = $this->get($slug);
+		$menuPage = $this->get($slug);
 
-		if (null !== $menu_page) {
-			$this->remove($menu_page);
+		if (null !== $menuPage) {
+			$this->remove($menuPage);
 			return true;
 		}
 
 		return false;
 	}
 
-	public function remove_submenu_page(string $slug): bool
+	public function removeSubMenuPage(string $slug): bool
 	{
-		return $this->remove_menu_page($slug);
+		return $this->removeMenuPage($slug);
 	}
 
 	/**
@@ -71,18 +74,18 @@ class MenuCollection extends AbstractInvokerCollection
 	 *
 	 * @param MenuPageInterface $menu_page
 	 */
-	private function remove(MenuPageInterface $menu_page)
+	private function remove(MenuPageInterface $menuPage)
 	{
-		switch (get_class($menu_page)) {
+		switch (get_class($menuPage)) {
 			case MenuPage::class:
-				remove_menu_page($menu_page->slug());
+				remove_menu_page($menuPage->slug());
 				break;
 			case SubMenuPage::class:
-				remove_submenu_page($menu_page->parent_slug(), $menu_page->slug());
+				remove_submenu_page($menuPage->parent_slug(), $menuPage->slug());
 				break;
 		}
 		
-		unset($this->menu_pages[(string) $menu_page->id()]);
+		unset($this->menuPages[(string) $menuPage->id()]);
 	}
 
 	/**
@@ -90,43 +93,43 @@ class MenuCollection extends AbstractInvokerCollection
 	 * 
 	 * @return string
 	 */
-	public function menu_page(MenuPage $menu_page): string
+	public function menu_page(MenuPage $menuPage): string
 	{
-		$this->add($menu_page);
+		$this->add($menuPage);
 		return add_menu_page(
-			$menu_page->page_title(),
-			$menu_page->menu_title(),
-			$menu_page->capability(),
-			$menu_page->slug(),
-			[$this, (string) $menu_page->id()],
-			$menu_page->icon_url(),
-			$menu_page->position()
+			$menuPage->pageTitle(),
+			$menuPage->menuTitle(),
+			$menuPage->capability(),
+			$menuPage->slug(),
+			[$this, (string) $menuPage->id()],
+			$menuPage->icon_url(),
+			$menuPage->position()
 		);
 	}
 
 	/**
 	 * Add a sub-menu page.
 	 *
-	 * @param SubMenuPage $sub_menu_page
+	 * @param SubMenuPage $subMenuPage
 	 * @return string|false
 	 */
-	public function sub_menu_page(SubMenuPage $sub_menu_page)
+	public function subMenuPage(SubMenuPage $subMenuPage)
 	{
-		$this->add($sub_menu_page);
+		$this->add($subMenuPage);
 		return add_submenu_page(
-			$sub_menu_page->parent_slug(),
-			$sub_menu_page->page_title(),
-			$sub_menu_page->menu_title(),
-			$sub_menu_page->capability(),
-			$sub_menu_page->slug(),
-			[$this, (string) $sub_menu_page->id()],
-			$sub_menu_page->position()
+			$subMenuPage->parent_slug(),
+			$subMenuPage->page_title(),
+			$subMenuPage->menu_title(),
+			$subMenuPage->capability(),
+			$subMenuPage->slug(),
+			[$this, (string) $subMenuPage->id()],
+			$subMenuPage->position()
 		);
 	}
 
 	public function __call(string $name, array $arguments)
 	{
-		$response = $this->resolve($this->menu_pages[$name], $arguments);
+		$response = $this->resolve($this->menuPages[$name], $arguments);
 
 		if ($response instanceof Response) {
 			$response->send();

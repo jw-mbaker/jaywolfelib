@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Component\Config;
+namespace JayWolfeLib\Config;
 
 trait ConfigTrait
 {
@@ -17,7 +17,7 @@ trait ConfigTrait
 	 * @param ConfigInterface $config
 	 * @return void
 	 */
-	public function set_config(ConfigInterface $config)
+	public function setConfig(ConfigInterface $config)
 	{
 		$this->config = $config;
 	}
@@ -27,7 +27,7 @@ trait ConfigTrait
 	 *
 	 * @return ConfigInterface
 	 */
-	public function get_config(): ConfigInterface
+	public function getConfig(): ConfigInterface
 	{
 		return $this->config;
 	}

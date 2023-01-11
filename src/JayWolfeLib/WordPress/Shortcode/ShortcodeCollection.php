@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Component\WordPress\Shortcode;
+namespace JayWolfeLib\WordPress\Shortcode;
 
-use JayWolfeLib\Collection\AbstractInvokerCollection;
+use JayWolfeLib\Invoker\AbstractInvokerCollection;
 
 class ShortcodeCollection extends AbstractInvokerCollection
 {
@@ -21,10 +21,10 @@ class ShortcodeCollection extends AbstractInvokerCollection
 	 *
 	 * @param ShortcodeInterface $shortcode
 	 */
-	public function add_shortcode(ShortcodeInterface $shortcode)
+	public function addShortcode(ShortcodeInterface $shortcode)
 	{
 		$this->add($shortcode);
-		add_shortcode($shortcode->tag(), [$this, (string) $shortcode->id()]);
+		\add_shortcode($shortcode->tag(), [$this, (string) $shortcode->id()]);
 	}
 
 	/**
@@ -33,7 +33,7 @@ class ShortcodeCollection extends AbstractInvokerCollection
 	 * @param string $tag
 	 * @return bool
 	 */
-	public function remove_shortcode(string $tag): bool
+	public function removeShortcode(string $tag): bool
 	{
 		$shortcode = $this->get($tag);
 
@@ -50,7 +50,7 @@ class ShortcodeCollection extends AbstractInvokerCollection
 		return $this->shortcodes;
 	}
 
-	public function get_by_id(ShortcodeId $id): ?ShortcodeInterface
+	public function getById(ShortcodeId $id): ?ShortcodeInterface
 	{
 		return $this->shortcodes[(string) $id] ?? null;
 	}

@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Component\Config;
+namespace JayWolfeLib\Config;
 
-use JayWolfeLib\Collection\AbstractCollection;
+use JayWolfeLib\Common\Collection\AbstractCollection;
 
 class ConfigCollection extends AbstractCollection
 {

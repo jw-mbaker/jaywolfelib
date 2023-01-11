@@ -2,16 +2,16 @@
 
 namespace JayWolfeLib\Views;
 
-use JayWolfeLib\Component\Config\ConfigInterface;
+use JayWolfeLib\Config\ConfigInterface;
 
 interface ViewInterface
 {
 	public function render(
 		string $template,
 		array $args = [],
-		string $template_path = null
+		?string $templatePath = null
 	): string;
 
-	public function set_config(ConfigInterface $config);
-	public function get_config(): ConfigInterface;
+	public function setConfig(ConfigInterface $config);
+	public function getConfig(): ConfigInterface;
 }

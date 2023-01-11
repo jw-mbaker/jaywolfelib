@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Component\WordPress\MetaBox;
+namespace JayWolfeLib\WordPress\MetaBox;
 
 use JayWolfeLib\Invoker\CallableTrait;
 use Invoker\InvokerInterface;
@@ -20,7 +20,7 @@ class MetaBox implements MetaBoxInterface
 	];
 
 	protected MetaBoxId $id;
-	protected string $meta_id;
+	protected string $metaId;
 	protected string $title;
 
 	/**
@@ -32,39 +32,39 @@ class MetaBox implements MetaBoxInterface
 
 	protected string $context;
 	protected string $priority;
-	protected ?array $callback_args = null;
+	protected ?array $callbackArgs = null;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param string $meta_id
+	 * @param string $metaId
 	 * @param string $title
 	 * @param mixed $callable
 	 * @param string|array|WP_Screen|null $screen
 	 * @param string $context
 	 * @param string $pirority
-	 * @param array|null $callback_args
+	 * @param array|null $callbackArgs
 	 * @param array $map
 	 */
 	public function __construct(
-		string $meta_id,
+		string $metaId,
 		string $title,
 		$callable,
 		$screen = self::DEFAULTS[self::SCREEN],
 		string $context = self::DEFAULTS[self::CONTEXT],
 		string $pirority = self::DEFAULTS[self::PRIORITY],
-		?array $callback_args = self::DEFAULTS[self::CALLBACK_ARGS],
+		?array $callbackArgs = self::DEFAULTS[self::CALLBACK_ARGS],
 		array $map = self::DEFAULTS[self::MAP]
 	) {
 		self::validate_screen($screen);
 
-		$this->meta_id = $meta_id;
+		$this->metaId = $metaId;
 		$this->title = $title;
 		$this->callable = $callable;
 		$this->screen = $screen;
 		$this->context = $context;
 		$this->priority = $pirority;
-		$this->callback_args = $callback_args;
+		$this->callbackArgs = $callbackArgs;
 		$this->map = $map;
 	}
 
@@ -73,9 +73,9 @@ class MetaBox implements MetaBoxInterface
 		return $this->id ??= MetaBoxId::fromMetaBox($this);
 	}
 
-	public function meta_id(): string
+	public function metaId(): string
 	{
-		return $this->meta_id;
+		return $this->metaId;
 	}
 
 	public function title(): string
@@ -101,9 +101,9 @@ class MetaBox implements MetaBoxInterface
 		return $this->priority;
 	}
 
-	public function callback_args(): ?array
+	public function callbackArgs(): ?array
 	{
-		return $this->callback_args;
+		return $this->callbackArgs;
 	}
 
 	public function __invoke(InvokerInterface $invoker, ...$arguments)
@@ -133,7 +133,7 @@ class MetaBox implements MetaBoxInterface
 	 * @param mixed $screen
 	 * @throws InvalidArgumentException
 	 */
-	protected static function validate_screen($screen)
+	protected static function validateScreen($screen)
 	{
 		if (null !== $screen && !is_string($screen) && !is_array($screen) && !$screen instanceof WP_Screen) {
 			throw new InvalidArgumentException('Invalid value passed to $screen.');

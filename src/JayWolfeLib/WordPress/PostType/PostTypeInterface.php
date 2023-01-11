@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Component\WordPress\PostType;
+namespace JayWolfeLib\WordPress\PostType;
 
 interface PostTypeInterface
 {
-	public function post_type(): string;
+	public function postType(): string;
 	public function args(): array;
-	public function register_taxonomy(string $taxonomy, array $args = array());
+	public function registerTaxonomy(string $taxonomy, array $args = array());
 }

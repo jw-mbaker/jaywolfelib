@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Component\WordPress\AdminMenu;
+namespace JayWolfeLib\WordPress\AdminMenu;
 
 class MenuPage extends AbstractMenuPage
 {
@@ -10,25 +10,25 @@ class MenuPage extends AbstractMenuPage
 		self::ICON_URL => ''
 	];
 
-	private string $icon_url;
+	private string $iconUrl;
 
 	public function __construct(
 		string $slug,
 		$callable,
-		string $page_title = parent::DEFAULTS[self::PAGE_TITLE],
-		string $menu_title = parent::DEFAULTS[self::MENU_TITLE],
+		string $pageTitle = parent::DEFAULTS[self::PAGE_TITLE],
+		string $menuTitle = parent::DEFAULTS[self::MENU_TITLE],
 		string $capability = parent::DEFAULTS[self::CAPABILITY],
-		string $icon_url = self::DEFAULTS[self::ICON_URL],
+		string $iconUrl = self::DEFAULTS[self::ICON_URL],
 		$position = parent::DEFAULTS[self::POSITION],
 		array $map = parent::DEFAULTS[self::MAP]
 	) {
-		parent::__construct($slug, $callable, $page_title, $menu_title, $capability, $position, $map);
-		$this->icon_url = $icon_url;
+		parent::__construct($slug, $callable, $pageTitle, $menuTitle, $capability, $position, $map);
+		$this->iconUrl = $iconUrl;
 	}
 
-	public function icon_url(): string
+	public function iconUrl(): string
 	{
-		return $this->icon_url;
+		return $this->iconUrl;
 	}
 
 	public static function create(array $args): self

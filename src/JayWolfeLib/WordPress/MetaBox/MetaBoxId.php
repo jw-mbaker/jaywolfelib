@@ -1,13 +1,13 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Component\WordPress\MetaBox;
+namespace JayWolfeLib\WordPress\MetaBox;
 
-use JayWolfeLib\ObjectHash\AbstractObjectHash;
+use JayWolfeLib\Common\ObjectHash\AbstractObjectHash;
 
 class MetaBoxId extends AbstractObjectHash
 {
-	public static function fromMetaBox(MetaBoxInterface $meta_box): self
+	public static function fromMetaBox(MetaBoxInterface $metaBox): self
 	{
-		return new self($meta_box);
+		return new self($metaBox);
 	}
 }

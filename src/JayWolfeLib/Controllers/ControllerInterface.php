@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JayWolfeLib\Controllers;
 
-use JayWolfeLib\Component\Config\ConfigInterface;
+use JayWolfeLib\Config\ConfigInterface;
 
 /**
  * The controller interface.
@@ -16,7 +16,4 @@ interface ControllerInterface
 	 * @return mixed
 	 */
 	public function init();
-
-	public function set_config(ConfigInterface $config);
-	public function get_config(): ConfigInterface;
 }

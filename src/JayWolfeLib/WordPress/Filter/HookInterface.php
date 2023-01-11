@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Component\WordPress\Filter;
+namespace JayWolfeLib\WordPress\Filter;
 
 use JayWolfeLib\Invoker\HandlerInterface;
 
@@ -12,5 +12,5 @@ interface HookInterface extends HandlerInterface
 
 	public function hook(): string;
 	public function priority(): int;
-	public function num_args(): int;
+	public function numArgs(): int;
 }

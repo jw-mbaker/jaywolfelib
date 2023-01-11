@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Component\WordPress\Shortcode;
+namespace JayWolfeLib\WordPress\Shortcode;
 
 use JayWolfeLib\Invoker\HandlerInterface;
 

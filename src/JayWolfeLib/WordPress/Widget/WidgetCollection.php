@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Component\WordPress\Widget;
+namespace JayWolfeLib\WordPress\Widget;
 
-use JayWolfeLib\Collection\AbstractCollection;
+use JayWolfeLib\Common\Collection\AbstractCollection;
 use WP_Widget;
 
 class WidgetCollection extends AbstractCollection
@@ -17,15 +17,15 @@ class WidgetCollection extends AbstractCollection
 		$this->widgets[(string) $widget->id()] = $widget;
 	}
 
-	public function register_widget(WidgetInterface $widget)
+	public function registerWidget(WidgetInterface $widget)
 	{
 		$this->add($widget);
-		\register_widget($widget->wp_widget());
+		\register_widget($widget->wpWidget());
 	}
 
-	public function unregister_widget($wp_widget): bool
+	public function unregisterWidget($wpWidget): bool
 	{
-		$widget = $this->get($wp_widget);
+		$widget = $this->get($wpWidget);
 
 		if (null !== $widget) {
 			$this->remove($widget);
@@ -40,7 +40,7 @@ class WidgetCollection extends AbstractCollection
 		return $this->widgets;
 	}
 
-	public function get_by_id(WidgetId $id): ?WidgetInterface
+	public function getById(WidgetId $id): ?WidgetInterface
 	{
 		return $this->widgets[(string) $id] ?? null;
 	}
@@ -48,15 +48,15 @@ class WidgetCollection extends AbstractCollection
 	/**
 	 * Retrieve the widget object by the WP_Widget.
 	 *
-	 * @param string|WP_Widget $wp_widget
+	 * @param string|WP_Widget $wpWidget
 	 * @return WidgetInterface|null
 	 */
-	public function get($wp_widget): ?WidgetInterface
+	public function get($wpWidget): ?WidgetInterface
 	{
-		$widget = array_reduce($this->widgets, function($carry, $item) use ($wp_widget) {
+		$widget = array_reduce($this->widgets, function($carry, $item) use ($wpWidget) {
 			if (null !== $carry) return $carry;
 
-			return $item->wp_widget() === $wp_widget ? $item : null;
+			return $item->wpWidget() === $wpWidget ? $item : null;
 		}, null);
 
 		return $widget;
@@ -64,7 +64,7 @@ class WidgetCollection extends AbstractCollection
 
 	private function remove(WidgetInterface $widget)
 	{
-		\unregister_widget($widget->wp_widget());
+		\unregister_widget($widget->wpWidget());
 		unset($this->widgets[(string) $widget->id()]);
 	}
 }

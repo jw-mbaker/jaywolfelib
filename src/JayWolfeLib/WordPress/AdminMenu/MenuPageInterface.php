@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Component\WordPress\AdminMenu;
+namespace JayWolfeLib\WordPress\AdminMenu;
 
 use JayWolfeLib\Invoker\HandlerInterface;
 

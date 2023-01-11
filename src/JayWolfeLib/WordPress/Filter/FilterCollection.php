@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Component\WordPress\Filter;
+namespace JayWolfeLib\WordPress\Filter;
 
-use JayWolfeLib\Collection\AbstractInvokerCollection;
+use JayWolfeLib\Invoker\AbstractInvokerCollection;
 use Symfony\Component\HttpFoundation\Response;
 
 class FilterCollection extends AbstractInvokerCollection
@@ -17,23 +17,23 @@ class FilterCollection extends AbstractInvokerCollection
 		$this->hooks[(string) $hook->id()] = $hook;
 	}
 
-	public function add_filter(HookInterface $hook)
+	public function addFilter(HookInterface $hook)
 	{
 		$this->add($hook);
 		return add_filter(
 			$hook->hook(),
 			[$this, (string) $hook->id()],
 			$hook->priority(),
-			$hook->num_args()
+			$hook->numArgs()
 		);
 	}
 
-	public function add_action(HookInterface $hook)
+	public function addAction(HookInterface $hook)
 	{
-		return $this->add_filter($hook);
+		return $this->addFilter($hook);
 	}
 
-	public function remove_filter(string $hook, $callable, int $priority = 10): bool
+	public function removeFilter(string $hook, $callable, int $priority = 10): bool
 	{
 		$hooks = $this->get($hook, $callable, $priority);
 
@@ -45,9 +45,9 @@ class FilterCollection extends AbstractInvokerCollection
 		return false;
 	}
 
-	public function remove_action(string $hook, $callable, int $priority = 10): bool
+	public function removeAction(string $hook, $callable, int $priority = 10): bool
 	{
-		return $this->remove_filter($hook, $callable, $priority);
+		return $this->removeFilter($hook, $callable, $priority);
 	}
 
 	public function all(): array
@@ -55,7 +55,7 @@ class FilterCollection extends AbstractInvokerCollection
 		return $this->hooks;
 	}
 
-	public function get_by_id(HookId $id): ?HookInterface
+	public function getById(HookId $id): ?HookInterface
 	{
 		return $this->hooks[(string) $id] ?? null;
 	}

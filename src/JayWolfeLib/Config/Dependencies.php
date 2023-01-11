@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Component\Config;
+namespace JayWolfeLib\Config;
 
-use JayWolfeLib\Parameter\ParameterBag;
+use JayWolfeLib\Common\Parameter\ParameterBag;
 
 class Dependencies
 {
@@ -40,19 +40,19 @@ class Dependencies
 		return $this->dependencies->has($name);
 	}
 
-	public function requirements_met(): bool
+	public function requirementsMet(): bool
 	{
 		$requirements_met = true;
 
-		if (!$this->is_php_version_dependency_met()) {
+		if (!$this->isPhpVersionDependencyMet()) {
 			$requirements_met = false;
 		}
 
-		if (!$this->is_wp_version_dependency_met()) {
+		if (!$this->isWpVersionDependencyMet()) {
 			$requirements_met = false;
 		}
 
-		if (!$this->are_required_plugins_dependency_met()) {
+		if (!$this->areRequiredPluginsDependencyMet()) {
 			$requirements_met = false;
 		}
 
@@ -72,12 +72,12 @@ class Dependencies
 	/**
 	 * Get the errors.
 	 */
-	public function get_errors(): array
+	public function getErrors(): array
 	{
 		return $this->errors->all();
 	}
 
-	private function is_php_version_dependency_met(): bool
+	private function isPhpVersionDependencyMet(): bool
 	{
 		if (null === $this->dependencies->get('min_php_version')) {
 			return true;
@@ -87,7 +87,7 @@ class Dependencies
 			return true;
 		}
 
-		$this->add_error_notice(
+		$this->addErrorNotice(
 			sprintf('PHP %s is required.', $this->dependencies->get('min_php_version')),
 			sprintf("You're running version %s", PHP_VERSION)
 		);
@@ -95,7 +95,7 @@ class Dependencies
 		return false;
 	}
 
-	private function is_wp_version_dependency_met(): bool
+	private function isWpVersionDependencyMet(): bool
 	{
 		global $wp_version;
 
@@ -107,7 +107,7 @@ class Dependencies
 			return true;
 		}
 
-		$this->add_error_notice(
+		$this->addErrorNotice(
 			sprintf('WordPress %s is required.', $this->dependencies->get('min_wp_version')),
 			"You're running version $wp_version"
 		);
@@ -115,7 +115,7 @@ class Dependencies
 		return false;
 	}
 
-	private function is_plugin_active(string $slug): bool
+	private function isPluginActive(string $slug): bool
 	{
 		require_once ABSPATH . '/wp-admin/includes/plugin.php';
 
@@ -123,7 +123,7 @@ class Dependencies
 			return true;
 		}
 
-		$this->add_error_notice(
+		$this->addErrorNotice(
 			"$slug is a required plugin.",
 			"$slug needs to be installed and activated."
 		);
@@ -131,7 +131,7 @@ class Dependencies
 		return false;
 	}
 
-	private function are_required_plugins_dependency_met(): bool
+	private function areRequiredPluginsDependencyMet(): bool
 	{
 		$plugin_dependency_met = true;
 
@@ -140,7 +140,7 @@ class Dependencies
 		}
 
 		$installed_plugins = array_filter($this->dependencies->get('plugins'), function(string $slug) {
-			return $this->is_plugin_active($slug);
+			return $this->isPluginActive($slug);
 		});
 
 		if (count($installed_plugins) !== count($this->dependencies->get('plugins'))) {
@@ -150,7 +150,7 @@ class Dependencies
 		return $plugin_dependency_met;
 	}
 
-	private function add_error_notice(string $message, string $info)
+	private function addErrorNotice(string $message, string $info)
 	{
 		$key = count($this->errors);
 		$this->errors->set((string) $key, (object) [

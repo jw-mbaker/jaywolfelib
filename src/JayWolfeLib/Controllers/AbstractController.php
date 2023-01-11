@@ -3,9 +3,8 @@
 namespace JayWolfeLib\Controllers;
 
 use JayWolfeLib\Views\ViewFactory;
-use JayWolfeLib\Component\Config\ConfigTrait;
-use JayWolfeLib\Traits\ContainerAwareTrait;
-use JayWolfeLib\Exception\InvalidConfig;
+use JayWolfeLib\Config\ConfigTrait;
+use JayWolfeLib\Contracts\ContainerAwareInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -15,24 +14,38 @@ use Psr\Container\ContainerInterface;
 /**
  * The controller base class.
  */
-abstract class AbstractController implements ControllerInterface
+abstract class AbstractController implements ControllerInterface, ContainerAwareInterface
 {
 	use ConfigTrait;
-	use ContainerAwareTrait;
+
+	private ContainerInterface $container;
+
+	/**
+	 * @Inject
+	 */
+	public function setContainer(ContainerInterface $container)
+	{
+		$this->container = $container;
+	}
+
+	public function getContainer(): ContainerInterface
+	{
+		return $this->container;
+	}
 
 	protected function json($data, int $status = 200, array $headers = [], array $context = []): JsonResponse
 	{
 		return new JsonResponse($data, $status, $headers);
 	}
 
-	protected function render_view(string $template, array $parameters = []): string
+	protected function renderView(string $template, array $parameters = []): string
 	{
 		return $this->container->get(ViewFactory::class)->make($template, $parameters, null, $this->config);
 	}
 
 	protected function render(string $template, array $parameters = [], Response $response = null): Response
 	{
-		$content = $this->render_view($template, $parameters);
+		$content = $this->renderView($template, $parameters);
 		$response ??= new Response($content);
 
 		return $response;

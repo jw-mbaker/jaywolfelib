@@ -2,39 +2,48 @@
 
 namespace JayWolfeLib;
 
-use JayWolfeLib\Component\Config\ConfigCollection;
-use JayWolfeLib\Component\Config\ConfigInterface;
-use JayWolfeLib\Component\Config\Config;
-use JayWolfeLib\Component\WordPress\Filter\FilterCollection;
-use JayWolfeLib\Component\WordPress\AdminMenu\MenuCollection;
-use JayWolfeLib\Component\WordPress\Shortcode\ShortcodeCollection;
-use JayWolfeLib\Component\WordPress\PostType\PostTypeCollection;
-use JayWolfeLib\Component\WordPress\Widget\WidgetCollection;
-use JayWolfeLib\Component\WordPress\MetaBox\MetaBoxCollection;
-use JayWolfeLib\Traits\ContainerAwareTrait;
+use JayWolfeLib\Config\ConfigCollection;
+use JayWolfeLib\Config\ConfigInterface;
+use JayWolfeLib\Config\Config;
+use JayWolfeLib\WordPress\Filter\FilterCollection;
+use JayWolfeLib\WordPress\AdminMenu\MenuCollection;
+use JayWolfeLib\WordPress\Shortcode\ShortcodeCollection;
+use JayWolfeLib\WordPress\PostType\PostTypeCollection;
+use JayWolfeLib\WordPress\Widget\WidgetCollection;
+use JayWolfeLib\WordPress\MetaBox\MetaBoxCollection;
+use JayWolfeLib\Contracts\ContainerAwareInterface;
 use DI\ContainerBuilder;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-final class JayWolfeLib
+final class JayWolfeLib implements ContainerAwareInterface
 {
-	use ContainerAwareTrait;
-
 	private static bool $loaded = false;
 
 	private ContainerBuilder $containerBuilder;
+	private ContainerInterface $container;
 
 	public function __construct(ContainerBuilder $containerBuilder)
 	{
 		$this->containerBuilder = $containerBuilder;
 	}
 
-	public static function load(string $config_file = null, ContainerBuilder $containerBuilder = null): bool
+	public function setContainer(ContainerInterface $container)
+	{
+		$this->container = $container;
+	}
+
+	public function getContainer(): ContainerInterface
+	{
+		return $this->container;
+	}
+
+	public static function load(?string $configFile = null, ?ContainerBuilder $containerBuilder = null): bool
 	{
 		try {
-			if (null !== $config_file) {
-				add_action('jwlib_config', function(ConfigCollection $configCollection) use ($config_file) {
-					$config = Config::from_file($config_file);
+			if (null !== $configFile) {
+				add_action('jwlib_config', function(ConfigCollection $configCollection) use ($configFile) {
+					$config = Config::fromFile($configFile);
 					$configCollection->add( plugin_basename( $config->get('plugin_file') ), $config );
 				});
 			}
@@ -75,10 +84,10 @@ final class JayWolfeLib
 	{
 		try {
 			// Initialize the global container.
-			$container = $this->add_definitions();
+			$container = $this->addDefinitions();
 			//container( $container );
 
-			add_action('jwlib_config', [$this, 'check_and_set_configs'], 99, 1);
+			add_action('jwlib_config', [$this, 'checkAndSetConfigs'], 99, 1);
 
 			do_action('jwlib_config', $container->get(ConfigCollection::class));
 			do_action('jwlib_hooks', $container->get(FilterCollection::class));
@@ -105,7 +114,7 @@ final class JayWolfeLib
 		}
 	}
 
-	public function add_definitions(): ContainerInterface
+	public function addDefinitions(): ContainerInterface
 	{
 		$dev = apply_filters('jwlib_dev', !defined(__NAMESPACE__ . '\\PRODUCTION') || !PRODUCTION);
 
@@ -125,31 +134,31 @@ final class JayWolfeLib
 
 		do_action('jwlib_container_definitions', $this->containerBuilder);
 
-		$this->set_container($this->containerBuilder->build());
+		$this->setContainer($this->containerBuilder->build());
 		return $this->container;
 	}
 
-	public function check_and_set_configs(ConfigCollection $configs)
+	public function checkAndSetConfigs(ConfigCollection $configs)
 	{
 		foreach ($configs as $config) {
-			if ($this->check_requirements($config)) {
+			if ($this->checkRequirements($config)) {
 				$this->container->set(sprintf('config.%s', plugin_basename($config->get('plugin_file'))), $config);
 			}
 		}
 	}
 
-	private function check_requirements(ConfigInterface $config): bool
+	private function checkRequirements(ConfigInterface $config): bool
 	{
-		if (!$config->requirements_met()) {
+		if (!$config->requirementsMet()) {
 			ob_start();
-			$errors = $config->get_errors();
+			$errors = $config->getErrors();
 			foreach ($errors as $error):
 			?>
-			<div><?=$error->error_message?> (<?=$error->info?>)</div>
+			<div><?=$error->errorMessage?> (<?=$error->info?>)</div>
 			<?php
 			endforeach;
 
-			$this->deactivate_die($config->get('plugin_file'), ob_get_clean());
+			$this->deactivateDie($config->get('plugin_file'), ob_get_clean());
 
 			return false;
 		}
@@ -157,7 +166,7 @@ final class JayWolfeLib
 		return true;
 	}
 
-	private function deactivate_die(string $plugin_file, string $message)
+	private function deactivateDie(string $plugin_file, string $message)
 	{
 		require_once ABSPATH . '/wp-admin/includes/plugin.php';
 		deactivate_plugins( plugin_basename( $plugin_file ) );

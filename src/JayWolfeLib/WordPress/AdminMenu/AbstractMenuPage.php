@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Component\WordPress\AdminMenu;
+namespace JayWolfeLib\WordPress\AdminMenu;
 
 use JayWolfeLib\Invoker\CallableTrait;
 use Invoker\InvokerInterface;
@@ -18,8 +18,8 @@ abstract class AbstractMenuPage implements MenuPageInterface
 	];
 
 	protected string $slug;
-	protected string $page_title;
-	protected string $menu_title;
+	protected string $pageTitle;
+	protected string $menuTitle;
 	protected string $capability;
 	protected MenuId $id;
 	protected $position;
@@ -28,8 +28,8 @@ abstract class AbstractMenuPage implements MenuPageInterface
 	public function __construct(
 		string $slug,
 		$callable,
-		string $page_title = self::DEFAULTS[self::PAGE_TITLE],
-		string $menu_title = self::DEFAULTS[self::MENU_TITLE],
+		string $pageTitle = self::DEFAULTS[self::PAGE_TITLE],
+		string $menuTitle = self::DEFAULTS[self::MENU_TITLE],
 		string $capability = self::DEFAULTS[self::CAPABILITY],
 		$position = self::DEFAULTS[self::POSITION],
 		array $map = self::DEFAULTS[self::MAP]
@@ -40,8 +40,8 @@ abstract class AbstractMenuPage implements MenuPageInterface
 
 		$this->slug = $slug;
 		$this->callable = $callable;
-		$this->page_title = $page_title;
-		$this->menu_title = $menu_title;
+		$this->pageTitle = $pageTitle;
+		$this->menuTitle = $menuTitle;
 		$this->capability = $capability;
 		$this->position = $position;
 		$this->map = $map;
@@ -57,14 +57,14 @@ abstract class AbstractMenuPage implements MenuPageInterface
 		return $this->slug;
 	}
 
-	public function page_title(): string
+	public function pageTitle(): string
 	{
-		return $this->page_title;
+		return $this->pageTitle;
 	}
 
-	public function menu_title(): string
+	public function menuTitle(): string
 	{
-		return $this->menu_title;
+		return $this->menuTitle;
 	}
 
 	public function capability(): string

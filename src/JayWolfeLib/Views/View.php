@@ -2,18 +2,18 @@
 
 namespace JayWolfeLib\Views;
 
-use JayWolfeLib\Component\Config\ConfigInterface;
-use JayWolfeLib\Component\Config\ConfigTrait;
+use JayWolfeLib\Config\ConfigInterface;
+use JayWolfeLib\Config\ConfigTrait;
 use JayWolfeLib\Exception\InvalidTemplateException;
 
 class View implements ViewInterface
 {
 	use ConfigTrait;
 
-	public function __construct(ConfigInterface $config = null)
+	public function __construct(?ConfigInterface $config = null)
 	{
 		if (null !== $config) {
-			$this->set_config($config);
+			$this->setConfig($config);
 		}
 	}
 	
@@ -22,21 +22,21 @@ class View implements ViewInterface
 	 *
 	 * @param string $_template
 	 * @param array $_args
-	 * @param string|null $_template_path
+	 * @param string|null $_templatePath
 	 * @return string
 	 */
-	public function render(string $_template, array $_args = [], string $_template_path = null): string
+	public function render(string $_template, array $_args = [], ?string $_templatePath = null): string
 	{
 		extract($_args);
 
-		$located = $this->locate_template($_template, $_template_path);
+		$located = $this->locateTemplate($_template, $_templatePath);
 
 		if (null === $located) return '';
 
 		ob_start();
-		do_action('jwlib_before_template_render', $_template, $_template_path, $located, $_args);
+		do_action('jwlib_before_template_render', $_template, $_templatePath, $located, $_args);
 		include $located;
-		do_action('jwlib_after_template_render', $_template, $_template_path, $located, $_args);
+		do_action('jwlib_after_template_render', $_template, $_templatePath, $located, $_args);
 
 		return ob_get_clean();
 	}
@@ -45,15 +45,15 @@ class View implements ViewInterface
 	 * Locate the template file.
 	 *
 	 * @param string $template
-	 * @param string|null $template_path
+	 * @param string|null $templatePath
 	 * @return string|null
-	 * @throws InvalidTemplate
+	 * @throws InvalidTemplateException
 	 */
-	protected function locate_template(string $template, ?string $template_path = null): ?string
+	protected function locateTemplate(string $template, ?string $templatePath = null): ?string
 	{
-		if (null === $template_path && !$this->config instanceof ConfigInterface) {
+		if (null === $templatePath && !$this->config instanceof ConfigInterface) {
 			throw new \InvalidArgumentException(
-				sprintf('$template_path must be specified if %s is not provided.', ConfigInterface::class)
+				sprintf('$templatePath must be specified if %s is not provided.', ConfigInterface::class)
 			);
 		}
 
@@ -62,17 +62,17 @@ class View implements ViewInterface
 				throw new InvalidTemplateException('Template path not set for ' . $this->config->get('plugin_file') . '.');
 			}
 	
-			$template_path ??= $this->config->get('paths')['templates'];
+			$templatePath ??= $this->config->get('paths')['templates'];
 		}
 
 		if (!preg_match('/\.php/', $template)) {
 			$template .= '.php';
 		}
 
-		$file_path = trailingslashit( $template_path ) . $template;
+		$filePath = trailingslashit( $templatePath ) . $template;
 
-		if (file_exists($file_path)) {
-			return $file_path;
+		if (file_exists($filePath)) {
+			return $filePath;
 		}
 
 		return null;

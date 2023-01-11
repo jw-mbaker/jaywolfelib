@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Component\WordPress\Filter;
+namespace JayWolfeLib\WordPress\Filter;
 
-use JayWolfeLib\ObjectHash\AbstractObjectHash;
+use JayWolfeLib\Common\ObjectHash\AbstractObjectHash;
 
 class HookId extends AbstractObjectHash
 {

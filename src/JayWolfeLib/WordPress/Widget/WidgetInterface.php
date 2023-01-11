@@ -1,11 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace JayWolfeLib\Component\WordPress\Widget;
+namespace JayWolfeLib\WordPress\Widget;
 
 use WP_Widget;
 
 interface WidgetInterface
 {
 	/** @return string|WP_Widget */
-	public function wp_widget();
+	public function wpWidget();
 }

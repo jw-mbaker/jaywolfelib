@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Component\Config;
+namespace JayWolfeLib\Config;
 
-use JayWolfeLib\Parameter\ParameterBag;
+use JayWolfeLib\Common\Parameter\ParameterBag;
 use JayWolfeLib\Exception\InvalidConfigException;
 
 class Config implements ConfigInterface
@@ -57,9 +57,9 @@ class Config implements ConfigInterface
 	 *
 	 * @return bool
 	 */
-	public function requirements_met(): bool
+	public function requirementsMet(): bool
 	{
-		return $this->dependencies->requirements_met();
+		return $this->dependencies->requirementsMet();
 	}
 
 	/**
@@ -67,32 +67,32 @@ class Config implements ConfigInterface
 	 *
 	 * @return array
 	 */
-	public function get_errors(): array
+	public function getErrors(): array
 	{
-		return $this->dependencies->get_errors();
+		return $this->dependencies->getErrors();
 	}
 
-	public function add_dependencies(array $dependencies)
+	public function addDependencies(array $dependencies)
 	{
 		$this->dependencies->add($dependencies);
 	}
 
-	public function set_dependency(string $name, $value)
+	public function setDependency(string $name, $value)
 	{
 		$this->dependencies->set($name, $value);
 	}
 
-	public function remove_dependency(string $name)
+	public function removeDependency(string $name)
 	{
 		$this->dependencies->remove($name);
 	}
 
-	public function clear_dependencies()
+	public function clearDependencies()
 	{
 		$this->dependencies->clear();
 	}
 
-	public function get_dependencies(): Dependencies
+	public function getDependencies(): Dependencies
 	{
 		return $this->dependencies;
 	}
@@ -104,7 +104,7 @@ class Config implements ConfigInterface
 	 * @throws InvalidConfigException
 	 * @return self
 	 */
-	public static function from_file(string $file, ?Dependencies $dependencies = null): self
+	public static function fromFile(string $file, ?Dependencies $dependencies = null): self
 	{
 		if (!is_readable($file)) {
 			throw new InvalidConfigException(

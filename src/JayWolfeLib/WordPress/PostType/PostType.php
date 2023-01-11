@@ -1,22 +1,22 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Component\WordPress\PostType;
+namespace JayWolfeLib\WordPress\PostType;
 
 class PostType implements PostTypeInterface
 {
 	protected PostTypeId $id;
-	protected string $post_type;
+	protected string $postType;
 	protected array $args;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param string $post_type
+	 * @param string $postType
 	 * @param array $args
 	 */
-	public function __construct(string $post_type, array $args = [])
+	public function __construct(string $postType, array $args = [])
 	{
-		$this->post_type = $post_type;
+		$this->postType = $postType;
 		$this->args = $args;
 	}
 
@@ -25,9 +25,9 @@ class PostType implements PostTypeInterface
 		return $this->id ??= PostTypeId::fromPostType($this);
 	}
 
-	public function post_type(): string
+	public function postType(): string
 	{
-		return $this->post_type;
+		return $this->postType;
 	}
 
 	public function args(): array
@@ -35,16 +35,16 @@ class PostType implements PostTypeInterface
 		return $this->args;
 	}
 
-	public function register_taxonomy(string $taxonomy, array $args = array()): self
+	public function registerTaxonomy(string $taxonomy, array $args = array()): self
 	{
 		$callback = function() use ($taxonomy, $args) {
-			\register_taxonomy($taxonomy, $this->post_type, $args);
+			\register_taxonomy($taxonomy, $this->postType, $args);
 		};
 
-		if (did_action("registered_post_type_{$this->post_type}")) {
+		if (did_action("registered_post_type_{$this->postType}")) {
 			$callback();
 		} else {
-			add_action("registered_post_type_{$this->post_type}", $callback);
+			add_action("registered_post_type_{$this->postType}", $callback);
 		}
 
 		return $this;

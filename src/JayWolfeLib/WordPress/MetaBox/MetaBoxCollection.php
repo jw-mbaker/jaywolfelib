@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Component\WordPress\MetaBox;
+namespace JayWolfeLib\WordPress\MetaBox;
 
-use JayWolfeLib\Collection\AbstractInvokerCollection;
+use JayWolfeLib\Invoker\AbstractInvokerCollection;
 use Symfony\Component\HttpFoundation\Response;
 use WP_Screen;
 
@@ -11,41 +11,41 @@ class MetaBoxCollection extends AbstractInvokerCollection
 	/**
 	 * @var array<string, MetaBoxInterface>
 	 */
-	private array $meta_boxes = [];
+	private array $metaBoxes = [];
 
-	private function add(MetaBoxInterface $meta_box)
+	private function add(MetaBoxInterface $metaBox)
 	{
-		$this->meta_boxes[(string) $meta_box->id()] = $meta_box;
+		$this->metaBoxes[(string) $metaBox->id()] = $metaBox;
 	}
 
-	public function add_meta_box(MetaBoxInterface $meta_box)
+	public function addMetaBox(MetaBoxInterface $metaBox)
 	{
-		$this->add($meta_box);
+		$this->add($metaBox);
 		add_meta_box(
-			$meta_box->meta_id(),
-			$meta_box->title(),
-			[$this, (string) $meta_box->id()],
-			$meta_box->screen(),
-			$meta_box->context(),
-			$meta_box->priority(),
-			$meta_box->callback_args()
+			$metaBox->metaId(),
+			$metaBox->title(),
+			[$this, (string) $metaBox->id()],
+			$metaBox->screen(),
+			$metaBox->context(),
+			$metaBox->priority(),
+			$metaBox->callbackArgs()
 		);
 	}
 
 	/**
 	 * Remove a meta box.
 	 *
-	 * @param string $meta_id
+	 * @param string $metaId
 	 * @param string|array|WP_Screen $screen
 	 * @param string $context
 	 * @return bool
 	 */
-	public function remove_meta_box(string $meta_id, $screen, string $context): bool
+	public function removeMetaBox(string $metaId, $screen, string $context): bool
 	{
-		$meta_box = $this->get($meta_id, $screen, $context);
+		$metaBox = $this->get($metaId, $screen, $context);
 
-		if (null !== $meta_box) {
-			$this->remove($meta_box);
+		if (null !== $metaBox) {
+			$this->remove($metaBox);
 			return true;
 		}
 
@@ -54,29 +54,29 @@ class MetaBoxCollection extends AbstractInvokerCollection
 
 	public function all(): array
 	{
-		return $this->meta_boxes;
+		return $this->metaBoxes;
 	}
 
-	public function get_by_id(MetaBoxId $id): ?MetaBoxInterface
+	public function getById(MetaBoxId $id): ?MetaBoxInterface
 	{
-		return $this->meta_boxes[(string) $id] ?? null;
+		return $this->metaBoxes[(string) $id] ?? null;
 	}
 
 	/**
 	 * Get the meta box object filtered by its id, screen, and context.
 	 *
-	 * @param string $meta_id
+	 * @param string $metaId
 	 * @param string|array|WP_Screen $screen
 	 * @param string $context
 	 * @return MetaBoxInterface|null
 	 */
-	public function get(string $meta_id, $screen, string $context): ?MetaBoxInterface
+	public function get(string $metaId, $screen, string $context): ?MetaBoxInterface
 	{
-		$meta_box = array_reduce($this->meta_boxes, function($carry, $item) use ($meta_id, $screen, $context) {
+		$metaBox = array_reduce($this->metaBoxes, function($carry, $item) use ($metaId, $screen, $context) {
 			if (null !== $carry) return $carry;
 
 			if (
-				$item->meta_id() === $meta_id &&
+				$item->metaId() === $metaId &&
 				$item->screen() === $screen &&
 				$item->context() === $context
 			) {
@@ -86,18 +86,18 @@ class MetaBoxCollection extends AbstractInvokerCollection
 			return null;
 		}, null);
 
-		return $meta_box;
+		return $metaBox;
 	}
 
-	private function remove(MetaBoxInterface $meta_box)
+	private function remove(MetaBoxInterface $metaBox)
 	{
-		remove_meta_box($meta_box->meta_id(), $meta_box->screen(), $meta_box->context());
-		unset($this->meta_boxes[(string) $meta_box->id()]);
+		remove_meta_box($metaBox->metaId(), $metaBox->screen(), $metaBox->context());
+		unset($this->metaBoxes[(string) $metaBox->id()]);
 	}
 
 	public function __call(string $name, array $arguments)
 	{
-		$response = $this->resolve($this->meta_boxes[$name], $arguments);
+		$response = $this->resolve($this->metaBoxes[$name], $arguments);
 
 		if ($response instanceof Response) {
 			$response->send();

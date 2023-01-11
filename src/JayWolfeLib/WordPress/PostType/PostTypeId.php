@@ -1,13 +1,13 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Component\WordPress\PostType;
+namespace JayWolfeLib\WordPress\PostType;
 
-use JayWolfeLib\ObjectHash\AbstractObjectHash;
+use JayWolfeLib\Common\ObjectHash\AbstractObjectHash;
 
 class PostTypeId extends AbstractObjectHash
 {
-	public static function fromPostType(PostTypeInterface $post_type): self
+	public static function fromPostType(PostTypeInterface $postType): self
 	{
-		return new self($post_type);
+		return new self($postType);
 	}
 }

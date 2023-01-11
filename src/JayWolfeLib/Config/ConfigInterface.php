@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Component\Config;
+namespace JayWolfeLib\Config;
 
 interface ConfigInterface
 {
-	public function requirements_met(): bool;
-	public function get_errors(): array;
+	public function requirementsMet(): bool;
+	public function getErrors(): array;
 }
