@@ -61,7 +61,7 @@ class FilterTest extends \WP_Mock\Tools\TestCase
 			Filter::CALLABLE => function(MockTypeHint $th, string $test) {
 				$this->assertEquals($test, 'test');
 			},
-			Filter::MAP => [\Di\get(MockTypeHint::class)]
+			Filter::MAP => [\DI\get(MockTypeHint::class)]
 		]);
 
 		WP_Mock::onFilter($filter->hook())

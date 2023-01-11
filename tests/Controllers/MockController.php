@@ -3,12 +3,13 @@
 namespace JayWolfeLib\Tests\Controllers;
 
 use JayWolfeLib\Controllers\AbstractController;
+use JayWolfeLib\Config\ConfigInterface;
 
 class MockController extends AbstractController
 {
-	public function init()
+	public function setConfig(ConfigInterface $config)
 	{
-		
+		$this->config = $config;
 	}
 
 	public function __call(string $name, array $arguments)

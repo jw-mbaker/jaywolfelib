@@ -10,10 +10,5 @@ use JayWolfeLib\Config\ConfigInterface;
  */
 interface ControllerInterface
 {
-	/**
-	 * Intialize the controller.
-	 *
-	 * @return mixed
-	 */
-	public function init();
+	public function setConfig(ConfigInterface $config);
 }

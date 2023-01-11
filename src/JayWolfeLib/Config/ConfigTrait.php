@@ -6,10 +6,8 @@ trait ConfigTrait
 {
 	/**
 	 * The config object.
-	 *
-	 * @var ConfigInterface
 	 */
-	protected $config;
+	protected ?ConfigInterface $config = null;
 
 	/**
 	 * Set the config.
@@ -24,8 +22,6 @@ trait ConfigTrait
 
 	/**
 	 * Get the config.
-	 *
-	 * @return ConfigInterface
 	 */
 	public function getConfig(): ConfigInterface
 	{

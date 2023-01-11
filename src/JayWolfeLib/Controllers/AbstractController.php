@@ -3,7 +3,7 @@
 namespace JayWolfeLib\Controllers;
 
 use JayWolfeLib\Views\ViewFactory;
-use JayWolfeLib\Config\ConfigTrait;
+use JayWolfeLib\Config\ConfigInterface;
 use JayWolfeLib\Contracts\ContainerAwareInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -16,9 +16,8 @@ use Psr\Container\ContainerInterface;
  */
 abstract class AbstractController implements ControllerInterface, ContainerAwareInterface
 {
-	use ConfigTrait;
-
 	private ContainerInterface $container;
+	protected ConfigInterface $config;
 
 	/**
 	 * @Inject
@@ -38,12 +37,22 @@ abstract class AbstractController implements ControllerInterface, ContainerAware
 		return new JsonResponse($data, $status, $headers);
 	}
 
+	/**
+	 * @param array<string, string> $parameters
+	 * @throws \BadMethodCallException
+	 */
 	protected function renderView(string $template, array $parameters = []): string
 	{
+		if (!$this->config instanceof ConfigInterface) {
+			throw new \BadMethodCallException(
+				sprintf('$config must be set to use %s.', __METHOD__)
+			);
+		}
+
 		return $this->container->get(ViewFactory::class)->make($template, $parameters, null, $this->config);
 	}
 
-	protected function render(string $template, array $parameters = [], Response $response = null): Response
+	protected function render(string $template, array $parameters = [], ?Response $response = null): Response
 	{
 		$content = $this->renderView($template, $parameters);
 		$response ??= new Response($content);
