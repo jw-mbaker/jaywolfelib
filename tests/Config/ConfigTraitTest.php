@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace JayWolfeLib\Tests\Component\Config;
+namespace JayWolfeLib\Tests\Config;
 
-use JayWolfeLib\Component\Config\ConfigInterface;
-use JayWolfeLib\Component\Config\Config;
-use JayWolfeLib\Component\Config\ConfigTrait;
+use JayWolfeLib\Config\ConfigInterface;
+use JayWolfeLib\Config\Config;
+use JayWolfeLib\Config\ConfigTrait;
 use JayWolfeLib\Tests\Traits\MockConfigTrait;
 use WP_Mock;
 use Mockery;
@@ -26,24 +26,24 @@ class ConfigTraitTest extends \WP_Mock\Tools\TestCase
 	}
 
 	/**
-	 * @covers \JayWolfeLib\Component\Config\ConfigTrait::set_config
+	 * @covers \JayWolfeLib\Config\ConfigTrait::setConfig
 	 * @group config
 	 */
 	public function testCanSetConfig()
 	{
-		$this->set_config($this->createMockConfig());
+		$this->setConfig($this->createMockConfig());
 
 		$this->assertInstanceOf(ConfigInterface::class, $this->config);
 	}
 
 	/**
-	 * @covers \JayWolfeLib\Component\Config\ConfigTrait::get_config
+	 * @covers \JayWolfeLib\Config\ConfigTrait::getConfig
 	 * @group config
 	 */
 	public function testCanGetConfig()
 	{
 		$this->config = $this->createMockConfig();
-		$this->assertSame($this->config, $this->get_config());
-		$this->assertInstanceOf(ConfigInterface::class, $this->get_config());
+		$this->assertSame($this->config, $this->getConfig());
+		$this->assertInstanceOf(ConfigInterface::class, $this->getConfig());
 	}
 }

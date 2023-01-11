@@ -154,7 +154,7 @@ class Dependencies
 	{
 		$key = count($this->errors);
 		$this->errors->set((string) $key, (object) [
-			'error_message' => $message,
+			'errorMessage' => $message,
 			'info' => $info
 		]);
 	}

@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Tests\Component\WordPress\MetaBox;
+namespace JayWolfeLib\Tests\WordPress\MetaBox;
 
-use JayWolfeLib\Component\WordPress\MetaBox\MetaBox;
-use JayWolfeLib\Component\WordPress\MetaBox\MetaBoxId;
+use JayWolfeLib\WordPress\MetaBox\MetaBox;
+use JayWolfeLib\WordPress\MetaBox\MetaBoxId;
 use JayWolfeLib\Tests\Invoker\MockTypeHint;
 use JayWolfeLib\Tests\Traits\DevContainerTrait;
 use Symfony\Component\HttpFoundation\Response;
@@ -93,7 +93,7 @@ class MetaBoxTest extends \WP_Mock\Tools\TestCase
 			MetaBox::CALLABLE => function() {}
 		]);
 
-		$this->assertEquals('test', $mb->meta_id());
+		$this->assertEquals('test', $mb->metaId());
 	}
 
 	/**

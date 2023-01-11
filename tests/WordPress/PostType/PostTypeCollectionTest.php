@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Tests\Component\WordPress\PostType;
+namespace JayWolfeLib\Tests\WordPress\PostType;
 
-use JayWolfeLib\Component\WordPress\PostType\PostTypeCollection;
-use JayWolfeLib\Component\WordPress\PostType\PostTypeInterface;
-use JayWolfeLib\Component\WordPress\PostType\PostType;
-use JayWolfeLib\Component\WordPress\PostType\PostTypeId;
+use JayWolfeLib\WordPress\PostType\PostTypeCollection;
+use JayWolfeLib\WordPress\PostType\PostTypeInterface;
+use JayWolfeLib\WordPress\PostType\PostType;
+use JayWolfeLib\WordPress\PostType\PostTypeId;
 use WP_Mock;
 use Mockery;
 
@@ -37,17 +37,17 @@ class PostTypeCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testCanRegisterPostType()
 	{
-		$post_type = $this->createPostType();
+		$postType = $this->createPostType();
 
 		WP_Mock::userFunction('register_post_type', [
 			'args' => ['test', []],
-			'return' => $post_type,
+			'return' => $postType,
 			'times' => 1
 		]);
 
-		$this->collection->register_post_type($post_type);
-		$this->assertContains($post_type, $this->collection->all());
-		$this->assertSame($post_type, $this->collection->get_by_id($post_type->id()));
+		$this->collection->registerPostType($postType);
+		$this->assertContains($postType, $this->collection->all());
+		$this->assertSame($postType, $this->collection->getById($postType->id()));
 	}
 
 	/**
@@ -57,7 +57,7 @@ class PostTypeCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testShouldThrowExceptionOnWpError()
 	{
-		$post_type = $this->createPostType();
+		$postType = $this->createPostType();
 
 		WP_Mock::userFunction('register_post_type', [
 			'args' => ['test', []],
@@ -70,7 +70,7 @@ class PostTypeCollectionTest extends \WP_Mock\Tools\TestCase
 			sprintf('Error registering post type test.')
 		);
 
-		$this->collection->register_post_type($post_type);
+		$this->collection->registerPostType($postType);
 	}
 
 	/**
@@ -81,26 +81,26 @@ class PostTypeCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testCanUnregisterPostType()
 	{
-		$post_type = $this->createPostType();
+		$postType = $this->createPostType();
 
 		WP_Mock::userFunction('register_post_type', [
 			'args' => ['test', []],
-			'return' => $post_type,
+			'return' => $postType,
 			'times' => 1
 		]);
 
-		$this->collection->register_post_type($post_type);
-		$this->assertContains($post_type, $this->collection->all());
+		$this->collection->registerPostType($postType);
+		$this->assertContains($postType, $this->collection->all());
 
 		WP_Mock::userFunction('unregister_post_type', [
 			'args' => 'test',
-			'return' => $post_type,
+			'return' => $postType,
 			'times' => 1
 		]);
 
-		$bool = $this->collection->unregister_post_type('test');
+		$bool = $this->collection->unregisterPostType('test');
 		$this->assertTrue($bool);
-		$this->assertNotContains($post_type, $this->collection->all());
+		$this->assertNotContains($postType, $this->collection->all());
 	}
 
 	/**
@@ -111,16 +111,16 @@ class PostTypeCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testUnregisterPostTypeShouldThrowExceptionOnWpError()
 	{
-		$post_type = $this->createPostType();
+		$postType = $this->createPostType();
 
 		WP_Mock::userFunction('register_post_type', [
 			'args' => ['test', []],
-			'return' => $post_type,
+			'return' => $postType,
 			'times' => 1
 		]);
 
-		$this->collection->register_post_type($post_type);
-		$this->assertContains($post_type, $this->collection->all());
+		$this->collection->registerPostType($postType);
+		$this->assertContains($postType, $this->collection->all());
 
 		WP_Mock::userFunction('unregister_post_type', [
 			'args' => 'test',
@@ -131,7 +131,7 @@ class PostTypeCollectionTest extends \WP_Mock\Tools\TestCase
 		$this->expectException(\Exception::class);
 		$this->expectExceptionMessage('Error removing post type test');
 
-		$this->collection->unregister_post_type('test');
+		$this->collection->unregisterPostType('test');
 	}
 
 	/**
@@ -141,7 +141,7 @@ class PostTypeCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testUnregisterPostTypeReturnsFalseOnInvalidKey()
 	{
-		$bool = $this->collection->unregister_post_type('test');
+		$bool = $this->collection->unregisterPostType('test');
 		$this->assertFalse($bool);
 	}
 
@@ -152,16 +152,16 @@ class PostTypeCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testCanGetPostType()
 	{
-		$post_type = $this->createPostType();
+		$postType = $this->createPostType();
 
 		WP_Mock::userFunction('register_post_type', [
 			'args' => ['test', []],
-			'return' => $post_type,
+			'return' => $postType,
 			'times' => 1
 		]);
 
-		$this->collection->register_post_type($post_type);
-		$this->assertSame($post_type, $this->collection->get('test'));
+		$this->collection->registerPostType($postType);
+		$this->assertSame($postType, $this->collection->get('test'));
 	}
 
 	public function testGetPostTypeReturnsNullIfNotFound()
@@ -179,26 +179,26 @@ class PostTypeCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testCanRegisterTaxonomy()
 	{
-		$post_type = $this->createPostType();
+		$postType = $this->createPostType();
 
 		WP_Mock::userFunction('register_post_type', [
-			'args' => [$post_type->post_type(), $post_type->args()],
-			'return' => $post_type,
+			'args' => [$postType->postType(), $postType->args()],
+			'return' => $postType,
 			'times' => 1
 		]);
 
-		$this->collection->register_post_type($post_type);
+		$this->collection->registerPostType($postType);
 
-		$this->assertSame($post_type, $this->collection->get_by_id($post_type->id()));
+		$this->assertSame($postType, $this->collection->getById($postType->id()));
 
 		WP_Mock::userFunction('register_taxonomy', ['times' => 1]);
 		WP_Mock::userFunction('did_action', [
-			'args' => sprintf('registered_post_type_%s', $post_type->post_type()),
+			'args' => sprintf('registered_post_type_%s', $postType->postType()),
 			'return' => true,
 			'times' => 1
 		]);
 
-		$this->collection->register_taxonomy('test', $post_type->post_type());
+		$this->collection->registerTaxonomy('test', $postType->postType());
 	}
 
 	private function createPostType(): PostTypeInterface

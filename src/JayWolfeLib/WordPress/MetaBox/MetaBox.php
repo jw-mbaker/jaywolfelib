@@ -56,7 +56,7 @@ class MetaBox implements MetaBoxInterface
 		?array $callbackArgs = self::DEFAULTS[self::CALLBACK_ARGS],
 		array $map = self::DEFAULTS[self::MAP]
 	) {
-		self::validate_screen($screen);
+		self::validateScreen($screen);
 
 		$this->metaId = $metaId;
 		$this->title = $title;

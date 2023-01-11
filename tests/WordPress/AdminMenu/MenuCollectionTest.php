@@ -1,12 +1,12 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Tests\Component\WordPress\AdminMenu;
+namespace JayWolfeLib\Tests\WordPress\AdminMenu;
 
-use JayWolfeLib\Component\WordPress\AdminMenu\MenuCollection;
-use JayWolfeLib\Component\WordPress\AdminMenu\MenuPageInterface;
-use JayWolfeLib\Component\WordPress\AdminMenu\MenuPage;
-use JayWolfeLib\Component\WordPress\AdminMenu\SubMenuPage;
-use JayWolfeLib\Component\WordPress\AdminMenu\MenuId;
+use JayWolfeLib\WordPress\AdminMenu\MenuCollection;
+use JayWolfeLib\WordPress\AdminMenu\MenuPageInterface;
+use JayWolfeLib\WordPress\AdminMenu\MenuPage;
+use JayWolfeLib\WordPress\AdminMenu\SubMenuPage;
+use JayWolfeLib\WordPress\AdminMenu\MenuId;
 use JayWolfeLib\Tests\Invoker\MockTypeHint;
 use JayWolfeLib\Tests\Traits\DevContainerTrait;
 use Symfony\Component\HttpFoundation\Request;
@@ -48,7 +48,7 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 	{
 		$mp = $this->createMenuPage();
 
-		$this->collection->menu_page($mp);
+		$this->collection->menuPage($mp);
 		$this->assertContains($mp, $this->collection->all());
 	}
 
@@ -61,7 +61,7 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 	{
 		$smp = $this->createSubMenuPage();
 
-		$this->collection->sub_menu_page($smp);
+		$this->collection->subMenuPage($smp);
 		$this->assertContains($smp, $this->collection->all());
 	}
 
@@ -75,10 +75,10 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 	{
 		$mp = $this->createMenuPage();
 
-		$this->collection->menu_page($mp);
+		$this->collection->menuPage($mp);
 		$this->assertContains($mp, $this->collection->all());
 
-		$this->collection->remove_menu_page('test');
+		$this->collection->removeMenuPage('test');
 		$this->assertNotContains($mp, $this->collection->all());
 	}
 
@@ -92,10 +92,10 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 	{
 		$smp = $this->createSubMenuPage();
 
-		$this->collection->sub_menu_page($smp);
+		$this->collection->subMenuPage($smp);
 		$this->assertContains($smp, $this->collection->all());
 
-		$this->collection->remove_submenu_page('test');
+		$this->collection->removeSubmenuPage('test');
 		$this->assertNotContains($smp, $this->collection->all());
 	}
 
@@ -106,7 +106,7 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testRemoveMenuPageReturnsFalseOnInvalidSlug()
 	{
-		$bool = $this->collection->remove_menu_page('test');
+		$bool = $this->collection->removeMenuPage('test');
 		$this->assertFalse($bool);
 	}
 
@@ -119,7 +119,7 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 	{
 		$mp = $this->createMenuPage();
 
-		$this->collection->menu_page($mp);
+		$this->collection->menuPage($mp);
 		$this->assertContains($mp, $this->collection->all());
 
 		$obj = $this->collection->get('test');
@@ -136,7 +136,7 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 	{
 		$smp = $this->createSubMenuPage();
 
-		$this->collection->sub_menu_page($smp);
+		$this->collection->subMenuPage($smp);
 		$this->assertContains($smp, $this->collection->all());
 
 		$obj = $this->collection->get('test');
@@ -172,7 +172,7 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 			MenuPage::CAPABILITY => 'administrator'
 		]);
 
-		$this->collection->menu_page($mp);
+		$this->collection->menuPage($mp);
 
 		$this->assertSame($mp, $this->collection->get('test'));
 
@@ -197,7 +197,7 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 			SubMenuPage::CAPABILITY => 'administrator'
 		]);
 
-		$this->collection->sub_menu_page($smp);
+		$this->collection->subMenuPage($smp);
 
 		$this->assertSame($smp, $this->collection->get($smp->slug()));
 
@@ -222,7 +222,7 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 			MenuPage::CAPABILITY => 'administrator'
 		]);
 
-		$this->collection->menu_page($mp);
+		$this->collection->menuPage($mp);
 
 		$this->assertSame($mp, $this->collection->get($mp->slug()));
 
@@ -248,7 +248,7 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 			SubMenuPage::CAPABILITY => 'administrator'
 		]);
 
-		$this->collection->sub_menu_page($smp);
+		$this->collection->subMenuPage($smp);
 
 		$this->assertSame($smp, $this->collection->get($smp->slug()));
 
@@ -275,7 +275,7 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 			MenuPage::CAPABILITY => 'administrator'
 		]);
 
-		$this->collection->menu_page($mp);
+		$this->collection->menuPage($mp);
 
 		$this->assertSame($mp, $this->collection->get($mp->slug()));
 
@@ -305,7 +305,7 @@ class MenuCollectionTest extends \WP_Mock\Tools\TestCase
 			SubMenuPage::CAPABILITY => 'administrator'
 		]);
 
-		$this->collection->sub_menu_page($smp);
+		$this->collection->subMenuPage($smp);
 
 		$this->assertSame($smp, $this->collection->get($smp->slug()));
 

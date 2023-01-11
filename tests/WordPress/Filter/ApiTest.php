@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Tests\Component\WordPress\Filter;
+namespace JayWolfeLib\Tests\WordPress\Filter;
 
-use JayWolfeLib\Component\WordPress\Filter\HookInterface;
-use JayWolfeLib\Component\WordPress\Filter\Api;
+use JayWolfeLib\WordPress\Filter\HookInterface;
+use JayWolfeLib\WordPress\Filter\Api;
 use JayWolfeLib\Tests\Traits\DevContainerTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

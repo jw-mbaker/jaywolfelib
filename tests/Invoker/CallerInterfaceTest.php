@@ -28,7 +28,7 @@ class CallerInterfaceTest extends \WP_Mock\Tools\TestCase
 
 		$this->collection->addHandler($handler);
 
-		$this->assertSame($handler, $this->collection->get_by_id($handler->id()));
+		$this->assertSame($handler, $this->collection->getById($handler->id()));
 	}
 
 	/**

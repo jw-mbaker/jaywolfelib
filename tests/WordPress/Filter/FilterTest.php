@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Tests\Component\WordPress\Filter;
+namespace JayWolfeLib\Tests\WordPress\Filter;
 
-use JayWolfeLib\Component\WordPress\Filter\Filter;
-use JayWolfeLib\Component\WordPress\Filter\HookId;
+use JayWolfeLib\WordPress\Filter\Filter;
+use JayWolfeLib\WordPress\Filter\HookId;
 use JayWolfeLib\Tests\Invoker\MockTypeHint;
 use JayWolfeLib\Tests\Traits\DevContainerTrait;
 use Invoker\InvokerInterface;
@@ -122,6 +122,6 @@ class FilterTest extends \WP_Mock\Tools\TestCase
 			Filter::NUM_ARGS => 3
 		]);
 
-		$this->assertEquals(3, $filter->num_args());
+		$this->assertEquals(3, $filter->numArgs());
 	}
 }

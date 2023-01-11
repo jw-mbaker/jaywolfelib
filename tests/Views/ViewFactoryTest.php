@@ -1,11 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JayWolfeLib\Tests\Views;
 
 use JayWolfeLib\Views\ViewFactory;
 use JayWolfeLib\Views\ViewInterface;
-use JayWolfeLib\Component\Config\ConfigInterface;
-use JayWolfeLib\Component\Config\Config;
+use JayWolfeLib\Config\ConfigInterface;
+use JayWolfeLib\Config\Config;
 use JayWolfeLib\Exception\InvalidTemplateException;
 use WP_Mock;
 use Mockery;
@@ -58,7 +58,7 @@ class ViewFactoryTest extends \WP_Mock\Tools\TestCase
 
 		$this->expectException(\InvalidArgumentException::class);
 		$this->expectExceptionMessage(
-			sprintf('$template_path must be specified if %s is not provided.', ConfigInterface::class)
+			sprintf('$templatePath must be specified if %s is not provided.', ConfigInterface::class)
 		);
 
 		$factory->make('mock-template');
@@ -67,7 +67,7 @@ class ViewFactoryTest extends \WP_Mock\Tools\TestCase
 	public function testMakeFromConfig()
 	{
 		$factory = new ViewFactory();
-		$config = Config::from_file(MOCK_CONFIG_FILE);
+		$config = Config::fromFile(MOCK_CONFIG_FILE);
 
 		$str = $factory->make('mock-template.php', [], null, $config);
 		$this->assertEquals('Hello World!', $str);
@@ -76,7 +76,7 @@ class ViewFactoryTest extends \WP_Mock\Tools\TestCase
 	public function testMakeFromConfigWithoutExtension()
 	{
 		$factory = new ViewFactory();
-		$config = Config::from_file(MOCK_CONFIG_FILE);
+		$config = Config::fromFile(MOCK_CONFIG_FILE);
 
 		$str = $factory->make('mock-template', [], null, $config);
 		$this->assertEquals('Hello World!', $str);
@@ -85,7 +85,7 @@ class ViewFactoryTest extends \WP_Mock\Tools\TestCase
 	public function testMakeFromConfigWithArgs()
 	{
 		$factory = new ViewFactory();
-		$config = Config::from_file(MOCK_CONFIG_FILE);
+		$config = Config::fromFile(MOCK_CONFIG_FILE);
 
 		$str = $factory->make('mock-template', ['foo' => 'bar'], null, $config);
 		$this->assertEquals('bar', $str);

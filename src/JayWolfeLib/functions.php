@@ -2,8 +2,8 @@
 
 namespace JayWolfeLib;
 
-use JayWolfeLib\Component\Config\ConfigInterface;
-use JayWolfeLib\Component\Config\Config;
+use JayWolfeLib\Config\ConfigInterface;
+use JayWolfeLib\Config\Config;
 use JayWolfeLib\Exception\InvalidConfigException;
 
 /**
@@ -17,7 +17,7 @@ function install($config)
 	global $wpdb;
 
 	if (is_string($config)) {
-		$config = Config::from_file($config);
+		$config = Config::fromFile($config);
 	}
 
 	if (!$config instanceof ConfigInterface) {

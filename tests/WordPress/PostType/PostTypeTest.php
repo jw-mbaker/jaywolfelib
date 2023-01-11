@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Tests\Component\WordPress\PostType;
+namespace JayWolfeLib\Tests\WordPress\PostType;
 
-use JayWolfeLib\Component\WordPress\PostType\PostType;
-use JayWolfeLib\Component\WordPress\PostType\PostTypeId;
+use JayWolfeLib\WordPress\PostType\PostType;
+use JayWolfeLib\WordPress\PostType\PostTypeId;
 use WP_Mock;
 
 class PostTypeTest extends \WP_Mock\Tools\TestCase
@@ -24,9 +24,9 @@ class PostTypeTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testCanGetPostTypeAndArgs()
 	{
-		$post_type = new PostType('test', ['label' => 'test123']);
-		$this->assertEquals('test', $post_type->post_type());
-		$this->assertEquals('test123', $post_type->args()['label']);
+		$postType = new PostType('test', ['label' => 'test123']);
+		$this->assertEquals('test', $postType->postType());
+		$this->assertEquals('test123', $postType->args()['label']);
 	}
 
 	/**
@@ -36,12 +36,12 @@ class PostTypeTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testShouldAddActionToRegisterTaxonomy()
 	{
-		$post_type = new PostType('test', []);
+		$postType = new PostType('test', []);
 
 		WP_Mock::userFunction('did_action', ['return' => false, 'times' => 1]);
-		WP_Mock::expectActionAdded(sprintf('registered_post_type_%s', $post_type->post_type()), function() {});
+		WP_Mock::expectActionAdded(sprintf('registered_post_type_%s', $postType->postType()), function() {});
 
-		$post_type->register_taxonomy('test');
+		$postType->registerTaxonomy('test');
 	}
 
 	/**
@@ -51,15 +51,15 @@ class PostTypeTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testShouldCallCallbackOnRegisterTaxonomy()
 	{
-		$post_type = new PostType('test', []);
+		$postType = new PostType('test', []);
 
 		WP_Mock::userFunction('did_action', ['return' => true, 'times' => 1]);
 		WP_Mock::userFunction('register_taxonomy', [
-			'args' => ['test', $post_type->post_type(), []],
+			'args' => ['test', $postType->postType(), []],
 			'times' => 1
 		]);
 
-		$post_type->register_taxonomy('test');
+		$postType->registerTaxonomy('test');
 	}
 
 	/**
@@ -68,10 +68,10 @@ class PostTypeTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testPostTypeIdMethodShouldReturnPostTypeId()
 	{
-		$post_type = new PostType('test', []);
+		$postType = new PostType('test', []);
 
-		$id = $post_type->id();
+		$id = $postType->id();
 		$this->assertInstanceOf(PostTypeId::class, $id);
-		$this->assertSame((string) $id, spl_object_hash($post_type));
+		$this->assertSame((string) $id, spl_object_hash($postType));
 	}
 }

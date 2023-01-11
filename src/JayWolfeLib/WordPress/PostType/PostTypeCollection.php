@@ -53,7 +53,7 @@ class PostTypeCollection extends AbstractCollection
 			$postType = $this->get($t);
 			if (null === $postType) continue;
 
-			$postType->register_taxonomy($taxonomy, $args);
+			$postType->registerTaxonomy($taxonomy, $args);
 		}
 	}
 

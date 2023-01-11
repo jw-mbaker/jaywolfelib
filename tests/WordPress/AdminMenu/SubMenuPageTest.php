@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Tests\Component\WordPress\AdminMenu;
+namespace JayWolfeLib\Tests\WordPress\AdminMenu;
 
-use JayWolfeLib\Component\WordPress\AdminMenu\SubMenuPage;
-use JayWolfeLib\Component\WordPress\AdminMenu\MenuId;
+use JayWolfeLib\WordPress\AdminMenu\SubMenuPage;
+use JayWolfeLib\WordPress\AdminMenu\MenuId;
 use JayWolfeLib\Tests\Invoker\MockTypeHint;
 use JayWolfeLib\Tests\Traits\DevContainerTrait;
 use Symfony\Component\HttpFoundation\Request;

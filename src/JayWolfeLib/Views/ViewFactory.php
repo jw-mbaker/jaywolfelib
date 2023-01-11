@@ -2,7 +2,7 @@
 
 namespace JayWolfeLib\Views;
 
-use JayWolfeLib\Component\Config\ConfigInterface;
+use JayWolfeLib\Config\ConfigInterface;
 
 class ViewFactory
 {

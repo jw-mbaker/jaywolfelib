@@ -81,7 +81,7 @@ class MenuCollection extends AbstractInvokerCollection
 				remove_menu_page($menuPage->slug());
 				break;
 			case SubMenuPage::class:
-				remove_submenu_page($menuPage->parent_slug(), $menuPage->slug());
+				remove_submenu_page($menuPage->parentSlug(), $menuPage->slug());
 				break;
 		}
 		
@@ -93,7 +93,7 @@ class MenuCollection extends AbstractInvokerCollection
 	 * 
 	 * @return string
 	 */
-	public function menu_page(MenuPage $menuPage): string
+	public function menuPage(MenuPage $menuPage): string
 	{
 		$this->add($menuPage);
 		return add_menu_page(
@@ -102,7 +102,7 @@ class MenuCollection extends AbstractInvokerCollection
 			$menuPage->capability(),
 			$menuPage->slug(),
 			[$this, (string) $menuPage->id()],
-			$menuPage->icon_url(),
+			$menuPage->iconUrl(),
 			$menuPage->position()
 		);
 	}
@@ -117,9 +117,9 @@ class MenuCollection extends AbstractInvokerCollection
 	{
 		$this->add($subMenuPage);
 		return add_submenu_page(
-			$subMenuPage->parent_slug(),
-			$subMenuPage->page_title(),
-			$subMenuPage->menu_title(),
+			$subMenuPage->parentSlug(),
+			$subMenuPage->pageTitle(),
+			$subMenuPage->menuTitle(),
 			$subMenuPage->capability(),
 			$subMenuPage->slug(),
 			[$this, (string) $subMenuPage->id()],

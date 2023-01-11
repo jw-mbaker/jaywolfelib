@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Tests\Component\WordPress\MetaBox;
+namespace JayWolfeLib\Tests\WordPress\MetaBox;
 
-use JayWolfeLib\Component\WordPress\MetaBox\MetaBoxCollection;
-use JayWolfeLib\Component\WordPress\MetaBox\MetaBoxInterface;
-use JayWolfeLib\Component\WordPress\MetaBox\MetaBox;
+use JayWolfeLib\WordPress\MetaBox\MetaBoxCollection;
+use JayWolfeLib\WordPress\MetaBox\MetaBoxInterface;
+use JayWolfeLib\WordPress\MetaBox\MetaBox;
 use JayWolfeLib\Tests\Invoker\MockTypeHint;
 use JayWolfeLib\Tests\Traits\DevContainerTrait;
 use Symfony\Component\HttpFoundation\Response;
@@ -44,9 +44,9 @@ class MetaBoxCollectionTest extends \WP_Mock\Tools\TestCase
 	{
 		$mb = $this->createMetaBox();
 
-		$this->collection->add_meta_box($mb);
+		$this->collection->addMetaBox($mb);
 		$this->assertContains($mb, $this->collection->all());
-		$this->assertSame($mb, $this->collection->get_by_id($mb->id()));
+		$this->assertSame($mb, $this->collection->getById($mb->id()));
 	}
 
 	/**
@@ -59,10 +59,10 @@ class MetaBoxCollectionTest extends \WP_Mock\Tools\TestCase
 	{
 		$mb = $this->createMetaBox();
 
-		$this->collection->add_meta_box($mb);
+		$this->collection->addMetaBox($mb);
 		$this->assertContains($mb, $this->collection->all());
 
-		$bool = $this->collection->remove_meta_box('test', null, 'advanced');
+		$bool = $this->collection->removeMetaBox('test', null, 'advanced');
 		$this->assertTrue($bool);
 
 		$this->assertNotContains($mb, $this->collection->all());
@@ -76,7 +76,7 @@ class MetaBoxCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testRemoveMetaBoxReturnsFalseOnInvalidKey()
 	{
-		$bool = $this->collection->remove_meta_box('test', null, 'advanced');
+		$bool = $this->collection->removeMetaBox('test', null, 'advanced');
 		$this->assertFalse($bool);
 	}
 
@@ -89,7 +89,7 @@ class MetaBoxCollectionTest extends \WP_Mock\Tools\TestCase
 	{
 		$mb = $this->createMetaBox();
 
-		$this->collection->add_meta_box($mb);
+		$this->collection->addMetaBox($mb);
 		$this->assertContains($mb, $this->collection->all());
 
 		$obj = $this->collection->get('test', null, 'advanced');
@@ -123,9 +123,9 @@ class MetaBoxCollectionTest extends \WP_Mock\Tools\TestCase
 			}
 		]);
 
-		$this->collection->add_meta_box($mb);
+		$this->collection->addMetaBox($mb);
 
-		$this->assertSame($mb, $this->collection->get_by_id($mb->id()));
+		$this->assertSame($mb, $this->collection->getById($mb->id()));
 		call_user_func([$this->collection, (string) $mb->id()], $this->post);
 	}
 
@@ -145,9 +145,9 @@ class MetaBoxCollectionTest extends \WP_Mock\Tools\TestCase
 			MetaBox::MAP => [\DI\get(MockTypeHint::class)]
 		]);
 
-		$this->collection->add_meta_box($mb);
+		$this->collection->addMetaBox($mb);
 
-		$this->assertSame($mb, $this->collection->get_by_id($mb->id()));
+		$this->assertSame($mb, $this->collection->getById($mb->id()));
 		call_user_func([$this->collection, (string) $mb->id()], $this->post);
 	}
 
@@ -169,10 +169,10 @@ class MetaBoxCollectionTest extends \WP_Mock\Tools\TestCase
 			MetaBox::MAP => [\DI\get(MockTypeHint::class)]
 		]);
 
-		$this->collection->add_meta_box($mb);
+		$this->collection->addMetaBox($mb);
 
-		$this->assertSame($mb, $this->collection->get_by_id($mb->id()));
-		call_user_func([$this->collection, (string) $mb->id()], $this->post, $mb->callback_args());
+		$this->assertSame($mb, $this->collection->getById($mb->id()));
+		call_user_func([$this->collection, (string) $mb->id()], $this->post, $mb->callbackArgs());
 	}
 
 	/**
@@ -193,9 +193,9 @@ class MetaBoxCollectionTest extends \WP_Mock\Tools\TestCase
 			}
 		]);
 
-		$this->collection->add_meta_box($mb);
+		$this->collection->addMetaBox($mb);
 
-		$this->assertSame($mb, $this->collection->get_by_id($mb->id()));
+		$this->assertSame($mb, $this->collection->getById($mb->id()));
 
 		$response->expects()->send();
 

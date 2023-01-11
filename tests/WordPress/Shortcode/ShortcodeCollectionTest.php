@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Tests\Component\WordPress\Shortcode;
+namespace JayWolfeLib\Tests\WordPress\Shortcode;
 
-use JayWolfeLib\Component\WordPress\Shortcode\ShortcodeCollection;
-use JayWolfeLib\Component\WordPress\Shortcode\ShortcodeInterface;
-use JayWolfeLib\Component\WordPress\Shortcode\Shortcode;
-use JayWolfeLib\Component\WordPress\Shortcode\ShortcodeId;
+use JayWolfeLib\WordPress\Shortcode\ShortcodeCollection;
+use JayWolfeLib\WordPress\Shortcode\ShortcodeInterface;
+use JayWolfeLib\WordPress\Shortcode\Shortcode;
+use JayWolfeLib\WordPress\Shortcode\ShortcodeId;
 use JayWolfeLib\Tests\Invoker\MockTypeHint;
 use JayWolfeLib\Tests\Traits\DevContainerTrait;
 use WP_Mock;
@@ -41,7 +41,7 @@ class ShortcodeCollectionTest extends \WP_Mock\Tools\TestCase
 	{
 		$shortcode = $this->createShortcode();
 
-		$this->collection->add_shortcode($shortcode);
+		$this->collection->addShortcode($shortcode);
 		$this->assertContains($shortcode, $this->collection->all());
 	}
 
@@ -54,10 +54,10 @@ class ShortcodeCollectionTest extends \WP_Mock\Tools\TestCase
 	{
 		$shortcode = $this->createShortcode();
 
-		$this->collection->add_shortcode($shortcode);
+		$this->collection->addShortcode($shortcode);
 		$this->assertContains($shortcode, $this->collection->all());
 
-		$bool = $this->collection->remove_shortcode('test');
+		$bool = $this->collection->removeShortcode('test');
 		$this->assertTrue($bool);
 
 		$this->assertNotContains($shortcode, $this->collection->all());
@@ -70,7 +70,7 @@ class ShortcodeCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testRemoveShortCodeReturnsFalseOnInvalidKey()
 	{
-		$bool = $this->collection->remove_shortcode('test');
+		$bool = $this->collection->removeShortcode('test');
 		$this->assertFalse($bool);
 	}
 
@@ -83,8 +83,8 @@ class ShortcodeCollectionTest extends \WP_Mock\Tools\TestCase
 	{
 		$shortcode = $this->createShortcode();
 
-		$this->collection->add_shortcode($shortcode);
-		$this->assertSame($shortcode, $this->collection->get_by_id($shortcode->id()));
+		$this->collection->addShortcode($shortcode);
+		$this->assertSame($shortcode, $this->collection->getById($shortcode->id()));
 	}
 
 	/**
@@ -102,9 +102,9 @@ class ShortcodeCollectionTest extends \WP_Mock\Tools\TestCase
 			}
 		]);
 
-		$this->collection->add_shortcode($shortcode);
+		$this->collection->addShortcode($shortcode);
 
-		$this->assertSame($shortcode, $this->collection->get_by_id($shortcode->id()));
+		$this->assertSame($shortcode, $this->collection->getById($shortcode->id()));
 
 		$content = call_user_func([$this->collection, (string) $shortcode->id()], ['test' => 123], 'xyz');
 		$this->assertEquals('xyz', $content);
@@ -127,9 +127,9 @@ class ShortcodeCollectionTest extends \WP_Mock\Tools\TestCase
 			Shortcode::MAP => [\DI\get(MockTypeHint::class)]
 		]);
 
-		$this->collection->add_shortcode($shortcode);
+		$this->collection->addShortcode($shortcode);
 
-		$this->assertSame($shortcode, $this->collection->get_by_id($shortcode->id()));
+		$this->assertSame($shortcode, $this->collection->getById($shortcode->id()));
 
 		$content = call_user_func([$this->collection, (string) $shortcode->id()], ['test' => 123], 'xyz');
 		$this->assertEquals('xyz', $content);

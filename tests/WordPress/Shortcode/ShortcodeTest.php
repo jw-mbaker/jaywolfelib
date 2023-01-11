@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Tests\Component\WordPress\Shortcode;
+namespace JayWolfeLib\Tests\WordPress\Shortcode;
 
-use JayWolfeLib\Component\WordPress\Shortcode\ShortcodeInterface;
-use JayWolfeLib\Component\WordPress\Shortcode\Shortcode;
-use JayWolfeLib\Component\WordPress\Shortcode\ShortcodeId;
+use JayWolfeLib\WordPress\Shortcode\ShortcodeInterface;
+use JayWolfeLib\WordPress\Shortcode\Shortcode;
+use JayWolfeLib\WordPress\Shortcode\ShortcodeId;
 use JayWolfeLib\Tests\Invoker\MockTypeHint;
 use JayWolfeLib\Tests\Traits\DevContainerTrait;
 use WP_Mock;

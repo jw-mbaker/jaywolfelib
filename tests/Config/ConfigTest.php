@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Tests\Component\Config;
+namespace JayWolfeLib\Tests\Config;
 
-use JayWolfeLib\Component\Config\ConfigInterface;
-use JayWolfeLib\Component\Config\Config;
-use JayWolfeLib\Component\Config\Dependencies;
+use JayWolfeLib\Config\ConfigInterface;
+use JayWolfeLib\Config\Config;
+use JayWolfeLib\Config\Dependencies;
 use WP_Mock;
 use Mockery;
 
@@ -61,21 +61,21 @@ class ConfigTest extends \WP_Mock\Tools\TestCase
 	}
 
 	/**
-	 * @covers \JayWolfeLib\Component\Config\Config::from_file
+	 * @covers \JayWolfeLib\Config\Config::fromFile
 	 * @group config
 	 */
 	public function testCreateConfigFromFile()
 	{
 		$dependencies = $this->createMockDependencies();
 
-		$config = Config::from_file(MOCK_CONFIG_FILE, $dependencies);
+		$config = Config::fromFile(MOCK_CONFIG_FILE, $dependencies);
 
 		$this->assertInstanceOf(ConfigInterface::class, $config);
 		$this->assertInstanceOf(Config::class, $config);
 	}
 
 	/**
-	 * @covers \JayWolfeLib\Component\Config\Config::from_File
+	 * @covers \JayWolfeLib\Config\Config::from_File
 	 * @group config
 	 */
 	public function testCreateConfigFromFileThrowsInvalidConfig()
@@ -87,7 +87,7 @@ class ConfigTest extends \WP_Mock\Tools\TestCase
 		$this->expectException(\JayWolfeLib\Exception\InvalidConfigException::class);
 		$this->expectExceptionMessage(sprintf('%s not found.', $file));
 
-		$config = Config::from_file($file, $dependencies);
+		$config = Config::fromFile($file, $dependencies);
 	}
 
 	private function createMockDependencies(): Dependencies

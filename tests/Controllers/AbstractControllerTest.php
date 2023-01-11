@@ -1,9 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JayWolfeLib\Tests\Controllers;
 
 use JayWolfeLib\Controllers\AbstractController;
-use JayWolfeLib\Component\Config\ConfigInterface;
+use JayWolfeLib\Config\ConfigInterface;
 use JayWolfeLib\Views\ViewInterface;
 use JayWolfeLib\Views\ViewFactory;
 use JayWolfeLib\Tests\Traits\DevContainerTrait;
@@ -38,10 +38,10 @@ class AbstractControllerTest extends \WP_Mock\Tools\TestCase
 		$this->container->set(ViewFactory::class, $factory);
 
 		$controller = $this->createController();
-		$controller->set_container($this->container);
-		$controller->set_config($config);
+		$controller->setContainer($this->container);
+		$controller->setConfig($config);
 
-		$this->assertEquals('foo', $controller->render_view('mock-template'));
+		$this->assertEquals('foo', $controller->renderView('mock-template'));
 	}
 
 	public function testRender()
@@ -54,8 +54,8 @@ class AbstractControllerTest extends \WP_Mock\Tools\TestCase
 		$this->container->set(ViewFactory::class, $factory);
 
 		$controller = $this->createController();
-		$controller->set_container($this->container);
-		$controller->set_config($config);
+		$controller->setContainer($this->container);
+		$controller->setConfig($config);
 
 		$this->assertEquals('foo', $controller->render('mock-template')->getContent());
 	}
@@ -63,7 +63,7 @@ class AbstractControllerTest extends \WP_Mock\Tools\TestCase
 	public function testJson()
 	{
 		$controller = $this->createController();
-		$controller->set_container($this->container);
+		$controller->setContainer($this->container);
 
 		$response = $controller->json([]);
 
@@ -74,7 +74,7 @@ class AbstractControllerTest extends \WP_Mock\Tools\TestCase
 	public function testFile()
 	{
 		$controller = $this->createController();
-		$controller->set_container($this->container);
+		$controller->setContainer($this->container);
 
 		$response = $controller->file(new File(__FILE__));
 		$this->assertInstanceOf(BinaryFileResponse::class, $response);

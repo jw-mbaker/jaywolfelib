@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Tests\Component\WordPress\Widget;
+namespace JayWolfeLib\Tests\WordPress\Widget;
 
-use JayWolfeLib\Component\WordPress\Widget\WidgetCollection;
-use JayWolfeLib\Component\WordPress\Widget\WidgetInterface;
-use JayWolfeLib\Component\WordPress\Widget\Widget;
-use JayWolfeLib\Component\WordPress\Widget\WidgetId;
+use JayWolfeLib\WordPress\Widget\WidgetCollection;
+use JayWolfeLib\WordPress\Widget\WidgetInterface;
+use JayWolfeLib\WordPress\Widget\Widget;
+use JayWolfeLib\WordPress\Widget\WidgetId;
 use WP_Widget;
 use WP_Mock;
 use Mockery;
@@ -39,9 +39,9 @@ class WidgetCollectionTest extends \WP_Mock\Tools\TestCase
 
 		$this->mockRegisterWidget();
 
-		$this->collection->register_widget($widget);
+		$this->collection->registerWidget($widget);
 		$this->assertContains($widget, $this->collection->all());
-		$this->assertSame($widget, $this->collection->get_by_id($widget->id()));
+		$this->assertSame($widget, $this->collection->getById($widget->id()));
 	}
 
 	/**
@@ -56,12 +56,12 @@ class WidgetCollectionTest extends \WP_Mock\Tools\TestCase
 
 		$this->mockRegisterWidget();
 
-		$this->collection->register_widget($widget);
+		$this->collection->registerWidget($widget);
 		$this->assertContains($widget, $this->collection->all());
 
 		$this->mockUnregisterWidget();
 
-		$bool = $this->collection->unregister_widget($this->wp_widget);
+		$bool = $this->collection->unregisterWidget($this->wp_widget);
 		$this->assertTrue($bool);
 		$this->assertNotContains($widget, $this->collection->all());
 	}
@@ -77,7 +77,7 @@ class WidgetCollectionTest extends \WP_Mock\Tools\TestCase
 
 		$this->mockRegisterWidget();
 
-		$this->collection->register_widget($widget);
+		$this->collection->registerWidget($widget);
 		$this->assertContains($widget, $this->collection->all());
 
 		$obj = $this->collection->get($this->wp_widget);

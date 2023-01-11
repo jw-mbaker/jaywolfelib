@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JayWolfeLib\Tests;
 
-use JayWolfeLib\Component\Config\ConfigInterface;
+use JayWolfeLib\Config\ConfigInterface;
 use JayWolfeLib\Tests\Traits\MockConfigTrait;
 use WP_Mock;
 use Mockery;
@@ -136,7 +136,7 @@ class FunctionsTest extends \WP_Mock\Tools\TestCase
 	 * @group config
 	 * @group install
 	 */
-	public function testInstallThrowsInvalidConfigOnNonFile()
+	public function testInstallThrowsInvalidConfigExceptionOnNonFile()
 	{
 		$file = 'xyz.file';
 		$this->expectException(\JayWolfeLib\Exception\InvalidConfigException::class);
@@ -151,7 +151,7 @@ class FunctionsTest extends \WP_Mock\Tools\TestCase
 	 * @group config
 	 * @group install
 	 */
-	public function testInstallThrowsInvalidConfigOnNoDB()
+	public function testInstallThrowsInvalidConfigExceptionOnNoDB()
 	{
 		$file = trailingslashit( ABSPATH ) . 'mock-config-no-db.php';
 
@@ -397,6 +397,18 @@ class FunctionsTest extends \WP_Mock\Tools\TestCase
 
 		$this->assertArrayHasKey('test', $arr);
 		$this->assertArrayHasKey('test2', $arr);
+	}
+
+	private function fragmentCacheSetup()
+	{
+		WP_Mock::onFilter('fragment_cache_prefix')
+			->with('fragment_cache_')
+			->reply('fragment_cache_');
+
+		WP_Mock::userFunction('get_transient', [
+			'args' => 'fragment_cache_test',
+			'return' => 'test123'
+		]);
 	}
 
 	private function fetchArrayDir(): string

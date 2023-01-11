@@ -1,13 +1,13 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Tests\Component\WordPress\Filter;
+namespace JayWolfeLib\Tests\WordPress\Filter;
 
-use JayWolfeLib\Component\WordPress\Filter\FilterCollection;
-use JayWolfeLib\Component\WordPress\Filter\HookInterface;
-use JayWolfeLib\Component\WordPress\Filter\Filter;
-use JayWolfeLib\Component\WordPress\Filter\Action;
-use JayWolfeLib\Component\WordPress\Filter\Api;
-use JayWolfeLib\Component\WordPress\Filter\HookId;
+use JayWolfeLib\WordPress\Filter\FilterCollection;
+use JayWolfeLib\WordPress\Filter\HookInterface;
+use JayWolfeLib\WordPress\Filter\Filter;
+use JayWolfeLib\WordPress\Filter\Action;
+use JayWolfeLib\WordPress\Filter\Api;
+use JayWolfeLib\WordPress\Filter\HookId;
 use JayWolfeLib\Tests\Invoker\MockTypeHint;
 use JayWolfeLib\Tests\Traits\DevContainerTrait;
 use Symfony\Component\HttpFoundation\Request;
@@ -54,7 +54,7 @@ class FilterCollectionTest extends \WP_Mock\Tools\TestCase
 			Filter::CALLABLE => $callable
 		]);
 		
-		$this->collection->add_filter($filter);
+		$this->collection->addFilter($filter);
 		$this->assertContains($filter, $this->collection->all());
 		$this->assertSame($filter, $this->collection->get('test', $callable)[(string) $filter->id()]);
 	}
@@ -74,10 +74,10 @@ class FilterCollectionTest extends \WP_Mock\Tools\TestCase
 			Filter::CALLABLE => $callable
 		]);
 
-		$this->collection->add_filter($filter);
+		$this->collection->addFilter($filter);
 		$this->assertContains($filter, $this->collection->all());
 
-		$bool = $this->collection->remove_filter('test', $callable);
+		$bool = $this->collection->removeFilter('test', $callable);
 		$this->assertTrue($bool);
 
 		$this->assertNotContains($filter, $this->collection->all());
@@ -91,7 +91,7 @@ class FilterCollectionTest extends \WP_Mock\Tools\TestCase
 	 */
 	public function testRemoveFilterReturnsFalseOnInvalidKey()
 	{
-		$bool = $this->collection->remove_filter('test', function() {});
+		$bool = $this->collection->removeFilter('test', function() {});
 		$this->assertFalse($bool);
 	}
 
@@ -109,7 +109,7 @@ class FilterCollectionTest extends \WP_Mock\Tools\TestCase
 			Filter::CALLABLE => $callable
 		]);
 		
-		$this->collection->add_filter($filter);
+		$this->collection->addFilter($filter);
 		$this->assertContains($filter, $this->collection->all());
 
 		$objs = $this->collection->get('test', $callable);
@@ -144,9 +144,9 @@ class FilterCollectionTest extends \WP_Mock\Tools\TestCase
 		]);
 
 		WP_Mock::expectFilterAdded('test', [$this->collection, (string) $filter->id()]);
-		$this->collection->add_filter($filter);
+		$this->collection->addFilter($filter);
 
-		$this->assertSame($filter, $this->collection->get_by_id($filter->id()));
+		$this->assertSame($filter, $this->collection->getById($filter->id()));
 
 		WP_Mock::onFilter('test')
 			->with('test')
@@ -174,7 +174,7 @@ class FilterCollectionTest extends \WP_Mock\Tools\TestCase
 		]);
 
 		WP_Mock::expectFilterAdded('test', [$this->collection, (string) $action->id()]);
-		$this->collection->add_action($action);
+		$this->collection->addAction($action);
 
 		WP_Mock::onAction('test')
 			->with(null)
@@ -206,7 +206,7 @@ class FilterCollectionTest extends \WP_Mock\Tools\TestCase
 		$this->request->expects()->get('key')->twice()->andReturn(null);
 
 		WP_Mock::expectFilterAdded('test', [$this->collection, (string) $api->id()]);
-		$this->collection->add_action($api);
+		$this->collection->addAction($api);
 
 		WP_Mock::onAction('test')
 			->with(null)
@@ -234,9 +234,9 @@ class FilterCollectionTest extends \WP_Mock\Tools\TestCase
 			Filter::MAP => [\DI\get(MockTypeHint::class)]
 		]);
 
-		$this->collection->add_filter($filter);
+		$this->collection->addFilter($filter);
 
-		$this->assertSame($filter, $this->collection->get_by_id($filter->id()));
+		$this->assertSame($filter, $this->collection->getById($filter->id()));
 
 		WP_Mock::onFilter('test')
 			->with('test')
@@ -263,9 +263,9 @@ class FilterCollectionTest extends \WP_Mock\Tools\TestCase
 			}
 		]);
 
-		$this->collection->add_action($action);
+		$this->collection->addAction($action);
 
-		$this->assertSame($action, $this->collection->get_by_id($action->id()));
+		$this->assertSame($action, $this->collection->getById($action->id()));
 
 		WP_Mock::onAction('test')
 			->with(null)
@@ -296,9 +296,9 @@ class FilterCollectionTest extends \WP_Mock\Tools\TestCase
 		$this->request->expects()->getMethod()->twice()->andReturn('GET');
 		$this->request->expects()->get('key')->twice()->andReturn(null);
 
-		$this->collection->add_action($api);
+		$this->collection->addAction($api);
 
-		$this->assertSame($api, $this->collection->get_by_id($api->id()));
+		$this->assertSame($api, $this->collection->getById($api->id()));
 
 		WP_Mock::onAction('test')
 			->with(null)
@@ -327,9 +327,9 @@ class FilterCollectionTest extends \WP_Mock\Tools\TestCase
 			Action::NUM_ARGS => 2
 		]);
 
-		$this->collection->add_action($action);
+		$this->collection->addAction($action);
 
-		$this->assertSame($action, $this->collection->get_by_id($action->id()));
+		$this->assertSame($action, $this->collection->getById($action->id()));
 
 		WP_Mock::onAction('test')
 			->with(true, 123)
@@ -360,9 +360,9 @@ class FilterCollectionTest extends \WP_Mock\Tools\TestCase
 			}
 		]);
 
-		$this->collection->add_action($action);
+		$this->collection->addAction($action);
 
-		$this->assertSame($action, $this->collection->get_by_id($action->id()));
+		$this->assertSame($action, $this->collection->getById($action->id()));
 
 		$response->expects()->send();
 
@@ -397,9 +397,9 @@ class FilterCollectionTest extends \WP_Mock\Tools\TestCase
 		$this->request->expects()->getMethod()->twice()->andReturn('GET');
 		$this->request->expects()->get('key')->twice()->andReturn(null);
 
-		$this->collection->add_action($api);
+		$this->collection->addAction($api);
 
-		$this->assertSame($api, $this->collection->get_by_id($api->id()));
+		$this->assertSame($api, $this->collection->getById($api->id()));
 
 		$response->expects()->send();
 
@@ -433,9 +433,9 @@ class FilterCollectionTest extends \WP_Mock\Tools\TestCase
 		$this->request->expects()->getMethod()->andReturn('GET');
 		$this->request->expects()->get('key')->twice()->andReturn('bad_key');
 
-		$this->collection->add_action($api);
+		$this->collection->addAction($api);
 
-		$this->assertSame($api, $this->collection->get_by_id($api->id()));
+		$this->assertSame($api, $this->collection->getById($api->id()));
 
 		WP_Mock::onAction('test')
 			->with(null)
@@ -470,9 +470,9 @@ class FilterCollectionTest extends \WP_Mock\Tools\TestCase
 		$this->request->expects()->getMethod()->twice()->andReturn('POST');
 		$this->request->expects()->get('key')->twice()->andReturn(null);
 
-		$this->collection->add_action($api);
+		$this->collection->addAction($api);
 
-		$this->assertSame($api, $this->collection->get_by_id($api->id()));
+		$this->assertSame($api, $this->collection->getById($api->id()));
 
 		WP_Mock::onAction('test')
 			->with(null)

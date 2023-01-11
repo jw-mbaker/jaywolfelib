@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Tests\Component\WordPress\Filter;
+namespace JayWolfeLib\Tests\WordPress\Filter;
 
-use JayWolfeLib\Component\WordPress\Filter\Action;
+use JayWolfeLib\WordPress\Filter\Action;
 use JayWolfeLib\Tests\Invoker\MockTypeHint;
 use JayWolfeLib\Tests\Traits\DevContainerTrait;
 use Invoker\InvokerInterface;

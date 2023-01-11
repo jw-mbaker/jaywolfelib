@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace JayWolfeLib\Tests\Component\Config;
+namespace JayWolfeLib\Tests\Config;
 
-use JayWolfeLib\Component\Config\Dependencies;
+use JayWolfeLib\Config\Dependencies;
 use WP_Mock;
 
 class DependenciesTest extends \WP_Mock\Tools\TestCase
@@ -21,7 +21,7 @@ class DependenciesTest extends \WP_Mock\Tools\TestCase
 	}
 
 	/**
-	 * @covers \JayWolfeLib\Component\Config\Dependencies::all
+	 * @covers \JayWolfeLib\Config\Dependencies::all
 	 * @group dependencies
 	 * @group config
 	 */
@@ -34,7 +34,7 @@ class DependenciesTest extends \WP_Mock\Tools\TestCase
 	}
 
 	/**
-	 * @covers \JayWolfeLib\Component\Config\Dependencies::set
+	 * @covers \JayWolfeLib\Config\Dependencies::set
 	 * @group dependencies
 	 * @group config
 	 */
@@ -48,7 +48,7 @@ class DependenciesTest extends \WP_Mock\Tools\TestCase
 	}
 
 	/**
-	 * @covers \JayWolfeLib\Component\Config\Dependencies::get
+	 * @covers \JayWolfeLib\Config\Dependencies::get
 	 * @group dependencies
 	 * @group config
 	 */
@@ -62,7 +62,7 @@ class DependenciesTest extends \WP_Mock\Tools\TestCase
 	}
 
 	/**
-	 * @covers \JayWolfeLib\Component\Config\Dependencies::has
+	 * @covers \JayWolfeLib\Config\Dependencies::has
 	 * @group dependencies
 	 * @group config
 	 */
@@ -80,7 +80,7 @@ class DependenciesTest extends \WP_Mock\Tools\TestCase
 	}
 
 	/**
-	 * @covers \JayWolfeLib\Component\Config\Dependencies::remove
+	 * @covers \JayWolfeLib\Config\Dependencies::remove
 	 * @group dependencies
 	 * @group config
 	 */
@@ -95,7 +95,7 @@ class DependenciesTest extends \WP_Mock\Tools\TestCase
 	}
 
 	/**
-	 * @covers \JayWolfeLib\Component\Config\Dependencies::remove
+	 * @covers \JayWolfeLib\Config\Dependencies::remove
 	 * @group dependencies
 	 * @group config
 	 */
@@ -120,7 +120,7 @@ class DependenciesTest extends \WP_Mock\Tools\TestCase
 			'min_php_version' => '7.4'
 		]);
 
-		$this->assertTrue($dependencies->requirements_met());
+		$this->assertTrue($dependencies->requirementsMet());
 	}
 
 	/**
@@ -134,12 +134,12 @@ class DependenciesTest extends \WP_Mock\Tools\TestCase
 			'min_php_version' => '999'
 		]);
 
-		$this->assertFalse($dependencies->requirements_met());
+		$this->assertFalse($dependencies->requirementsMet());
 
-		$errors = $dependencies->get_errors();
+		$errors = $dependencies->getErrors();
 		$this->assertEquals(
 			"PHP 999 is required.",
-			$errors[0]->error_message
+			$errors[0]->errorMessage
 		);
 
 		$this->assertEquals(
@@ -159,7 +159,7 @@ class DependenciesTest extends \WP_Mock\Tools\TestCase
 			'min_wp_version' => '5.4'
 		]);
 
-		$this->assertTrue($dependencies->requirements_met());
+		$this->assertTrue($dependencies->requirementsMet());
 	}
 
 	/**
@@ -175,12 +175,12 @@ class DependenciesTest extends \WP_Mock\Tools\TestCase
 			'min_wp_version' => '999'
 		]);
 
-		$this->assertFalse($dependencies->requirements_met());
+		$this->assertFalse($dependencies->requirementsMet());
 
-		$errors = $dependencies->get_errors();
+		$errors = $dependencies->getErrors();
 		$this->assertEquals(
 			"WordPress 999 is required.",
-			$errors[0]->error_message
+			$errors[0]->errorMessage
 		);
 
 		$this->assertEquals(
@@ -209,7 +209,7 @@ class DependenciesTest extends \WP_Mock\Tools\TestCase
 			'return' => true
 		]);
 
-		$this->assertTrue($dependencies->requirements_met());
+		$this->assertTrue($dependencies->requirementsMet());
 	}
 
 	/**
@@ -232,13 +232,13 @@ class DependenciesTest extends \WP_Mock\Tools\TestCase
 			'return' => false
 		]);
 
-		$this->assertFalse($dependencies->requirements_met());
+		$this->assertFalse($dependencies->requirementsMet());
 
-		$errors = $dependencies->get_errors();
+		$errors = $dependencies->getErrors();
 
 		$this->assertEquals(
 			'mock/plugin.php is a required plugin.',
-			$errors[0]->error_message
+			$errors[0]->errorMessage
 		);
 
 		$this->assertEquals(

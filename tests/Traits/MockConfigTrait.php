@@ -2,7 +2,7 @@
 
 namespace JayWolfeLib\Tests\Traits;
 
-use JayWolfeLib\Component\Config\ConfigInterface;
+use JayWolfeLib\Config\ConfigInterface;
 use Mockery;
 
 trait MockConfigTrait

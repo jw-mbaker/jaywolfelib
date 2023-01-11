@@ -4,7 +4,7 @@ namespace JayWolfeLib\Tests\Invoker;
 
 use JayWolfeLib\Invoker\HandlerInterface;
 use JayWolfeLib\Invoker\CallableTrait;
-use JayWolfeLib\ObjectHash\AbstractObjectHash;
+use JayWolfeLib\Common\ObjectHash\AbstractObjectHash;
 use Invoker\InvokerInterface;
 
 class MockHandler implements HandlerInterface

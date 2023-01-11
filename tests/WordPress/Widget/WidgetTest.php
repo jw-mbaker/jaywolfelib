@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace JayWolfeLib\Tests\Component\WordPress\Widget;
+namespace JayWolfeLib\Tests\WordPress\Widget;
 
-use JayWolfeLib\Component\WordPress\Widget\Widget;
-use JayWolfeLib\Component\WordPress\Widget\WidgetId;
+use JayWolfeLib\WordPress\Widget\Widget;
+use JayWolfeLib\WordPress\Widget\WidgetId;
 use WP_Widget;
 use WP_Mock;
 use Mockery;
@@ -32,8 +32,8 @@ class WidgetTest extends \WP_Mock\Tools\TestCase
 	public function testCanGetWpWidget()
 	{
 		$widget = new Widget($this->wp_widget);
-		$this->assertInstanceOf(WP_Widget::class, $widget->wp_widget());
-		$this->assertSame($this->wp_widget, $widget->wp_widget());
+		$this->assertInstanceOf(WP_Widget::class, $widget->wpWidget());
+		$this->assertSame($this->wp_widget, $widget->wpWidget());
 	}
 
 	/**
@@ -43,7 +43,7 @@ class WidgetTest extends \WP_Mock\Tools\TestCase
 	public function testCanPassWpWidgetAsString()
 	{
 		$widget = new Widget(WP_Widget::class);
-		$this->assertEquals(WP_Widget::class, $widget->wp_widget());
+		$this->assertEquals(WP_Widget::class, $widget->wpWidget());
 	}
 
 	/**
@@ -64,7 +64,7 @@ class WidgetTest extends \WP_Mock\Tools\TestCase
 	public function testShouldThrowInvalidArgumentExceptionOnInvalidWpWidget()
 	{
 		$this->expectException(InvalidArgumentException::class);
-		$this->expectExceptionMessage('$wp_widget must be a string or an instance of WP_Widget.');
+		$this->expectExceptionMessage('$wpWidget must be a string or an instance of WP_Widget.');
 
 		$widget = new Widget(false);
 	}

@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace JayWolfeLib\Tests\Component\Config;
+namespace JayWolfeLib\Tests\Config;
 
-use JayWolfeLib\Component\Config\ConfigCollection;
-use JayWolfeLib\Component\Config\ConfigInterface;
-use JayWolfeLib\Component\Config\Config;
+use JayWolfeLib\Config\ConfigCollection;
+use JayWolfeLib\Config\ConfigInterface;
+use JayWolfeLib\Config\Config;
 use JayWolfeLib\Tests\Traits\MockConfigTrait;
 use WP_Mock;
 use Mockery;
@@ -13,7 +13,7 @@ class ConfigCollectionTest extends \WP_Mock\Tools\TestCase
 {
 	use MockConfigTrait;
 
-	private $collection;
+	private ConfigCollection $collection;
 
 	public function setUp(): void
 	{
@@ -28,7 +28,7 @@ class ConfigCollectionTest extends \WP_Mock\Tools\TestCase
 	}
 
 	/**
-	 * @covers \JayWolfeLib\Component\Config\ConfigCollection::add
+	 * @covers \JayWolfeLib\Config\ConfigCollection::add
 	 * @group config
 	 * @group config_collection
 	 * @group collection
@@ -42,7 +42,7 @@ class ConfigCollectionTest extends \WP_Mock\Tools\TestCase
 	}
 
 	/**
-	 * @covers \JayWolfeLib\Component\Config\ConfigCollection::all
+	 * @covers \JayWolfeLib\Config\ConfigCollection::all
 	 * @dataProvider configProvider
 	 * @group config
 	 * @group config_collection
@@ -64,7 +64,7 @@ class ConfigCollectionTest extends \WP_Mock\Tools\TestCase
 	}
 
 	/**
-	 * @covers \JayWolfeLib\Component\Config\ConfigCollection::get
+	 * @covers \JayWolfeLib\Config\ConfigCollection::get
 	 * @dataProvider configProvider
 	 * @group config
 	 * @group config_collection
@@ -82,7 +82,7 @@ class ConfigCollectionTest extends \WP_Mock\Tools\TestCase
 	}
 
 	/**
-	 * @covers \JayWolfeLib\Component\Config\ConfigCollection::remove
+	 * @covers \JayWolfeLib\Config\ConfigCollection::remove
 	 * @group config
 	 * @group config_collection
 	 * @group collection
@@ -103,7 +103,7 @@ class ConfigCollectionTest extends \WP_Mock\Tools\TestCase
 	}
 
 	/**
-	 * @covers \JayWolfeLib\Component\Config\ConfigCollection::remove
+	 * @covers \JayWolfeLib\Config\ConfigCollection::remove
 	 * @dataProvider configProvider
 	 * @group config
 	 * @group config_collection

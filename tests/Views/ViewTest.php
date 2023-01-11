@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JayWolfeLib\Tests\Views;
 
 use JayWolfeLib\Views\View;
-use JayWolfeLib\Component\Config\ConfigInterface;
-use JayWolfeLib\Component\Config\Config;
+use JayWolfeLib\Config\ConfigInterface;
+use JayWolfeLib\Config\Config;
 use JayWolfeLib\Exception\InvalidTemplateException;
 use WP_Mock;
 use Mockery;
@@ -57,7 +57,7 @@ class ViewTest extends \WP_Mock\Tools\TestCase
 
 		$this->expectException(\InvalidArgumentException::class);
 		$this->expectExceptionMessage(
-			sprintf('$template_path must be specified if %s is not provided.', ConfigInterface::class)
+			sprintf('$templatePath must be specified if %s is not provided.', ConfigInterface::class)
 		);
 
 		$view->render('mock-template');
@@ -108,6 +108,6 @@ class ViewTest extends \WP_Mock\Tools\TestCase
 
 	private function createConfig(): ConfigInterface
 	{
-		return Config::from_file(MOCK_CONFIG_FILE);
+		return Config::fromFile(MOCK_CONFIG_FILE);
 	}
 }
