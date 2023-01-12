@@ -430,9 +430,12 @@ class JayWolfeLibTest extends \WP_Mock\Tools\TestCase
 		$this->assertTrue($bool);
 	}
 
-	public function testShouldAddJwLibConfigAction()
+	/**
+	 * @test
+	 */
+	public function shouldAddJwLibContainerDefinitionsActionIfConfigFileIsProvided()
 	{
-		WP_Mock::expectActionAdded('jwlib_config', '__CLOSURE__');
+		WP_Mock::expectActionAdded('jwlib_container_definitions', '__CLOSURE__');
 
 		WP_Mock::userFunction('did_action', [
 			'args' => 'init',

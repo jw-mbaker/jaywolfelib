@@ -42,9 +42,13 @@ final class JayWolfeLib implements ContainerAwareInterface
 	{
 		try {
 			if (null !== $configFile) {
-				add_action('jwlib_config', function(ConfigCollection $configCollection) use ($configFile) {
-					$config = Config::fromFile($configFile);
-					$configCollection->add( plugin_basename( $config->get('plugin_file') ), $config );
+				add_action('jwlib_container_definitions', function(ContainerBuilder $builder) use ($configFile) {
+					$builder->addDefinitions([
+						ConfigCollection::class => \DI\decorate(function($previous, ContainerInterface $c) use ($configFile) {
+							$config = Config::fromFile($configFile);
+							$previous->add( plugin_basename( $config->get('plugin_file') ), $config );
+						})
+					]);
 				});
 			}
 
