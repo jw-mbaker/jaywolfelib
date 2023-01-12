@@ -77,15 +77,18 @@ final class JayWolfeLib implements ContainerAwareInterface
 		return true;
 	}
 
-	public static function addConfig(string $configFile)
+	/**
+	 * Extend the ConfigCollection definition.
+	 */
+	public static function addConfig(string $configFile): void
 	{
 		add_action('jwlib_container_definitions', function(ContainerBuilder $builder) use ($configFile) {
 			$builder->addDefinitions([
-				ConfigCollection::class => \DI\decorate(function($previous, ContainerInterface $c) use ($configFile) {
+				ConfigCollection::class => \DI\decorate(function(ConfigCollection $collection, ContainerInterface $c) use ($configFile): ConfigCollection {
 					$config = Config::fromFile($configFile);
-					$previous->add( plugin_basename( $config->get('plugin_file') ), $config );
+					$collection->add( plugin_basename( $config->get('plugin_file') ), $config );
 
-					return $previous;
+					return $collection;
 				})
 			]);
 		});

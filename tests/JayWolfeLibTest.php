@@ -52,6 +52,7 @@ class JayWolfeLibTest extends \WP_Mock\Tools\TestCase
 	public function tearDown(): void
 	{
 		WP_Mock::tearDown();
+		Mockery::close();
 	}
 
 	public function testEnableCompilation()
@@ -446,6 +447,51 @@ class JayWolfeLibTest extends \WP_Mock\Tools\TestCase
 		$bool = JayWolfeLib::load(MOCK_CONFIG_FILE, $this->containerBuilder);
 		
 		$this->assertTrue($bool);
+	}
+
+	/**
+	 * @covers \JayWolfeLib\JayWolfeLib::addConfig
+	 * @test
+	 */
+	public function decorateConfigCollectionDefinition()
+	{
+		$configs = [
+			Mockery::mock(ConfigInterface::class),
+			Mockery::mock(ConfigInterface::class),
+			Mockery::mock(ConfigInterface::class)
+		];
+
+		$this->containerBuilder->addDefinitions([
+			ConfigCollection::class => \DI\create()
+		]);
+
+		$this->containerBuilder->addDefinitions([
+			ConfigCollection::class => \DI\decorate(function(ConfigCollection $collection) use ($configs) {
+				$collection->add('test1', $configs[0]);
+				return $collection;
+			})
+		]);
+
+		$this->containerBuilder->addDefinitions([
+			ConfigCollection::class => \DI\decorate(function(ConfigCollection $collection) use ($configs) {
+				$collection->add('test2', $configs[1]);
+				return $collection;
+			})
+		]);
+
+		$this->containerBuilder->addDefinitions([
+			ConfigCollection::class => \DI\decorate(function(ConfigCollection $collection) use ($configs) {
+				$collection->add('test3', $configs[2]);
+				return $collection;
+			})
+		]);
+
+		$container = $this->containerBuilder->build();
+		$collection = $container->get(ConfigCollection::class);
+
+		$this->assertSame($configs[0], $collection->get('test1'));
+		$this->assertSame($configs[1], $collection->get('test2'));
+		$this->assertSame($configs[2], $collection->get('test3'));
 	}
 
 	public function testShouldThrowExceptionIfDidInitAction()
