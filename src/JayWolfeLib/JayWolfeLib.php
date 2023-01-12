@@ -133,7 +133,8 @@ final class JayWolfeLib implements ContainerAwareInterface
 			\WPDB::class => function() {
 				global $wpdb;
 				return $wpdb;
-			}
+			},
+			ConfigCollection::class => \DI\create()
 		]);
 
 		do_action('jwlib_container_definitions', $this->containerBuilder);
