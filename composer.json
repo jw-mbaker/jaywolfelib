@@ -11,7 +11,7 @@
         "symfony/http-foundation": "^5.4",
         "php-di/php-di": "^6.4.0",
         "doctrine/annotations": "^1.14",
-        "jw-mbaker/jaywolfelib-common": "^1.0"
+        "jw-mbaker/jaywolfelib-common": "^1.1"
     },
     "autoload": {
         "psr-4": {
