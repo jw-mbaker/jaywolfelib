@@ -42,14 +42,7 @@ final class JayWolfeLib implements ContainerAwareInterface
 	{
 		try {
 			if (null !== $configFile) {
-				add_action('jwlib_container_definitions', function(ContainerBuilder $builder) use ($configFile) {
-					$builder->addDefinitions([
-						ConfigCollection::class => \DI\decorate(function($previous, ContainerInterface $c) use ($configFile) {
-							$config = Config::fromFile($configFile);
-							$previous->add( plugin_basename( $config->get('plugin_file') ), $config );
-						})
-					]);
-				});
+				self::addConfig($configFile);
 			}
 
 			if (did_action('init')) {
@@ -82,6 +75,18 @@ final class JayWolfeLib implements ContainerAwareInterface
 		}
 
 		return true;
+	}
+
+	public static function addConfig(string $configFile)
+	{
+		add_action('jwlib_container_definitions', function(ContainerBuilder $builder) use ($configFile) {
+			$builder->addDefinitions([
+				ConfigCollection::class => \DI\decorate(function($previous, ContainerInterface $c) use ($configFile) {
+					$config = Config::fromFile($configFile);
+					$previous->add( plugin_basename( $config->get('plugin_file') ), $config );
+				})
+			]);
+		});
 	}
 
 	public function init()
